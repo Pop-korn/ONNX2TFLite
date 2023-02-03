@@ -4,7 +4,7 @@ import tflite.SubGraph as sg
 import tflite.Tensor as t
 import tflite.TensorType as tt
 
-import generator.Quantization as Quantization
+import generator.model.Quantization as Quantization
 
 class Shape:
     shape: list[int]

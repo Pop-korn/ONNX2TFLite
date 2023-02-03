@@ -3,10 +3,10 @@ import tflite.Model as Model
 import tflite.BuiltinOperator as BuiltinOperator
 import tflite.TensorType as TensorType
 
-import generator.OperatorCode as OperatorCode
-import generator.SubGraph as SubGraph
-import generator.Tensor as Tensor
-import generator.Quantization as Quant
+import generator.model.OperatorCode as OperatorCode
+import generator.model.SubGraph as SubGraph
+import generator.model.Tensor as Tensor
+import generator.model.Quantization as Quant
 
 def gen_Model(builder: fb.Builder):
     desc = builder.CreateString("Model Description")

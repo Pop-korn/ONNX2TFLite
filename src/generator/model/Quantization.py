@@ -2,61 +2,24 @@ import flatbuffers as fb
 
 import tflite.QuantizationParameters as qp
 
-class Min:
-    min: list[float]
+import generator.meta.meta as meta
 
+class Min (meta.FloatVector):
     def __init__(self, min: list[float]) -> None:
-        self.min = min
+        super().__init__(min, qp.StartMinVector)
 
-    def genTFLite(self, builder: fb.Builder):
-        qp.StartMinVector(builder, len(self.min))
-
-        for val in self.min:
-            builder.PrependFloat32(val)
-
-        return builder.EndVector()
-
-class Max:
-    max: list[float]
-
+class Max (meta.FloatVector):
     def __init__(self, max: list[float]) -> None:
-        self.max = max
+        super().__init__(max,qp.StartMaxVector)
 
-    def genTFLite(self, builder: fb.Builder):
-        qp.StartMaxVector(builder, len(self.max))
-
-        for val in self.max:
-            builder.PrependFloat32(val)
-
-        return builder.EndVector()
-
-class Scale:
-    scale: list[float]
-
+class Scale(meta.FloatVector):
     def __init__(self, scale: list[float]) -> None:
-        self.scale = scale
+        super().__init__(scale,qp.StartScaleVector)
 
-    def genTFLite(self, builder: fb.Builder):
-        qp.StartScaleVector(builder, len(self.scale))
-
-        for val in self.scale:
-            builder.PrependFloat32(val)
-
-        return builder.EndVector()
-
-class ZeroPoint:
-    zeroPoint: list[int]
-
+class ZeroPoint(meta.IntVector):
     def __init__(self, zeroPoint: list[int]) -> None:
-        self.zeroPoint = zeroPoint
-
-    def genTFLite(self, builder: fb.Builder):
-        qp.StartZeroPointVector(builder, len(self.zeroPoint))
-
-        for val in self.zeroPoint:
-            builder.PrependInt64(val)
-
-        return builder.EndVector()
+        super().__init__(zeroPoint,qp.StartZeroPointVector,
+                            lambda builder : builder.PrependInt64)
 
 class Quantisation:
     min: Min
