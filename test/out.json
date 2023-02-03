@@ -10,11 +10,14 @@
   "subgraphs": [
     {
       "inputs": [
-        6789,
-        42,
         0
+      ],
+      "outputs": [
+        5,
+        3,
+        2
       ]
     }
   ],
-  "description": "Popis modelu"
+  "description": "Model Description"
 }

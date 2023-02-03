@@ -6,7 +6,7 @@ import generator.OperatorCode as OperatorCode
 import generator.SubGraph as SubGraph
 
 def gen_Model(builder: fb.Builder):
-    desc = builder.CreateString("Popis modelu")
+    desc = builder.CreateString("Model Description")
 
     # Operator Codes
     operatorCodes = [OperatorCode.OperatorCode(BuiltinOperator.BuiltinOperator.CONV_2D)]
@@ -14,7 +14,8 @@ def gen_Model(builder: fb.Builder):
 
     # SubGraphs
     inputs = SubGraph.Inputs([0])
-    subGraphs = [SubGraph.SubGraph(inputs)]
+    outputs = SubGraph.Outputs([2,3,5])
+    subGraphs = [SubGraph.SubGraph(inputs, outputs)]
     subGraphsTFLite = SubGraph.genSubGraphs(builder,subGraphs)
 
     # Create Model

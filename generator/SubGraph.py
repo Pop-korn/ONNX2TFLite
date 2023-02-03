@@ -4,6 +4,8 @@ import tflite.Model as Model
 
 
 class Inputs:
+    inputs: list[int] = None
+
     def __init__(self, inputs: list[int]):
         self.inputs = inputs
 
@@ -15,16 +17,36 @@ class Inputs:
 
         return builder.EndVector()
 
+class Outputs:
+    outputs: list[int] = None
+
+    def __init__(self, outputs: list[int]):
+        self.outputs = outputs
+
+    def genTFLite(self, builder: fb.Builder):
+        sg.StartOutputsVector(builder, len(self.outputs))
+        
+        for output in self.outputs:
+            builder.PrependInt32(output)
+
+        return builder.EndVector() 
+
 class SubGraph:
-    def __init__(self, inputs: Inputs):
+    inputs: Inputs = None
+    outputs: Outputs = None
+
+    def __init__(self, inputs: Inputs, outputs: Outputs):
         self.inputs = inputs
+        self.outputs = outputs
 
     def genTFLite(self, builder: fb.Builder):
         inputsTFLite = self.inputs.genTFLite(builder)
+        outputsTFLite = self.outputs.genTFLite(builder)
 
         sg.Start(builder)
 
         sg.AddInputs(builder,inputsTFLite)
+        sg.AddOutputs(builder, outputsTFLite)
 
         return sg.End(builder)
 
