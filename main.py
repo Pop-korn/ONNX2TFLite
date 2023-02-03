@@ -1,48 +1,33 @@
 import flatbuffers as fb
 import tflite.Model as Model
-import tflite.SubGraph as SubGraph
+import tflite.BuiltinOperator as BuiltinOperator
 
 import generator.OperatorCode as OperatorCode
-
-def gen_Subgraph(builder: fb.Builder):
-
-    SubGraph.Start(builder)
-
-    return SubGraph.End(builder)
-
-
-def gen_Subgraphs(builder: fb.Builder):
-    subgraphs = []
-
-    subgraphs.append(gen_Subgraph(builder))
-
-    return subgraphs
+import generator.SubGraph as SubGraph
 
 def gen_Model(builder: fb.Builder):
     desc = builder.CreateString("Popis modelu")
 
     # Operator Codes
-    opCodes = OperatorCode.genOperatorCodes(builder) # TODO add parameters
+    operatorCodes = [OperatorCode.OperatorCode(BuiltinOperator.BuiltinOperator.CONV_2D)]
+    opCodesFB = OperatorCode.genOperatorCodes(builder,operatorCodes)
 
-    # SubGraphs
-    subgraphs = gen_Subgraphs(builder)
+    # SubGraphs (only 1 so far)
+    subgraph = SubGraph.genSubgraph(builder)
     Model.StartSubgraphsVector(builder,1)
-    for subgraph in subgraphs:
-        builder.PrependSOffsetTRelative(subgraph)
+    builder.PrependSOffsetTRelative(subgraph)
     subgraphs = builder.EndVector()
 
+
+    # Create Model
     Model.Start(builder)
 
     Model.AddVersion(builder,5)
     Model.AddDescription(builder,desc)
-    Model.AddOperatorCodes(builder,opCodes)
+    Model.AddOperatorCodes(builder,opCodesFB)
     Model.AddSubgraphs(builder,subgraphs)
 
-    # Model.AddOperatorCodes(builder,)
-
     builder.Finish(Model.End(builder))
-
-
 
 builder = fb.Builder(1024)
 
