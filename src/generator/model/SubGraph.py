@@ -4,35 +4,17 @@ import tflite.SubGraph as sg
 import tflite.Model as Model
 
 import generator.model.Tensor as Tensor
+import generator.meta.meta as meta
 
+""" Classes representing the 'SubGraph' structure and its parameters """
 
-class Inputs:
-    inputs: list[int]
-
+class Inputs(meta.IntVector):
     def __init__(self, inputs: list[int]):
-        self.inputs = inputs
+        super().__init__(inputs,sg.StartInputsVector)
 
-    def genTFLite(self, builder: fb.Builder):
-        sg.StartInputsVector(builder, len(self.inputs))
-        
-        for input in self.inputs:
-            builder.PrependInt32(input)
-
-        return builder.EndVector()
-
-class Outputs:
-    outputs: list[int]
-
+class Outputs(meta.IntVector):
     def __init__(self, outputs: list[int]):
-        self.outputs = outputs
-
-    def genTFLite(self, builder: fb.Builder):
-        sg.StartOutputsVector(builder, len(self.outputs))
-        
-        for output in self.outputs:
-            builder.PrependInt32(output)
-
-        return builder.EndVector() 
+        super().__init__(outputs,sg.StartOutputsVector)
 
 
 class SubGraph:

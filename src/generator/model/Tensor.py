@@ -5,21 +5,15 @@ import tflite.Tensor as t
 import tflite.TensorType as tt
 
 import generator.model.Quantization as Quantization
+import generator.meta.meta as meta
 
-class Shape:
-    shape: list[int]
+""" Classes representing 'Tensor' structure and its Parameters. 'Tensor' is part of the 
+    'SubGraph' structure represented in the 'model/SubGraph.py' file.
+"""
 
+class Shape(meta.IntVector):
     def __init__(self, shape: list[int]) -> None:
-        self.shape = shape
-
-    def genTFLite(self, builder: fb.Builder):
-        t.StartShapeVector(builder, len(self.shape))
-
-        for dimension in self.shape:
-            builder.PrependInt32(dimension)
-
-        return builder.EndVector()
-
+        super().__init__(shape,t.StartShapeVector)
 
 class Tensor:
     isVariable: bool

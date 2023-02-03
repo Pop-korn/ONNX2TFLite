@@ -4,6 +4,10 @@ import tflite.QuantizationParameters as qp
 
 import generator.meta.meta as meta
 
+""" Classes representing 'Quantization' structure and its Parameters. 'Quantization' is part 
+    of the 'Tensor' structure, which is represented in the 'model/Tensor.py' file.
+"""
+
 class Min (meta.FloatVector):
     def __init__(self, min: list[float]) -> None:
         super().__init__(min, qp.StartMinVector)
