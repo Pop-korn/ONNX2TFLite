@@ -1,10 +1,13 @@
 import flatbuffers as fb
+
 import tflite.SubGraph as sg
 import tflite.Model as Model
 
+import generator.SubGraphTensor as Tensor
+
 
 class Inputs:
-    inputs: list[int] = None
+    inputs: list[int]
 
     def __init__(self, inputs: list[int]):
         self.inputs = inputs
@@ -18,7 +21,7 @@ class Inputs:
         return builder.EndVector()
 
 class Outputs:
-    outputs: list[int] = None
+    outputs: list[int]
 
     def __init__(self, outputs: list[int]):
         self.outputs = outputs
@@ -31,22 +34,27 @@ class Outputs:
 
         return builder.EndVector() 
 
-class SubGraph:
-    inputs: Inputs = None
-    outputs: Outputs = None
 
-    def __init__(self, inputs: Inputs, outputs: Outputs):
+class SubGraph:
+    inputs: Inputs
+    outputs: Outputs
+    tensors: Tensor.Tensors
+
+    def __init__(self, inputs: Inputs, outputs: Outputs, tensors: Tensor.Tensors):
         self.inputs = inputs
         self.outputs = outputs
+        self.tensors = tensors
 
     def genTFLite(self, builder: fb.Builder):
         inputsTFLite = self.inputs.genTFLite(builder)
         outputsTFLite = self.outputs.genTFLite(builder)
+        tensorsTFLite = self.tensors.genTFLite(builder)
 
         sg.Start(builder)
 
         sg.AddInputs(builder,inputsTFLite)
         sg.AddOutputs(builder, outputsTFLite)
+        sg.AddTensors(builder,tensorsTFLite)
 
         return sg.End(builder)
 

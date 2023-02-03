@@ -6,8 +6,8 @@ class OperatorCode:
     """ Represents an OperatorCode object, used in the vector 'operator_codes' in the model.
     """
 
-    builtinCode: int = None
-    version: int = None
+    builtinCode: int
+    version: int
 
     def __init__(self,builtinCode: int,version: int=1):
         """_summary_

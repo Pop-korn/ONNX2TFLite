@@ -4,6 +4,7 @@ import tflite.BuiltinOperator as BuiltinOperator
 
 import generator.OperatorCode as OperatorCode
 import generator.SubGraph as SubGraph
+import generator.SubGraphTensor as Tensor
 
 def gen_Model(builder: fb.Builder):
     desc = builder.CreateString("Model Description")
@@ -13,9 +14,11 @@ def gen_Model(builder: fb.Builder):
     opCodesTFLite = OperatorCode.genOperatorCodes(builder,operatorCodes)
 
     # SubGraphs
+    tensors = Tensor.Tensors([Tensor.Tensor(True)])
+
     inputs = SubGraph.Inputs([0])
     outputs = SubGraph.Outputs([2,3,5])
-    subGraphs = [SubGraph.SubGraph(inputs, outputs)]
+    subGraphs = [SubGraph.SubGraph(inputs, outputs,tensors)]
     subGraphsTFLite = SubGraph.genSubGraphs(builder,subGraphs)
 
     # Create Model

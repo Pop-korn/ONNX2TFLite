@@ -9,6 +9,14 @@
   ],
   "subgraphs": [
     {
+      "tensors": [
+        {
+          "type": "FLOAT32",
+          "buffer": 0,
+          "is_variable": true,
+          "has_rank": false
+        }
+      ],
       "inputs": [
         0
       ],
