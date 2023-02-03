@@ -1,19 +1,22 @@
 import flatbuffers as fb
+
 import tflite.OperatorCode as oc
 import tflite.Model as Model
+import tflite.BuiltinOperator as bo
 
 class OperatorCode:
     """ Represents an OperatorCode object, used in the vector 'operator_codes' in the model.
     """
 
-    builtinCode: int
+    builtinCode: bo.BuiltinOperator
     version: int
+    # TODO customCode
 
-    def __init__(self,builtinCode: int,version: int=1):
-        """_summary_
+    def __init__(self,builtinCode: bo.BuiltinOperator,version: int=1):
+        """
 
         Args:
-            builtinCode (int): code from the 'BuiltinOperator' enum
+            builtinCode (BuiltinOperator): operator code from the 'BuiltinOperator' enum
             version (int, optional): operator version. Defaults to 1.
         """
         self.version = version

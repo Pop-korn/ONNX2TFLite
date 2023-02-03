@@ -3,7 +3,7 @@ import flatbuffers as fb
 import tflite.SubGraph as sg
 import tflite.Model as Model
 
-import generator.SubGraphTensor as Tensor
+import generator.Tensor as Tensor
 
 
 class Inputs:

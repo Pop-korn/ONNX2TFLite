@@ -11,9 +11,30 @@
     {
       "tensors": [
         {
-          "type": "FLOAT32",
-          "buffer": 0,
-          "is_variable": true,
+          "shape": [
+            10,
+            1
+          ],
+          "type": "UINT8",
+          "buffer": 17,
+          "name": "CifarNet/Predictions/Reshape_1",
+          "quantization": {
+            "min": [
+              0.0
+            ],
+            "max": [
+              0.996094
+            ],
+            "scale": [
+              0.003906
+            ],
+            "zero_point": [
+              0
+            ],
+            "details_type": "NONE",
+            "quantized_dimension": 0
+          },
+          "is_variable": false,
           "has_rank": false
         }
       ],

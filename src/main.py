@@ -1,10 +1,12 @@
 import flatbuffers as fb
 import tflite.Model as Model
 import tflite.BuiltinOperator as BuiltinOperator
+import tflite.TensorType as TensorType
 
 import generator.OperatorCode as OperatorCode
 import generator.SubGraph as SubGraph
-import generator.SubGraphTensor as Tensor
+import generator.Tensor as Tensor
+import generator.Quantization as Quant
 
 def gen_Model(builder: fb.Builder):
     desc = builder.CreateString("Model Description")
@@ -14,8 +16,10 @@ def gen_Model(builder: fb.Builder):
     opCodesTFLite = OperatorCode.genOperatorCodes(builder,operatorCodes)
 
     # SubGraphs
-    tensors = Tensor.Tensors([Tensor.Tensor(True)])
-
+    quantization = Quant.Quantisation(Quant.Min([0.0]), Quant.Max([0.996094])
+                    , Quant.Scale([0.003906]), Quant.ZeroPoint([0]), 0)
+    tensors = Tensor.Tensors([Tensor.Tensor(quantization, Tensor.Shape([1,10]), 
+    "CifarNet/Predictions/Reshape_1",17,TensorType.TensorType.UINT8)])
     inputs = SubGraph.Inputs([0])
     outputs = SubGraph.Outputs([2,3,5])
     subGraphs = [SubGraph.SubGraph(inputs, outputs,tensors)]
