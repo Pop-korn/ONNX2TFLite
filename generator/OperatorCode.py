@@ -3,7 +3,7 @@ import tflite.OperatorCode as oc
 import tflite.Model as Model
 
 class OperatorCode:
-    """ Represents an OperatorCode struct, used in the array 'operator_codes' in the model.
+    """ Represents an OperatorCode object, used in the vector 'operator_codes' in the model.
     """
     def __init__(self,builtinCode: int,version: int=1):
         """_summary_
@@ -15,7 +15,7 @@ class OperatorCode:
         self.version = version
         self.builtinCode = builtinCode
 
-    def genTFLiteCode(self,builder: fb.builder):
+    def genTFLite(self,builder: fb.builder):
         """Generate TFLite representation for this OperatorCode
 
         Args:
@@ -44,7 +44,7 @@ def genOperatorCodes(builder: fb.builder,operatorCodes: list[OperatorCode]):
     tfliteOpCodes = []
 
     for opCode in operatorCodes:
-        tfliteOpCodes.append(opCode.genTFLiteCode(builder))
+        tfliteOpCodes.append(opCode.genTFLite(builder))
 
     Model.StartOperatorCodesVector(builder,1)
 

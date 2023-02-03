@@ -10,22 +10,20 @@ def gen_Model(builder: fb.Builder):
 
     # Operator Codes
     operatorCodes = [OperatorCode.OperatorCode(BuiltinOperator.BuiltinOperator.CONV_2D)]
-    opCodesFB = OperatorCode.genOperatorCodes(builder,operatorCodes)
+    opCodesTFLite = OperatorCode.genOperatorCodes(builder,operatorCodes)
 
-    # SubGraphs (only 1 so far)
-    subgraph = SubGraph.genSubgraph(builder)
-    Model.StartSubgraphsVector(builder,1)
-    builder.PrependSOffsetTRelative(subgraph)
-    subgraphs = builder.EndVector()
-
+    # SubGraphs
+    inputs = SubGraph.Inputs([0])
+    subGraphs = [SubGraph.SubGraph(inputs)]
+    subGraphsTFLite = SubGraph.genSubGraphs(builder,subGraphs)
 
     # Create Model
     Model.Start(builder)
 
     Model.AddVersion(builder,5)
     Model.AddDescription(builder,desc)
-    Model.AddOperatorCodes(builder,opCodesFB)
-    Model.AddSubgraphs(builder,subgraphs)
+    Model.AddOperatorCodes(builder,opCodesTFLite)
+    Model.AddSubgraphs(builder,subGraphsTFLite)
 
     builder.Finish(Model.End(builder))
 

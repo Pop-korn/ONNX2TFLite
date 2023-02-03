@@ -9,6 +9,11 @@
   ],
   "subgraphs": [
     {
+      "inputs": [
+        6789,
+        42,
+        0
+      ]
     }
   ],
   "description": "Popis modelu"
