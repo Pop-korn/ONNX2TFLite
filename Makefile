@@ -10,5 +10,5 @@ gen_json:
 parse_json:
 	flatc -b --strict-json --defaults-json -o . schema.fbs cifar10_model.json
 
-test:
-	flatc -t --strict-json --defaults-json schema.fbs -- test/out.tflite --raw-binary
+test: all
+	flatc -t --strict-json --defaults-json -o test schema.fbs -- test/out.tflite --raw-binary 

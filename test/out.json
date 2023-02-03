@@ -1,0 +1,15 @@
+{
+  "version": 5,
+  "operator_codes": [
+    {
+      "deprecated_builtin_code": 3,
+      "version": 1,
+      "builtin_code": "CONV_2D"
+    }
+  ],
+  "subgraphs": [
+    {
+    }
+  ],
+  "description": "Popis modelu"
+}
