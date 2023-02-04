@@ -22,12 +22,12 @@ class Tensor(meta.TFLiteObject):
     buffer: int
     name: str
     shape: Shape
-    quantization: Quantization.Quantisation
+    quantization: Quantization.Quantization
     # TODO sparsity
     # TODO shapeSignature
     # TODO variantTensors
 
-    def __init__(self, quantization: Quantization.Quantisation, shape: Shape,
+    def __init__(self, quantization: Quantization.Quantization, shape: Shape,
      name: str = None, buffer: int = 0, type: tt.TensorType = tt.TensorType.FLOAT32,
      isVariable: bool = False, hasRank: bool = False) -> None:
         self.isVariable = isVariable
@@ -58,5 +58,5 @@ class Tensor(meta.TFLiteObject):
         return t.End(builder)
 
 class Tensors(meta.TFLiteVector):
-    def __init__(self, tensors: list[Tensor]) -> None:
+    def __init__(self, tensors: list[Tensor] = []) -> None:
         super().__init__(tensors,sg.StartTensorsVector)

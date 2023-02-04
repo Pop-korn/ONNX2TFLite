@@ -15,7 +15,7 @@ class Outputs(meta.IntVector):
         super().__init__(outputs,op.StartOutputsVector)
 
 class MutatingVariableInputs(meta.BoolVector):
-        def __init__(self, mutatingVariableInputs: list[bool]) -> None:
+        def __init__(self, mutatingVariableInputs: list[bool]=[]) -> None:
              super().__init__(mutatingVariableInputs,op.StartMutatingVariableInputsVector)
 
 
@@ -29,8 +29,9 @@ class Operator(meta.TFLiteObject):
     # TODO customOptions
     # TODO intermediates
 
-    def __init__(self, inputs: Inputs, outputs: Outputs, builtinOptions: meta.BuiltinOptions
-    , mutatingVariableInputs: MutatingVariableInputs, opcodeIndex: int = 0
+    def __init__(self, inputs: Inputs=None, outputs: Outputs=None
+    , builtinOptions: meta.BuiltinOptions=None
+    , mutatingVariableInputs: MutatingVariableInputs=MutatingVariableInputs(), opcodeIndex: int = 0
     , customOptionsFormat: cof.CustomOptionsFormat = cof.CustomOptionsFormat.FLEXBUFFERS) -> None:
         self.opcodeIndex = opcodeIndex
         self.customOptionsFormat = customOptionsFormat
@@ -58,6 +59,6 @@ class Operator(meta.TFLiteObject):
 
 
 class Operators(meta.TFLiteVector):
-    def __init__(self, operators: list[Operator]) -> None:
+    def __init__(self, operators: list[Operator] = []) -> None:
         super().__init__(operators,sg.StartOperatorsVector) # TODO UOffset??
         

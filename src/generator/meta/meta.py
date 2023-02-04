@@ -39,7 +39,9 @@ class TFLiteVector(TFLiteObject):
 
     def genTFLite(self, builder: fb.Builder):
         """ Generates TFLite code for the vector """
-        tflVector = [item.genTFLite(builder) for item in self.vector]
+        # IMPORTANT! tflite MUST be generated for list items in REVERSE ORDER! 
+        # Otherwise the order will be wrong.
+        tflVector = [item.genTFLite(builder) for item in reversed(self.vector)]
 
         self.StartFunction(builder, len(self.vector))
 
@@ -71,7 +73,9 @@ class TFLiteAtomicVector(TFLiteObject):
         """ Generates TFLite code for the vector """
         self.StartFunction(builder, len(self.vector))
 
-        for val in self.vector:
+        # IMPORTANT! tflite MUST be generated for list items in REVERSE ORDER! 
+        # Otherwise the order will be wrong.
+        for val in reversed(self.vector):
             self.PrependFunction(builder)(val)
 
         return builder.EndVector()

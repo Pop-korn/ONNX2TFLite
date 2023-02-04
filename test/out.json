@@ -1,10 +1,25 @@
 {
-  "version": 5,
+  "version": 3,
   "operator_codes": [
     {
       "deprecated_builtin_code": 3,
       "version": 1,
       "builtin_code": "CONV_2D"
+    },
+    {
+      "deprecated_builtin_code": 9,
+      "version": 1,
+      "builtin_code": "FULLY_CONNECTED"
+    },
+    {
+      "deprecated_builtin_code": 17,
+      "version": 1,
+      "builtin_code": "MAX_POOL_2D"
+    },
+    {
+      "deprecated_builtin_code": 25,
+      "version": 1,
+      "builtin_code": "SOFTMAX"
     }
   ],
   "subgraphs": [
@@ -12,8 +27,8 @@
       "tensors": [
         {
           "shape": [
-            10,
-            1
+            1,
+            10
           ],
           "type": "UINT8",
           "buffer": 17,
@@ -39,20 +54,18 @@
         }
       ],
       "inputs": [
-        0
+        16
       ],
       "outputs": [
-        5,
-        3,
-        2
+        0
       ],
       "operators": [
         {
           "opcode_index": 0,
           "inputs": [
-            1,
+            16,
             3,
-            16
+            1
           ],
           "outputs": [
             2
@@ -74,5 +87,5 @@
       ]
     }
   ],
-  "description": "Model Description"
+  "description": "TOCO Converted."
 }

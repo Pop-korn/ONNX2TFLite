@@ -1,6 +1,7 @@
 import flatbuffers as fb
 
 import tflite.QuantizationParameters as qp
+import tflite.QuantizationDetails as qd
 
 import generator.meta.meta as meta
 
@@ -25,20 +26,23 @@ class ZeroPoint(meta.IntVector):
         super().__init__(zeroPoint,qp.StartZeroPointVector,
                         lambda builder : builder.PrependInt64)
 
-class Quantisation(meta.TFLiteObject):
+class Quantization(meta.TFLiteObject):
     min: Min
     max: Max
     scale: Scale
     zeroPoint: ZeroPoint
     quantizedDimension: int
+    detailsType: qd.QuantizationDetails
+    # TODO details
 
     def __init__(self, min: Min, max: Max, scale: Scale, zeroPoint: ZeroPoint
-                , quantizedDimension: int = 0) -> None:
+                , quantizedDimension: int = 0, detailsType: qd.QuantizationDetails=qd.QuantizationDetails.NONE) -> None:
         self.min = min
         self.max = max
         self.scale = scale
         self.zeroPoint = zeroPoint
         self.quantizedDimension = quantizedDimension
+        self.detailsType = detailsType
 
     def genTFLite(self, builder: fb.Builder):
         tflMin = self.min.genTFLite(builder)
@@ -53,5 +57,6 @@ class Quantisation(meta.TFLiteObject):
         qp.AddScale(builder, tflScale)
         qp.AddZeroPoint(builder, tflZeroPoint)
         qp.AddQuantizedDimension(builder,self.quantizedDimension)
+        qp.AddDetailsType(builder, self.detailsType)
 
         return qp.End(builder)

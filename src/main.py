@@ -1,59 +1,62 @@
 import flatbuffers as fb
-import tflite.Model as Model
-import tflite.BuiltinOperator as BuiltinOperator
-import tflite.TensorType as TensorType
-import tflite.Padding as Padding
 
+import tflite.BuiltinOperator as bo
+import tflite.TensorType as tt
 
-import generator.model.OperatorCodes as OperatorCodes
-import generator.model.SubGraphs as SubGraphs
-import generator.model.Tensors as Tensors
-import generator.model.Quantization as Quant
-import generator.model.Operators as Operators
+import generator.model.Model as m
+import generator.model.OperatorCodes as oc
+import generator.model.SubGraphs as sg
+import generator.model.Tensors as t
+import generator.model.Quantization as q
+import generator.model.Operators as o
+
 import generator.builtin.Conv2D as Conv2D
 
-def gen_Model(builder: fb.Builder):
-    desc = builder.CreateString("Model Description")
+def BuildModel():
+    """ Generate the 'cifar10_model.tflite' """
+    # OperatroCodes
+    operatorCodes = []
+    operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.CONV_2D))
+    operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.FULLY_CONNECTED))
+    operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.MAX_POOL_2D))
+    operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.SOFTMAX))
+    operatorCodes = oc.OperatorCodes(operatorCodes)
 
-    # Operator Codes
-    operatorCodes = [OperatorCodes.OperatorCode(BuiltinOperator.BuiltinOperator.CONV_2D)]
-    opCodesTFLite = OperatorCodes.genOperatorCodes(builder,operatorCodes)
+    # SubGraphs - Model only has 1 subgraph
+    subGraphs = sg.SubGraphs()
 
-    # SubGraphs
-    quantization = Quant.Quantisation(Quant.Min([0.0]), Quant.Max([0.996094])
-                    , Quant.Scale([0.003906]), Quant.ZeroPoint([0]), 0)
-    tensors = Tensors.Tensors([Tensors.Tensor(quantization, Tensors.Shape([1,10]), 
-    "CifarNet/Predictions/Reshape_1",17,TensorType.TensorType.UINT8)])
+    subGraph = sg.SubGraph()
+    subGraph.inputs = sg.Inputs([16])
+    subGraph.outputs = sg.Outputs([0])
 
-    inputs = SubGraphs.Inputs([0])
-    outputs = SubGraphs.Outputs([2,3,5])
-    conv2DOptions = Conv2D.Conv2D(Padding.Padding.SAME,1,1)
-    operators = Operators.Operators([Operators.Operator(Operators.Inputs([16,3,1])
-    ,Operators.Outputs([2]), conv2DOptions,
-        Operators.MutatingVariableInputs([]))])
+        # Operators
+    operators = o.Operators()
+    operators.append(o.Operator(o.Inputs([16,3,1]),o.Outputs([2]),Conv2D.Conv2D(strideH=1,strideW=1)))
+    subGraph.operators = operators
 
-    subGraphs = [SubGraphs.SubGraph(inputs, outputs, tensors,operators)]
-    subGraphsTFLite = SubGraphs.genSubGraphs(builder,subGraphs)
+        # Tensors
+    tensors = t.Tensors()
+    quantization = q.Quantization(q.Min([0.0]),q.Max([0.996094]), q.Scale([0.003906]), q.ZeroPoint([0]))
+    tensors.append(t.Tensor(quantization,t.Shape([1,10]),"CifarNet/Predictions/Reshape_1"
+    , 17, tt.TensorType.UINT8))
+        # TODO add more
+    subGraph.tensors = tensors
 
-    # Create Model
-    Model.Start(builder)
+    subGraphs.append(subGraph)
 
-    Model.AddVersion(builder,3)
-    Model.AddDescription(builder,desc)
-    Model.AddOperatorCodes(builder,opCodesTFLite)
-    Model.AddSubgraphs(builder,subGraphsTFLite)
+    return m.Model(3,"TOCO Converted.",operatorCodes,subGraphs)
 
-    builder.Finish(Model.End(builder))
 
+# Create a flatbuffer builder to build the .tflite file
 builder = fb.Builder(1024)
 
-gen_Model(builder)
+# Build the TFLite model structure. No TFLite generated yet, only internal representation
+model = BuildModel()
 
-# gen_conv2d(builder)
+# Generate the TFLite fot the model
+model.genTFLite(builder)
 
-
-
+# Write the TFLite data to file
 buffer = builder.Output()
-
 with open("test/out.tflite","wb") as f:
     f.write(buffer)
