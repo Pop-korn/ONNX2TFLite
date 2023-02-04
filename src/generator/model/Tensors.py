@@ -64,15 +64,12 @@ class Tensors:
         self.tensors = tensors
 
     def genTFLite(self, builder: fb.Builder):
-        tflTensors = []
-
-        for tensor in self.tensors:
-            tflTensors.append(tensor.genTFLite(builder))
+        tflTensors = [tensor.genTFLite(builder) for tensor in self.tensors]
 
         sg.StartTensorsVector(builder, len(self.tensors))
 
         for tflTensor in tflTensors:
-            builder.PrependSOffsetTRelative(tflTensor)
+            builder.PrependSOffsetTRelative(tflTensor) # TODO check
 
         return builder.EndVector()
 

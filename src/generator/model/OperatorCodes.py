@@ -30,21 +30,22 @@ class OperatorCode:
         
         return oc.End(builder)
 
-def genOperatorCodes(builder: fb.builder,operatorCodes: list[OperatorCode]):
-    """Generate TFLite representation for all OperatorCodes in 'operatorCodes' 
+class OperatorCodes:
+    operatorCodes: list[OperatorCode]
 
-    Args:
-        builder (fb.builder):
-        operatorCodes (list[OperatorCode]): List of 'OperatorCode' objects to generate TFLite for
-    """
-    tflOpCodes = []
+    def __init__(self, operatorCodes: list[OperatorCode]) -> None:
+        self.operatorCodes = operatorCodes
 
-    for opCode in operatorCodes:
-        tflOpCodes.append(opCode.genTFLite(builder))
+    def genTFLite(self, builder):
+        """Generate TFLite representation for all OperatorCodes in 'operatorCodes' """
+        tflOperatorCodes = [opCode.genTFLite(builder) for opCode in self.operatorCodes]
 
-    Model.StartOperatorCodesVector(builder,1)
+        Model.StartOperatorCodesVector(builder, len(self.operatorCodes))
 
-    for tflOpCode in tflOpCodes:
-        builder.PrependSOffsetTRelative(tflOpCode)
+        for tflOperatorCode in tflOperatorCodes:
+            builder.PrependSOffsetTRelative(tflOperatorCode) # TODO check
 
-    return builder.EndVector()
+        return builder.EndVector()
+
+
+    

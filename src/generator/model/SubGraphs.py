@@ -54,6 +54,6 @@ def genSubGraphs(builder: fb.Builder, subGraphs: list[SubGraph]):
     Model.StartSubgraphsVector(builder, len(subGraphs))
 
     for tflSubGraph in tflSubGraphs:
-        builder.PrependSOffsetTRelative(tflSubGraph)
+        builder.PrependSOffsetTRelative(tflSubGraph) # TODO check
 
     return builder.EndVector()

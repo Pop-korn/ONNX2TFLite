@@ -38,7 +38,7 @@ def gen_Model(builder: fb.Builder):
     # Create Model
     Model.Start(builder)
 
-    Model.AddVersion(builder,5)
+    Model.AddVersion(builder,3)
     Model.AddDescription(builder,desc)
     Model.AddOperatorCodes(builder,opCodesTFLite)
     Model.AddSubgraphs(builder,subGraphsTFLite)

@@ -69,7 +69,7 @@ class Operators:
         sg.StartOperatorsVector(builder, len(self.operators))
 
         for tflOperator in tflOperators:
-            builder.PrependUOffsetTRelative(tflOperator)
+            builder.PrependUOffsetTRelative(tflOperator) # TODO check
 
         return builder.EndVector()
         
