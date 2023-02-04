@@ -44,11 +44,11 @@ class IntVector:
 
     """ TFLite 'Start...Vector' function for the exact vector. Takes 2 arguments,
     'floatbuffers.Builder' and number of list elements """
-    StartFunction: Callable[[fb.Builder, int],None] # TFLite 'Start' function for the exact vector
+    StartFunction: Callable[[fb.Builder, int],None] 
     
     """ TFLite 'Prepend...' function for the exact vector item type. Takes 'flatbuffers.Builder' 
     as argument """
-    PrependFunction: Callable[[fb.Builder],None] # TFLite 'Prepend' function for the exact vector item
+    PrependFunction: Callable[[fb.Builder],None] 
 
     def __init__(self, intList: list[int], StartFunction: Callable[[fb.Builder, int],None]
     , PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependInt32) -> None:
@@ -62,5 +62,34 @@ class IntVector:
 
         for intVal in self.intList:
             self.PrependFunction(builder)(intVal)
+
+        return builder.EndVector()
+
+class BoolVector:
+    """ Class represents a TFLite vector of boolean values. Provides interface for storing data
+        and generating output TFLite code. """
+
+    boolList: list[bool]
+
+    """ TFLite 'Start...Vector' function for the exact vector. Takes 2 arguments,
+    'floatbuffers.Builder' and number of list elements """
+    StartFunction: Callable[[fb.Builder, int],None] 
+    
+    """ TFLite 'Prepend...' function for the exact vector item type. Takes 'flatbuffers.Builder' 
+    as argument """
+    PrependFunction: Callable[[fb.Builder],None] 
+
+    def __init__(self, boolList: list[bool], StartFunction: Callable[[fb.Builder, int],None]
+    , PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependBool) -> None:
+        self.boolList = boolList
+        self.StartFunction = StartFunction
+        self.PrependFunction = PrependFunction
+
+    def genTFLite(self, builder: fb.Builder):
+        """ Generates TFLite code for the vector """
+        self.StartFunction(builder, len(self.boolList))
+
+        for boolVal in self.boolList:
+            self.PrependFunction(builder)(boolVal)
 
         return builder.EndVector()

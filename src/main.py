@@ -7,6 +7,7 @@ import generator.model.OperatorCode as OperatorCode
 import generator.model.SubGraph as SubGraph
 import generator.model.Tensor as Tensor
 import generator.model.Quantization as Quant
+import generator.model.Operator as Operator
 
 def gen_Model(builder: fb.Builder):
     desc = builder.CreateString("Model Description")
@@ -20,9 +21,14 @@ def gen_Model(builder: fb.Builder):
                     , Quant.Scale([0.003906]), Quant.ZeroPoint([0]), 0)
     tensors = Tensor.Tensors([Tensor.Tensor(quantization, Tensor.Shape([1,10]), 
     "CifarNet/Predictions/Reshape_1",17,TensorType.TensorType.UINT8)])
+
     inputs = SubGraph.Inputs([0])
     outputs = SubGraph.Outputs([2,3,5])
-    subGraphs = [SubGraph.SubGraph(inputs, outputs,tensors)]
+
+    operators = Operator.Operators([Operator.Operator(Operator.Inputs([16,3,1]),Operator.Outputs([2]),
+        Operator.MutatingVariableInputs([]))])
+
+    subGraphs = [SubGraph.SubGraph(inputs, outputs, tensors,operators)]
     subGraphsTFLite = SubGraph.genSubGraphs(builder,subGraphs)
 
     # Create Model

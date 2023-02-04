@@ -4,6 +4,7 @@ import tflite.SubGraph as sg
 import tflite.Model as Model
 
 import generator.model.Tensor as Tensor
+import generator.model.Operator as Operator
 import generator.meta.meta as meta
 
 """ Classes representing the 'SubGraph' structure and its parameters """
@@ -21,22 +22,26 @@ class SubGraph:
     inputs: Inputs
     outputs: Outputs
     tensors: Tensor.Tensors
+    operators: Operator.Operators
 
-    def __init__(self, inputs: Inputs, outputs: Outputs, tensors: Tensor.Tensors):
+    def __init__(self, inputs: Inputs, outputs: Outputs, tensors: Tensor.Tensors, operators: Operator.Operators):
         self.inputs = inputs
         self.outputs = outputs
         self.tensors = tensors
+        self.operators = operators
 
     def genTFLite(self, builder: fb.Builder):
         inputsTFLite = self.inputs.genTFLite(builder)
         outputsTFLite = self.outputs.genTFLite(builder)
         tensorsTFLite = self.tensors.genTFLite(builder)
+        operatorsTFLite = self.operators.genTFLite(builder)
 
         sg.Start(builder)
 
-        sg.AddInputs(builder,inputsTFLite)
+        sg.AddInputs(builder, inputsTFLite)
         sg.AddOutputs(builder, outputsTFLite)
-        sg.AddTensors(builder,tensorsTFLite)
+        sg.AddTensors(builder, tensorsTFLite)
+        sg.AddOperators(builder, operatorsTFLite)
 
         return sg.End(builder)
 
