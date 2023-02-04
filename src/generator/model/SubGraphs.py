@@ -3,8 +3,8 @@ import flatbuffers as fb
 import tflite.SubGraph as sg
 import tflite.Model as Model
 
-import generator.model.Tensor as Tensor
-import generator.model.Operator as Operator
+import generator.model.Tensors as Tensors
+import generator.model.Operators as Operators
 import generator.meta.meta as meta
 
 """ Classes representing the 'SubGraph' structure and its parameters """
@@ -21,39 +21,39 @@ class Outputs(meta.IntVector):
 class SubGraph:
     inputs: Inputs
     outputs: Outputs
-    tensors: Tensor.Tensors
-    operators: Operator.Operators
+    tensors: Tensors.Tensors
+    operators: Operators.Operators
 
-    def __init__(self, inputs: Inputs, outputs: Outputs, tensors: Tensor.Tensors, operators: Operator.Operators):
+    def __init__(self, inputs: Inputs, outputs: Outputs, tensors: Tensors.Tensors, operators: Operators.Operators):
         self.inputs = inputs
         self.outputs = outputs
         self.tensors = tensors
         self.operators = operators
 
     def genTFLite(self, builder: fb.Builder):
-        inputsTFLite = self.inputs.genTFLite(builder)
-        outputsTFLite = self.outputs.genTFLite(builder)
-        tensorsTFLite = self.tensors.genTFLite(builder)
-        operatorsTFLite = self.operators.genTFLite(builder)
+        tflInputs = self.inputs.genTFLite(builder)
+        tflOutputs = self.outputs.genTFLite(builder)
+        tflTensors = self.tensors.genTFLite(builder)
+        tflOperators = self.operators.genTFLite(builder)
 
         sg.Start(builder)
 
-        sg.AddInputs(builder, inputsTFLite)
-        sg.AddOutputs(builder, outputsTFLite)
-        sg.AddTensors(builder, tensorsTFLite)
-        sg.AddOperators(builder, operatorsTFLite)
+        sg.AddInputs(builder, tflInputs)
+        sg.AddOutputs(builder, tflOutputs)
+        sg.AddTensors(builder, tflTensors)
+        sg.AddOperators(builder, tflOperators)
 
         return sg.End(builder)
 
 def genSubGraphs(builder: fb.Builder, subGraphs: list[SubGraph]):
-    tfliteSubGraphs = []
+    tflSubGraphs = []
 
     for subGraph in subGraphs:
-        tfliteSubGraphs.append(subGraph.genTFLite(builder))
+        tflSubGraphs.append(subGraph.genTFLite(builder))
 
     Model.StartSubgraphsVector(builder, len(subGraphs))
 
-    for tfliteSubGraph in tfliteSubGraphs:
-        builder.PrependSOffsetTRelative(tfliteSubGraph)
+    for tflSubGraph in tflSubGraphs:
+        builder.PrependSOffsetTRelative(tflSubGraph)
 
     return builder.EndVector()

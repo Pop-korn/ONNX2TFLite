@@ -14,7 +14,6 @@ class OperatorCode:
 
     def __init__(self,builtinCode: bo.BuiltinOperator,version: int=1):
         """
-
         Args:
             builtinCode (BuiltinOperator): operator code from the 'BuiltinOperator' enum
             version (int, optional): operator version. Defaults to 1.
@@ -23,14 +22,7 @@ class OperatorCode:
         self.builtinCode = builtinCode
 
     def genTFLite(self,builder: fb.builder):
-        """Generate TFLite representation for this OperatorCode
-
-        Args:
-            builder (fb.builder):
-
-        Returns:
-            int: TFLite representation of the OperatorCode
-        """
+        """ Generate TFLite representation for this OperatorCode """
         oc.Start(builder)
         oc.AddDeprecatedBuiltinCode(builder,self.builtinCode)
         oc.AddBuiltinCode(builder,self.builtinCode)
@@ -44,18 +36,15 @@ def genOperatorCodes(builder: fb.builder,operatorCodes: list[OperatorCode]):
     Args:
         builder (fb.builder):
         operatorCodes (list[OperatorCode]): List of 'OperatorCode' objects to generate TFLite for
-
-    Returns:
-        All: TFLite struct 'operator_codes'
     """
-    tfliteOpCodes = []
+    tflOpCodes = []
 
     for opCode in operatorCodes:
-        tfliteOpCodes.append(opCode.genTFLite(builder))
+        tflOpCodes.append(opCode.genTFLite(builder))
 
     Model.StartOperatorCodesVector(builder,1)
 
-    for tfliteOpCode in tfliteOpCodes:
-        builder.PrependSOffsetTRelative(tfliteOpCode)
+    for tflOpCode in tflOpCodes:
+        builder.PrependSOffsetTRelative(tflOpCode)
 
     return builder.EndVector()

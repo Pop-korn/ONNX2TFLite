@@ -41,17 +41,17 @@ class Quantisation:
         self.quantizedDimension = quantizedDimension
 
     def genTFLite(self, builder: fb.Builder):
-        minTFLite = self.min.genTFLite(builder)
-        maxTFLite = self.max.genTFLite(builder)
-        scaleTFLite = self.scale.genTFLite(builder)
-        zeroPointTFLite = self.zeroPoint.genTFLite(builder)
+        tflMin = self.min.genTFLite(builder)
+        tflMax = self.max.genTFLite(builder)
+        tflScale = self.scale.genTFLite(builder)
+        tflZeroPoint = self.zeroPoint.genTFLite(builder)
         
         qp.Start(builder)
 
-        qp.AddMin(builder, minTFLite)
-        qp.AddMax(builder, maxTFLite)
-        qp.AddScale(builder, scaleTFLite)
-        qp.AddZeroPoint(builder, zeroPointTFLite)
+        qp.AddMin(builder, tflMin)
+        qp.AddMax(builder, tflMax)
+        qp.AddScale(builder, tflScale)
+        qp.AddZeroPoint(builder, tflZeroPoint)
         qp.AddQuantizedDimension(builder,self.quantizedDimension)
 
         return qp.End(builder)

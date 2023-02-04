@@ -40,8 +40,8 @@ class Tensor:
 
     def genTFLite(self, builder: fb.Builder):
         name = builder.CreateString(self.name)
-        shapeTFLite = self.shape.genTFLite(builder)
-        quantizationTFLite = self.quantization.genTFLite(builder)
+        tflShape = self.shape.genTFLite(builder)
+        tflQuantization = self.quantization.genTFLite(builder)
 
         t.Start(builder)
 
@@ -52,8 +52,8 @@ class Tensor:
         if name is not None:
             t.AddName(builder, name)
 
-        t.AddShape(builder,shapeTFLite)
-        t.AddQuantization(builder,quantizationTFLite)
+        t.AddShape(builder,tflShape)
+        t.AddQuantization(builder,tflQuantization)
         
         return t.End(builder)
 
@@ -64,15 +64,15 @@ class Tensors:
         self.tensors = tensors
 
     def genTFLite(self, builder: fb.Builder):
-        tfliteTensors = []
+        tflTensors = []
 
         for tensor in self.tensors:
-            tfliteTensors.append(tensor.genTFLite(builder))
+            tflTensors.append(tensor.genTFLite(builder))
 
         sg.StartTensorsVector(builder, len(self.tensors))
 
-        for tfliteTensor in tfliteTensors:
-            builder.PrependSOffsetTRelative(tfliteTensor)
+        for tflTensor in tflTensors:
+            builder.PrependSOffsetTRelative(tflTensor)
 
         return builder.EndVector()
 
