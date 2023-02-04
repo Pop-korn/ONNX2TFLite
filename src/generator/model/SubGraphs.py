@@ -18,13 +18,14 @@ class Outputs(meta.IntVector):
         super().__init__(outputs,sg.StartOutputsVector)
 
 
-class SubGraph:
+class SubGraph(meta.TFLiteObject):
     inputs: Inputs
     outputs: Outputs
     tensors: Tensors.Tensors
     operators: Operators.Operators
 
-    def __init__(self, inputs: Inputs, outputs: Outputs, tensors: Tensors.Tensors, operators: Operators.Operators):
+    def __init__(self, inputs: Inputs=None, outputs: Outputs=None, tensors: Tensors.Tensors=None
+    , operators: Operators.Operators=None):
         self.inputs = inputs
         self.outputs = outputs
         self.tensors = tensors
@@ -45,15 +46,6 @@ class SubGraph:
 
         return sg.End(builder)
 
-def genSubGraphs(builder: fb.Builder, subGraphs: list[SubGraph]):
-    tflSubGraphs = []
-
-    for subGraph in subGraphs:
-        tflSubGraphs.append(subGraph.genTFLite(builder))
-
-    Model.StartSubgraphsVector(builder, len(subGraphs))
-
-    for tflSubGraph in tflSubGraphs:
-        builder.PrependSOffsetTRelative(tflSubGraph) # TODO check
-
-    return builder.EndVector()
+class SubGraphs(meta.TFLiteVector):
+    def __init__(self, subGraphs: list[SubGraph] = []) -> None:
+        super().__init__(subGraphs,Model.StartSubgraphsVector)

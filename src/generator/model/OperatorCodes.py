@@ -1,10 +1,12 @@
 import flatbuffers as fb
 
+import generator.meta.meta as meta
+
 import tflite.OperatorCode as oc
 import tflite.Model as Model
 import tflite.BuiltinOperator as bo
 
-class OperatorCode:
+class OperatorCode(meta.TFLiteObject):
     """ Represents an OperatorCode object, used in the vector 'operator_codes' in the model.
     """
 
@@ -30,28 +32,7 @@ class OperatorCode:
         
         return oc.End(builder)
 
-class OperatorCodes:
-    operatorCodes: list[OperatorCode]
-
+class OperatorCodes(meta.TFLiteVector):
     def __init__(self, operatorCodes: list[OperatorCode] = []) -> None:
-        self.operatorCodes = operatorCodes
-
-    def append(self, operatorCode: OperatorCode):
-        self.operatorCodes.append(operatorCode)
-
-    def get(self, index: int):
-        return self.operatorCodes[index]
-
-    def genTFLite(self, builder):
-        """Generate TFLite representation for all OperatorCodes in 'operatorCodes' """
-        tflOperatorCodes = [opCode.genTFLite(builder) for opCode in self.operatorCodes]
-
-        Model.StartOperatorCodesVector(builder, len(self.operatorCodes))
-
-        for tflOperatorCode in tflOperatorCodes:
-            builder.PrependSOffsetTRelative(tflOperatorCode) # TODO check
-
-        return builder.EndVector()
-
-
+        super().__init__(operatorCodes,Model.StartOperatorCodesVector)
     

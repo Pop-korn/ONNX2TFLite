@@ -19,7 +19,7 @@ class MutatingVariableInputs(meta.BoolVector):
              super().__init__(mutatingVariableInputs,op.StartMutatingVariableInputsVector)
 
 
-class Operator:
+class Operator(meta.TFLiteObject):
     opcodeIndex: int
     customOptionsFormat: cof.CustomOptionsFormat # Only default value is possible
     mutatingVariableInputs: MutatingVariableInputs
@@ -57,19 +57,7 @@ class Operator:
         return op.End(builder)
 
 
-class Operators:
-    operators: list[Operator]
-
+class Operators(meta.TFLiteVector):
     def __init__(self, operators: list[Operator]) -> None:
-        self.operators = operators
-
-    def genTFLite(self, builder: fb.Builder):
-        tflOperators = [operator.genTFLite(builder) for operator in self.operators]
-
-        sg.StartOperatorsVector(builder, len(self.operators))
-
-        for tflOperator in tflOperators:
-            builder.PrependUOffsetTRelative(tflOperator) # TODO check
-
-        return builder.EndVector()
+        super().__init__(operators,sg.StartOperatorsVector) # TODO UOffset??
         

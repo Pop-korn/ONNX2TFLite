@@ -15,7 +15,7 @@ class Shape(meta.IntVector):
     def __init__(self, shape: list[int]) -> None:
         super().__init__(shape,t.StartShapeVector)
 
-class Tensor:
+class Tensor(meta.TFLiteObject):
     isVariable: bool
     hasRank: bool
     type: tt.TensorType
@@ -57,22 +57,6 @@ class Tensor:
         
         return t.End(builder)
 
-class Tensors:
-    tensors: list[Tensor]
-
+class Tensors(meta.TFLiteVector):
     def __init__(self, tensors: list[Tensor]) -> None:
-        self.tensors = tensors
-
-    def genTFLite(self, builder: fb.Builder):
-        tflTensors = [tensor.genTFLite(builder) for tensor in self.tensors]
-
-        sg.StartTensorsVector(builder, len(self.tensors))
-
-        for tflTensor in tflTensors:
-            builder.PrependSOffsetTRelative(tflTensor) # TODO check
-
-        return builder.EndVector()
-
-
-
-    
+        super().__init__(tensors,sg.StartTensorsVector)

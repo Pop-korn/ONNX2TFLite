@@ -7,30 +7,71 @@ import err
 
 """ This file contains parent classes for simple classes used in the '/model' directory. """
 
-class TFLiteAtomicVector:
-    """ Represents a TFLite vector of atomic values. Provides interface for storing data
+class TFLiteObject:
+    """ Parent class for all tflite objects. That is all objects in the 'generator' directory. """
+    def genTFLite(self, builder: fb.Builder):
+        err.eprint("TFLiteObject: genTFLite() is not defined!")
+
+class TFLiteVector(TFLiteObject):
+    """ Represents a TFLite vector of TFLiteObjects. Provides interface for storing data
         and generating output TFLite code. """
-    vector: list[int|float|bool] # Item type has to be atomic!
+    vector: list[TFLiteObject]
 
     """ TFLite 'Start...Vector' function for the exact vector. Takes 2 arguments, 
-    'floatbuffers.Builder' and number of list elements """
+    'floatbuffers.Builder' and number of vector elements """
     StartFunction: Callable[[fb.Builder, int],None]
 
     """ TFLite 'Prepend...' function for the exact vector item type. Takes 'flatbuffers.Builder' 
     as argument """
     PrependFunction: Callable[[fb.Builder],None]
 
-    def __init__(self, list: list, StartFunction: Callable[[fb.Builder, int],None]
-                , PrependFunction: Callable[[fb.Builder],None]) -> None:
-        self.list = list
+    def __init__(self, vector: list[TFLiteObject], StartFunction: Callable[[fb.Builder, int],None]
+                , PrependFunction: Callable[[fb.Builder],Callable[[int],None]] = lambda builder: builder.PrependSOffsetTRelative) -> None:
+        self.vector = vector
+        self.StartFunction = StartFunction
+        self.PrependFunction = PrependFunction
+
+    def append(self, item):
+        self.vector.append(item)
+
+    def get(self, index: int):
+        return self.vector[index]
+
+    def genTFLite(self, builder: fb.Builder):
+        """ Generates TFLite code for the vector """
+        tflVector = [item.genTFLite(builder) for item in self.vector]
+
+        self.StartFunction(builder, len(self.vector))
+
+        for tflItem in tflVector:
+            self.PrependFunction(builder)(tflItem)
+
+        return builder.EndVector()
+
+class TFLiteAtomicVector(TFLiteObject):
+    """ Represents a TFLite vector of atomic values. Provides interface for storing data
+        and generating output TFLite code. """
+    vector: list[int|float|bool] # Item type has to be atomic!
+
+    """ TFLite 'Start...Vector' function for the exact vector. Takes 2 arguments, 
+    'floatbuffers.Builder' and number of vector elements """
+    StartFunction: Callable[[fb.Builder, int],None]
+
+    """ TFLite 'Prepend...' function for the exact vector item type. Takes 'flatbuffers.Builder' 
+    as argument """
+    PrependFunction: Callable[[fb.Builder],None]
+
+    def __init__(self, vector: list[int, float, bool], StartFunction: Callable[[fb.Builder, int],None]
+                , PrependFunction: Callable[[fb.Builder],Callable[[int],None]]) -> None:
+        self.vector = vector
         self.StartFunction = StartFunction
         self.PrependFunction = PrependFunction
 
     def genTFLite(self, builder: fb.Builder):
         """ Generates TFLite code for the vector """
-        self.StartFunction(builder, len(self.list))
+        self.StartFunction(builder, len(self.vector))
 
-        for val in self.list:
+        for val in self.vector:
             self.PrependFunction(builder)(val)
 
         return builder.EndVector()
@@ -60,7 +101,7 @@ class BoolVector(TFLiteAtomicVector):
 
 
 
-class BuiltinOptions:
+class BuiltinOptions(TFLiteObject):
     """ Class represents 'BuiltinOptions' for an Operator. Used in 'model/Operators.py'.
         Provides interface for work with any BuiltinOptions table. 
         This class alone does NOT generate any TFLite.
@@ -75,4 +116,4 @@ class BuiltinOptions:
 
     """ Function has to be overwritten """
     def genTFLite(self, builder: fb.Builder):
-        err.eprint(f"BuiltinOperator '{self.builtinOptionsType}': genTFLite() is not defined")
+        err.eprint(f"BuiltinOperator '{self.builtinOptionsType}': genTFLite() is not defined!")

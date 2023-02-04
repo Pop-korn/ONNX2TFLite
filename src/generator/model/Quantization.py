@@ -23,9 +23,9 @@ class Scale(meta.FloatVector):
 class ZeroPoint(meta.IntVector):
     def __init__(self, zeroPoint: list[int]) -> None:
         super().__init__(zeroPoint,qp.StartZeroPointVector,
-                            lambda builder : builder.PrependInt64)
+                        lambda builder : builder.PrependInt64)
 
-class Quantisation:
+class Quantisation(meta.TFLiteObject):
     min: Min
     max: Max
     scale: Scale
