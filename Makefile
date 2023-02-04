@@ -8,3 +8,8 @@ get_schema:
 
 test: all
 	flatc -t --strict-json --defaults-json -o test data/schema.fbs -- test/out.tflite --raw-binary 
+
+LB := (
+RB := )
+clear-pycache:
+	find . | grep -E "$(LB)/__pycache__$$|\.pyc$$|\.pyo$$$(RB)" | xargs rm -rf

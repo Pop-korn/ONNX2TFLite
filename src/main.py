@@ -33,7 +33,7 @@ def BuildModel():
 
         # Tensors
     tensors = t.Tensors()
-    quantization = q.Quantization(q.Min([0.0]),q.Max([0.996094]), q.Scale([0.003906]), q.ZeroPoint([0]))
+    quantization = q.Quantization(q.Min([0.0]),q.Max([0.99609375]), q.Scale([0.00390625]), q.ZeroPoint([0]))
     tensors.append(t.Tensor(quantization,t.Shape([1,10]),"CifarNet/Predictions/Reshape_1"
     , 17, tt.TensorType.UINT8))
         # TODO add more
@@ -57,4 +57,3 @@ model.genTFLite(builder)
 buffer = builder.Output()
 with open("test/out.tflite","wb") as f:
     f.write(buffer)
-    
