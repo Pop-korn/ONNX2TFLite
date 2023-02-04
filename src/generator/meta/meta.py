@@ -1,3 +1,4 @@
+from typing_extensions import override
 import flatbuffers as fb
 from typing import Callable
 
@@ -9,6 +10,8 @@ import err
 
 class TFLiteObject:
     """ Parent class for all tflite objects. That is all objects in the 'generator' directory. """
+    
+    """ Generates tflite representation for this object. MUST be overriden! """
     def genTFLite(self, builder: fb.Builder):
         err.eprint("TFLiteObject: genTFLite() is not defined!")
 
@@ -50,25 +53,12 @@ class TFLiteVector(TFLiteObject):
 
         return builder.EndVector()
 
-class TFLiteAtomicVector(TFLiteObject):
-    """ Represents a TFLite vector of atomic values. Provides interface for storing data
-        and generating output TFLite code. """
-    vector: list[int|float|bool] # Item type has to be atomic!
-
-    """ TFLite 'Start...Vector' function for the exact vector. Takes 2 arguments, 
-    'floatbuffers.Builder' and number of vector elements """
-    StartFunction: Callable[[fb.Builder, int],None]
-
-    """ TFLite 'Prepend...' function for the exact vector item type. Takes 'flatbuffers.Builder' 
-    as argument """
-    PrependFunction: Callable[[fb.Builder],None]
-
+class TFLiteAtomicVector(TFLiteVector):
     def __init__(self, vector: list[int, float, bool], StartFunction: Callable[[fb.Builder, int],None]
                 , PrependFunction: Callable[[fb.Builder],Callable[[int],None]]) -> None:
-        self.vector = vector
-        self.StartFunction = StartFunction
-        self.PrependFunction = PrependFunction
+        super().__init__(vector,StartFunction,PrependFunction)
 
+    @override
     def genTFLite(self, builder: fb.Builder):
         """ Generates TFLite code for the vector """
         self.StartFunction(builder, len(self.vector))
@@ -109,7 +99,7 @@ class BuiltinOptions(TFLiteObject):
     """ Class represents 'BuiltinOptions' for an Operator. Used in 'model/Operators.py'.
         Provides interface for work with any BuiltinOptions table. 
         This class alone does NOT generate any TFLite.
-        Subclasses do NOT generate TFLite for the 'builtinOptionsType', only for the exact options,
+        Subclasses do NOT generate TFLite for the 'builtinOptionsType', only for the exact options.
         'builtinOptionsType' is merely stored here for convenience and an 'Operator' object
         generates its TFLite representation (as it is the child of the 'operator' table in 'operators'). 
         """

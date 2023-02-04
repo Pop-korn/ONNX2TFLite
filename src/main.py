@@ -15,19 +15,16 @@ import generator.builtin.Conv2D as Conv2D
 def BuildModel():
     """ Generate the 'cifar10_model.tflite' """
     # OperatroCodes
-    operatorCodes = []
+    operatorCodes = oc.OperatorCodes()
     operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.CONV_2D))
     operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.FULLY_CONNECTED))
     operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.MAX_POOL_2D))
     operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.SOFTMAX))
-    operatorCodes = oc.OperatorCodes(operatorCodes)
 
     # SubGraphs - Model only has 1 subgraph
     subGraphs = sg.SubGraphs()
 
-    subGraph = sg.SubGraph()
-    subGraph.inputs = sg.Inputs([16])
-    subGraph.outputs = sg.Outputs([0])
+    subGraph = sg.SubGraph(sg.Inputs([16]), sg.Outputs([0]))
 
         # Operators
     operators = o.Operators()
