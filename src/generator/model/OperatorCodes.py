@@ -33,8 +33,14 @@ class OperatorCode:
 class OperatorCodes:
     operatorCodes: list[OperatorCode]
 
-    def __init__(self, operatorCodes: list[OperatorCode]) -> None:
+    def __init__(self, operatorCodes: list[OperatorCode] = []) -> None:
         self.operatorCodes = operatorCodes
+
+    def append(self, operatorCode: OperatorCode):
+        self.operatorCodes.append(operatorCode)
+
+    def get(self, index: int):
+        return self.operatorCodes[index]
 
     def genTFLite(self, builder):
         """Generate TFLite representation for all OperatorCodes in 'operatorCodes' """
