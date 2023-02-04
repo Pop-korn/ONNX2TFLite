@@ -60,3 +60,4 @@ class Quantization(meta.TFLiteObject):
         qp.AddDetailsType(builder, self.detailsType)
 
         return qp.End(builder)
+        

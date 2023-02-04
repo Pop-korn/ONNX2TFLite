@@ -5,3 +5,4 @@ def eprint(*args, **kwargs):
 
 def wprint(*args, **kwargs):
     print("WARNING: ", *args, file=sys.stderr, **kwargs)
+    

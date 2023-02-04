@@ -57,3 +57,4 @@ model.genTFLite(builder)
 buffer = builder.Output()
 with open("test/out.tflite","wb") as f:
     f.write(buffer)
+    
