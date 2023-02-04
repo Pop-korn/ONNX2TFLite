@@ -57,7 +57,15 @@
           "outputs": [
             2
           ],
-          "builtin_options_type": "NONE",
+          "builtin_options_type": "Conv2DOptions",
+          "builtin_options": {
+            "padding": "SAME",
+            "stride_w": 1,
+            "stride_h": 1,
+            "fused_activation_function": "NONE",
+            "dilation_w_factor": 1,
+            "dilation_h_factor": 1
+          },
           "custom_options_format": "FLEXBUFFERS",
           "mutating_variable_inputs": [
 

@@ -1,6 +1,10 @@
 import flatbuffers as fb
 from typing import Callable
 
+import tflite.BuiltinOptions as bo
+
+import err
+
 """ This file contains parent classes for simple classes used in the '/model' directory. """
 
 class TFLiteAtomicVector:
@@ -39,8 +43,6 @@ class FloatVector(TFLiteAtomicVector):
     , PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependFloat32) -> None:
         super().__init__(floatList,StartFunction,PrependFunction)
 
-
-
 class IntVector(TFLiteAtomicVector):
     """ Class represents a TFLite vector of integer values. Provides interface for storing data
         and generating output TFLite code. """
@@ -55,3 +57,22 @@ class BoolVector(TFLiteAtomicVector):
     def __init__(self, boolList: list[bool], StartFunction: Callable[[fb.Builder, int],None]
     , PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependBool) -> None:
         super().__init__(boolList,StartFunction,PrependFunction)
+
+
+
+class BuiltinOptions:
+    """ Class represents 'BuiltinOptions' for an Operator. Used in 'model/Operators.py'.
+        Provides interface for work with any BuiltinOptions table. 
+        This class alone does NOT generate any TFLite.
+        Subclasses do NOT generate TFLite for the 'builtinOptionsType', only for the exact options,
+        'builtinOptionsType' is merely stored here for convenience and an 'Operator' object
+        generates its TFLite representation (as it is the child of the 'operator' table in 'operators'). 
+        """
+    builtinOptionsType: bo.BuiltinOptions
+
+    def __init__(self, builtinOptionsType: bo.BuiltinOptions) -> None:
+        self.builtinOptionsType = builtinOptionsType
+
+    """ Function has to be overwritten """
+    def genTFLite(self, builder: fb.Builder):
+        err.eprint(f"BuiltinOperator '{self.builtinOptionsType}': genTFLite() is not defined")

@@ -22,13 +22,14 @@ class MutatingVariableInputs(meta.BoolVector):
 class Operator:
     opcodeIndex: int
     customOptionsFormat: cof.CustomOptionsFormat # Only default value is possible
-    # TODO customOptions
     mutatingVariableInputs: MutatingVariableInputs
     inputs: Inputs
     outputs: Outputs
+    builtinOptions: meta.BuiltinOptions
+    # TODO customOptions
     # TODO intermediates
 
-    def __init__(self, inputs: Inputs, outputs: Outputs
+    def __init__(self, inputs: Inputs, outputs: Outputs, builtinOptions: meta.BuiltinOptions
     , mutatingVariableInputs: MutatingVariableInputs, opcodeIndex: int = 0
     , customOptionsFormat: cof.CustomOptionsFormat = cof.CustomOptionsFormat.FLEXBUFFERS) -> None:
         self.opcodeIndex = opcodeIndex
@@ -36,18 +37,22 @@ class Operator:
         self.mutatingVariableInputs = mutatingVariableInputs
         self.inputs = inputs
         self.outputs = outputs
+        self.builtinOptions = builtinOptions
 
     def genTFLite(self, builder: fb.Builder):
         tflMutatingVariableInputs = self.mutatingVariableInputs.genTFLite(builder)
         tflInputs = self.inputs.genTFLite(builder)
         tflOutputs = self.outputs.genTFLite(builder)
+        tflBuiltinOptions = self.builtinOptions.genTFLite(builder)
 
         op.Start(builder)
 
         op.AddOpcodeIndex(builder, self.opcodeIndex)
-        op.AddMutatingVariableInputs(builder,tflMutatingVariableInputs)
-        op.AddInputs(builder,tflInputs)
-        op.AddOutputs(builder,tflOutputs)
+        op.AddMutatingVariableInputs(builder, tflMutatingVariableInputs)
+        op.AddInputs(builder, tflInputs)
+        op.AddOutputs(builder, tflOutputs)
+        op.AddBuiltinOptions(builder, tflBuiltinOptions)
+        op.AddBuiltinOptionsType(builder, self.builtinOptions.builtinOptionsType)
 
         return op.End(builder)
 

@@ -2,12 +2,15 @@ import flatbuffers as fb
 import tflite.Model as Model
 import tflite.BuiltinOperator as BuiltinOperator
 import tflite.TensorType as TensorType
+import tflite.Padding as Padding
+
 
 import generator.model.OperatorCodes as OperatorCodes
 import generator.model.SubGraphs as SubGraphs
 import generator.model.Tensors as Tensors
 import generator.model.Quantization as Quant
 import generator.model.Operators as Operators
+import generator.builtin.Conv2D as Conv2D
 
 def gen_Model(builder: fb.Builder):
     desc = builder.CreateString("Model Description")
@@ -24,8 +27,9 @@ def gen_Model(builder: fb.Builder):
 
     inputs = SubGraphs.Inputs([0])
     outputs = SubGraphs.Outputs([2,3,5])
-
-    operators = Operators.Operators([Operators.Operator(Operators.Inputs([16,3,1]),Operators.Outputs([2]),
+    conv2DOptions = Conv2D.Conv2D(Padding.Padding.SAME,1,1)
+    operators = Operators.Operators([Operators.Operator(Operators.Inputs([16,3,1])
+    ,Operators.Outputs([2]), conv2DOptions,
         Operators.MutatingVariableInputs([]))])
 
     subGraphs = [SubGraphs.SubGraph(inputs, outputs, tensors,operators)]
