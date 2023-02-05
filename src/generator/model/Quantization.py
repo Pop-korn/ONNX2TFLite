@@ -10,19 +10,19 @@ import generator.meta.meta as meta
 """
 
 class Min (meta.FloatVector):
-    def __init__(self, min: list[float]) -> None:
-        super().__init__(min, qp.StartMinVector)
+    def __init__(self, min: list[float]=[]) -> None:
+        super().__init__(min, qp.StartMinVector, genEmpty = False)
 
 class Max (meta.FloatVector):
-    def __init__(self, max: list[float]) -> None:
-        super().__init__(max,qp.StartMaxVector)
+    def __init__(self, max: list[float]=[]) -> None:
+        super().__init__(max,qp.StartMaxVector, genEmpty = False)
 
 class Scale(meta.FloatVector):
-    def __init__(self, scale: list[float]) -> None:
+    def __init__(self, scale: list[float]=[]) -> None:
         super().__init__(scale,qp.StartScaleVector)
 
 class ZeroPoint(meta.IntVector):
-    def __init__(self, zeroPoint: list[int]) -> None:
+    def __init__(self, zeroPoint: list[int]=[]) -> None:
         super().__init__(zeroPoint,qp.StartZeroPointVector,
                         lambda builder : builder.PrependInt64)
 
@@ -35,7 +35,7 @@ class Quantization(meta.TFLiteObject):
     detailsType: qd.QuantizationDetails
     # TODO details
 
-    def __init__(self, min: Min, max: Max, scale: Scale, zeroPoint: ZeroPoint
+    def __init__(self, min: Min=Min(), max: Max=Max(), scale: Scale=None, zeroPoint: ZeroPoint=ZeroPoint([0])
                 , quantizedDimension: int = 0, detailsType: qd.QuantizationDetails=qd.QuantizationDetails.NONE) -> None:
         self.min = min
         self.max = max
@@ -52,8 +52,10 @@ class Quantization(meta.TFLiteObject):
         
         qp.Start(builder)
 
-        qp.AddMin(builder, tflMin)
-        qp.AddMax(builder, tflMax)
+        if tflMin is not None:
+            qp.AddMin(builder, tflMin)
+        if tflMax is not None:
+            qp.AddMax(builder, tflMax)
         qp.AddScale(builder, tflScale)
         qp.AddZeroPoint(builder, tflZeroPoint)
         qp.AddQuantizedDimension(builder,self.quantizedDimension)

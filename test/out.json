@@ -5,21 +5,6 @@
       "deprecated_builtin_code": 3,
       "version": 1,
       "builtin_code": "CONV_2D"
-    },
-    {
-      "deprecated_builtin_code": 9,
-      "version": 1,
-      "builtin_code": "FULLY_CONNECTED"
-    },
-    {
-      "deprecated_builtin_code": 17,
-      "version": 1,
-      "builtin_code": "MAX_POOL_2D"
-    },
-    {
-      "deprecated_builtin_code": 25,
-      "version": 1,
-      "builtin_code": "SOFTMAX"
     }
   ],
   "subgraphs": [
@@ -28,20 +13,100 @@
         {
           "shape": [
             1,
-            10
+            32,
+            32,
+            3
           ],
           "type": "UINT8",
-          "buffer": 17,
-          "name": "CifarNet/Predictions/Reshape_1",
+          "buffer": 0,
+          "name": "input",
+          "quantization": {
+            "min": [
+              -1.007874
+            ],
+            "max": [
+              1.0
+            ],
+            "scale": [
+              0.007874
+            ],
+            "zero_point": [
+              128
+            ],
+            "details_type": "NONE",
+            "quantized_dimension": 0
+          },
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            32,
+            5,
+            5,
+            3
+          ],
+          "type": "UINT8",
+          "buffer": 1,
+          "name": "CifarNet/conv1/weights_quant/FakeQuantWithMinMaxVars",
+          "quantization": {
+            "min": [
+              -1.684995
+            ],
+            "max": [
+              1.27102
+            ],
+            "scale": [
+              0.011638
+            ],
+            "zero_point": [
+              146
+            ],
+            "details_type": "NONE",
+            "quantized_dimension": 0
+          },
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            32
+          ],
+          "type": "INT32",
+          "buffer": 2,
+          "name": "CifarNet/conv1/Conv2D_bias",
+          "quantization": {
+            "scale": [
+              0.000092
+            ],
+            "zero_point": [
+              0
+            ],
+            "details_type": "NONE",
+            "quantized_dimension": 0
+          },
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            1,
+            32,
+            32,
+            32
+          ],
+          "type": "UINT8",
+          "buffer": 3,
+          "name": "CifarNet/conv1/Relu",
           "quantization": {
             "min": [
               0.0
             ],
             "max": [
-              0.996094
+              23.805988
             ],
             "scale": [
-              0.003906
+              0.093357
             ],
             "zero_point": [
               0
@@ -54,21 +119,21 @@
         }
       ],
       "inputs": [
-        16
+        0
       ],
       "outputs": [
-        0
+        3
       ],
       "operators": [
         {
           "opcode_index": 0,
           "inputs": [
-            16,
-            3,
-            1
+            0,
+            1,
+            2
           ],
           "outputs": [
-            2
+            3
           ],
           "builtin_options_type": "Conv2DOptions",
           "builtin_options": {
@@ -90,12 +155,12 @@
   "description": "TOCO Converted.",
   "buffers": [
     {
-      "data": [
-        1,
-        2,
-        3,
-        4
-      ]
+    },
+    {
+    },
+    {
+    },
+    {
     }
   ]
 }

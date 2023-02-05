@@ -16,6 +16,10 @@ class TFLiteObject:
         err.eprint("TFLiteObject: genTFLite() is not defined!")
 
 class TFLiteVector(TFLiteObject):
+    """ Indicates if an empty vector should be generated if 'vector' attribute is
+    empty, or to not generate anything in that case. """
+    genEmpty: bool=True
+
     """ Represents a TFLite vector of TFLiteObjects. Provides interface for storing data
         and generating output TFLite code. """
     vector: list[TFLiteObject]
@@ -29,10 +33,12 @@ class TFLiteVector(TFLiteObject):
     PrependFunction: Callable[[fb.Builder],None]
 
     def __init__(self, vector: list[TFLiteObject], StartFunction: Callable[[fb.Builder, int],None]
-                , PrependFunction: Callable[[fb.Builder],Callable[[int],None]] = lambda builder: builder.PrependUOffsetTRelative) -> None:
+                , PrependFunction: Callable[[fb.Builder],Callable[[int],None]] = lambda builder: builder.PrependUOffsetTRelative,
+                genEmpty: bool=True) -> None:
         self.vector = vector
         self.StartFunction = StartFunction
         self.PrependFunction = PrependFunction
+        self.genEmpty = genEmpty
 
     def append(self, item):
         self.vector.append(item)
@@ -42,6 +48,11 @@ class TFLiteVector(TFLiteObject):
 
     def genTFLite(self, builder: fb.Builder):
         """ Generates TFLite code for the vector """
+
+        if (not self.genEmpty) and (len(self.vector) == 0):
+            # Nothing to generate
+            return
+
         # IMPORTANT! tflite MUST be generated for list items in REVERSE ORDER! 
         # Otherwise the order will be wrong.
         tflVector = [item.genTFLite(builder) for item in reversed(self.vector)]
@@ -55,12 +66,17 @@ class TFLiteVector(TFLiteObject):
 
 class TFLiteAtomicVector(TFLiteVector):
     def __init__(self, vector: list[int, float, bool], StartFunction: Callable[[fb.Builder, int],None]
-                , PrependFunction: Callable[[fb.Builder],Callable[[int],None]]) -> None:
-        super().__init__(vector,StartFunction,PrependFunction)
+                , PrependFunction: Callable[[fb.Builder],Callable[[int],None]], genEmpty: bool=True) -> None:
+        super().__init__(vector,StartFunction,PrependFunction,genEmpty)
 
     @override
     def genTFLite(self, builder: fb.Builder):
         """ Generates TFLite code for the vector """
+
+        if (not self.genEmpty) and (len(self.vector) == 0):
+            # Nothing to generate
+            return
+
         self.StartFunction(builder, len(self.vector))
 
         # IMPORTANT! tflite MUST be generated for list items in REVERSE ORDER! 
@@ -75,23 +91,26 @@ class FloatVector(TFLiteAtomicVector):
         and generating output TFLite code. """
 
     def __init__(self, floatList: list[float], StartFunction: Callable[[fb.Builder, int],None]
-    , PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependFloat32) -> None:
-        super().__init__(floatList,StartFunction,PrependFunction)
+    , PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependFloat32
+    , genEmpty: bool=True) -> None:
+        super().__init__(floatList,StartFunction,PrependFunction,genEmpty)
 
 class IntVector(TFLiteAtomicVector):
     """ Class represents a TFLite vector of integer values. Provides interface for storing data
         and generating output TFLite code. """
 
     def __init__(self, intList: list[int], StartFunction: Callable[[fb.Builder, int],None]
-    , PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependInt32) -> None:
-        super().__init__(intList,StartFunction,PrependFunction)
+    , PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependInt32
+    , genEmpty: bool=True) -> None:
+        super().__init__(intList,StartFunction,PrependFunction,genEmpty)
 
 class BoolVector(TFLiteAtomicVector):
     """ Class represents a TFLite vector of boolean values. Provides interface for storing data
         and generating output TFLite code. """
     def __init__(self, boolList: list[bool], StartFunction: Callable[[fb.Builder, int],None]
-    , PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependBool) -> None:
-        super().__init__(boolList,StartFunction,PrependFunction)
+    , PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependBool
+    , genEmpty: bool=True) -> None:
+        super().__init__(boolList,StartFunction,PrependFunction,genEmpty)
 
 
 

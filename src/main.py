@@ -13,37 +13,60 @@ import generator.model.Buffers as b
 
 import generator.builtin.Conv2D as Conv2D
 
+def BuildOperators(operators: o.Operators):
+    operators.append(o.Operator(o.Inputs([0,1,2]),o.Outputs([3])
+    ,Conv2D.Conv2D(strideH=1,strideW=1)))
+
+def BuildTensors(tensors: t.Tensors):
+    # quantization = q.Quantization(q.Min([0.0]),q.Max([0.99609375]), q.Scale([0.00390625]), q.ZeroPoint([0]))
+    # tensors.append(t.Tensor(quantization,t.Shape([1,10]),"CifarNet/Predictions/Reshape_1"
+    # , 17, tt.TensorType.UINT8))
+    #     # TODO add more
+
+    inputQuant = q.Quantization(q.Min([-1.0078740119934082]),q.Max([1.0]),q.Scale([0.007874015718698502]),q.ZeroPoint([128]))
+    tensors.append(t.Tensor(inputQuant,t.Shape([1,32,32,3]),"input",0,tt.TensorType.UINT8))
+
+    convWQuant = q.Quantization(q.Min([-1.6849952936172485]),q.Max([1.2710195779800415])
+    ,q.Scale([0.01163785345852375]),q.ZeroPoint([146]))
+    tensors.append(t.Tensor(convWQuant,t.Shape([32,5,5,3]),"CifarNet/conv1/weights_quant/FakeQuantWithMinMaxVars"
+    ,1,tt.TensorType.UINT8))
+
+    convBQuant = q.Quantization(scale=q.Scale([0.00009163664071820676 ]))
+    tensors.append(t.Tensor(convBQuant,t.Shape([32]),"CifarNet/conv1/Conv2D_bias",2,tt.TensorType.INT32))
+
+    outpuQuant = q.Quantization(q.Min([0.0]),q.Max([23.805988311767578]), q.Scale([0.09335681796073914]))
+    tensors.append(t.Tensor(outpuQuant,t.Shape([1,32,32,32]),"CifarNet/conv1/Relu"
+    , 3, tt.TensorType.UINT8))
+
+
 def BuildModel():
     """ Generate the 'cifar10_model.tflite' """
     # OperatroCodes
     operatorCodes = oc.OperatorCodes()
     operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.CONV_2D))
-    operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.FULLY_CONNECTED))
-    operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.MAX_POOL_2D))
-    operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.SOFTMAX))
+    #operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.FULLY_CONNECTED))
+    #operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.MAX_POOL_2D))
+    #operatorCodes.append(oc.OperatorCode(bo.BuiltinOperator.SOFTMAX))
 
     # SubGraphs - Model only has 1 subgraph
     subGraphs = sg.SubGraphs()
 
-    subGraph = sg.SubGraph(sg.Inputs([16]), sg.Outputs([0]))
+    subGraph = sg.SubGraph(sg.Inputs([0]), sg.Outputs([3]))
 
         # Operators
     operators = o.Operators()
-    operators.append(o.Operator(o.Inputs([16,3,1]),o.Outputs([2]),Conv2D.Conv2D(strideH=1,strideW=1)))
+    BuildOperators(operators)
     subGraph.operators = operators
 
         # Tensors
     tensors = t.Tensors()
-    quantization = q.Quantization(q.Min([0.0]),q.Max([0.99609375]), q.Scale([0.00390625]), q.ZeroPoint([0]))
-    tensors.append(t.Tensor(quantization,t.Shape([1,10]),"CifarNet/Predictions/Reshape_1"
-    , 17, tt.TensorType.UINT8))
-        # TODO add more
+    BuildTensors(tensors)
     subGraph.tensors = tensors
 
     subGraphs.append(subGraph)
 
     # Buffers
-    buffers = b.Buffers([b.Buffer([1,2,3,4])])
+    buffers = b.Buffers([b.Buffer(),b.Buffer([]),b.Buffer([]),b.Buffer()])
 
     return m.Model(3,"TOCO Converted.",buffers,operatorCodes,subGraphs)
 
