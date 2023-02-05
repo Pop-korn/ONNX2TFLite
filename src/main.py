@@ -1,5 +1,8 @@
 import flatbuffers as fb
 
+import numpy as np
+import io 
+
 import tflite.BuiltinOperator as bo
 import tflite.TensorType as tt
 
@@ -38,6 +41,18 @@ def BuildTensors(tensors: t.Tensors):
     tensors.append(t.Tensor(outpuQuant,t.Shape([1,32,32,32]),"CifarNet/conv1/Relu"
     , 3, tt.TensorType.UINT8))
 
+def BuildBuffers(buffers: b.Buffers):
+    buffers.append(b.Buffer()) # input -> empty
+
+    # load weights from file
+    convWeights = np.load("data/buffers/conv1-weights").flatten().tolist()
+    buffers.append(b.Buffer(convWeights,tt.TensorType.UINT8))
+
+    # load bias from file
+    convBias = np.load("data/buffers/conv1-bias").flatten().tolist()
+    buffers.append(b.Buffer(convBias))
+
+    buffers.append(b.Buffer()) # output -> empty
 
 def BuildModel():
     """ Generate the 'cifar10_model.tflite' """
@@ -66,7 +81,8 @@ def BuildModel():
     subGraphs.append(subGraph)
 
     # Buffers
-    buffers = b.Buffers([b.Buffer(),b.Buffer([]),b.Buffer([]),b.Buffer()])
+    buffers = b.Buffers()
+    BuildBuffers(buffers)
 
     return m.Model(3,"TOCO Converted.",buffers,operatorCodes,subGraphs)
 
