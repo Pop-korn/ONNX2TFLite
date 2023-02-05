@@ -11,6 +11,8 @@ import generator.meta.meta as meta
     'SubGraph' structure represented in the 'model/SubGraph.py' file.
 """
 
+# TODO If 'hasRank' is false, "shape" must be [].
+
 class Shape(meta.IntVector):
     def __init__(self, shape: list[int]) -> None:
         super().__init__(shape,t.StartShapeVector)

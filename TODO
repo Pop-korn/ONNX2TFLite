@@ -1,0 +1,5 @@
+from_json.tflite - prvych 248B je odlisnych - byty 249 az 2658 su rovnake 
+
+out.tflite - prvych 76B je odlisnych - byty 77 az 2486 su rovnake
+
+dalej su asi tenzory, ale v rozlicnom poradi a byty sa moc nezhoduju

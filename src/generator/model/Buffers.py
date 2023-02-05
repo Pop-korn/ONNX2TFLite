@@ -7,8 +7,6 @@ import tflite.TensorType as tt
 import generator.meta.meta as meta
 import generator.meta.types as types
 
-import err
-
 class Buffer(meta.TFLiteObject):
     data: list
     type: tt.TensorType
@@ -28,7 +26,12 @@ class Buffer(meta.TFLiteObject):
 
         PrependFunction = self.getPrependFunction(builder)
 
-        b.StartDataVector(builder, len(self.data) * types.TypeSize(self.type))
+        # 'data' length has to be multiplied by item size, because tflite.Buffer is
+        # a vector of 'UBYTE's. So e.g. one 'INT32' item will take up 4 spaces in the vector
+        lenBytes = len(self.data) * types.TypeSize(self.type)
+        # builder.StartVector(1, lenBytes, 2)
+        b.StartDataVector(builder, lenBytes)
+
 
         # IMPORTANT! Flatbuffer is built in reverse, so for correct order,
         # data MUST be iterated in revese
@@ -36,6 +39,7 @@ class Buffer(meta.TFLiteObject):
             PrependFunction(val)
 
         tflData = builder.EndVector()
+
 
         b.Start(builder)
         b.AddData(builder, tflData)
