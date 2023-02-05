@@ -29,7 +29,7 @@ class TFLiteVector(TFLiteObject):
     PrependFunction: Callable[[fb.Builder],None]
 
     def __init__(self, vector: list[TFLiteObject], StartFunction: Callable[[fb.Builder, int],None]
-                , PrependFunction: Callable[[fb.Builder],Callable[[int],None]] = lambda builder: builder.PrependSOffsetTRelative) -> None:
+                , PrependFunction: Callable[[fb.Builder],Callable[[int],None]] = lambda builder: builder.PrependUOffsetTRelative) -> None:
         self.vector = vector
         self.StartFunction = StartFunction
         self.PrependFunction = PrependFunction

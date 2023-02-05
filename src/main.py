@@ -9,6 +9,7 @@ import generator.model.SubGraphs as sg
 import generator.model.Tensors as t
 import generator.model.Quantization as q
 import generator.model.Operators as o
+import generator.model.Buffers as b
 
 import generator.builtin.Conv2D as Conv2D
 
@@ -41,7 +42,10 @@ def BuildModel():
 
     subGraphs.append(subGraph)
 
-    return m.Model(3,"TOCO Converted.",operatorCodes,subGraphs)
+    # Buffers
+    buffers = b.Buffers([b.Buffer([1,2,3,4])])
+
+    return m.Model(3,"TOCO Converted.",buffers,operatorCodes,subGraphs)
 
 
 # Create a flatbuffer builder to build the .tflite file
