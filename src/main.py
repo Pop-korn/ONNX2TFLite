@@ -84,17 +84,21 @@ def BuildModel():
     buffers = b.Buffers()
     BuildBuffers(buffers)
 
-    return m.Model(3,"TOCO Converted.",buffers,operatorCodes,subGraphs)
+    return m.Model(3,"",buffers,operatorCodes,subGraphs)
 
 
 # Create a flatbuffer builder to build the .tflite file
-builder = fb.Builder(1024)
+builder = fb.Builder(2048)
 
 # Build the TFLite model structure. No TFLite generated yet, only internal representation
 model = BuildModel()
 
 # Generate the TFLite fot the model
-model.genTFLite(builder)
+tflModel = model.genTFLite(builder)
+
+
+builder.Finish(tflModel,"TFL3".encode("utf-8"))
+
 
 # Write the TFLite data to file
 buffer = builder.Output()

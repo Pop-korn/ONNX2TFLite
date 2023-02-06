@@ -60,5 +60,5 @@ class Operator(meta.TFLiteObject):
 
 class Operators(meta.TFLiteVector):
     def __init__(self, operators: list[Operator] = []) -> None:
-        super().__init__(operators,sg.StartOperatorsVector) # TODO UOffset??
+        super().__init__(operators,sg.StartOperatorsVector)
         

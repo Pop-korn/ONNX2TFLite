@@ -40,4 +40,4 @@ class Model(meta.TFLiteObject):
         m.AddSubgraphs(builder,tflSubGraphs)
         m.AddBuffers(builder,tflBuffers)
 
-        builder.Finish(m.End(builder))
+        return m.End(builder)
