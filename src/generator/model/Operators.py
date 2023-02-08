@@ -31,8 +31,9 @@ class Operator(meta.TFLiteObject):
 
     def __init__(self, inputs: Inputs=None, outputs: Outputs=None,
                 builtinOptions: meta.BuiltinOptions=None,
+                opcodeIndex: int = 0, 
                 mutatingVariableInputs: MutatingVariableInputs=MutatingVariableInputs(),
-                opcodeIndex: int = 0, customOptionsFormat: cof.CustomOptionsFormat = cof.CustomOptionsFormat.FLEXBUFFERS) -> None:
+                customOptionsFormat: cof.CustomOptionsFormat = cof.CustomOptionsFormat.FLEXBUFFERS) -> None:
         self.opcodeIndex = opcodeIndex
         self.customOptionsFormat = customOptionsFormat
         self.mutatingVariableInputs = mutatingVariableInputs

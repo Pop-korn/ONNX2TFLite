@@ -13,7 +13,7 @@ class Conv2D(meta.BuiltinOptions):
     strideH: int = 0
     dilationWFactor: int = 1
     dilationHFactor: int = 1
-    fusedActivationFunction: aft.ActivationFunctionType = aft.ActivationFunctionType.NONE
+    fusedActivationFunction: aft.ActivationFunctionType
 
     def __init__(self, padding: p.Padding = p.Padding.SAME,
                 strideW: int = 0, strideH: int = 0,
@@ -30,7 +30,7 @@ class Conv2D(meta.BuiltinOptions):
     def genTFLite(self, builder: fb.Builder):
         conv.Start(builder)
 
-        # conv.AddPadding(builder, self.padding)
+        conv.AddPadding(builder, self.padding)
         conv.AddStrideW(builder,self.strideW)
         conv.AddStrideH(builder,self.strideH)
         conv.AddFusedActivationFunction(builder,self.fusedActivationFunction)

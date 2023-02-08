@@ -29,11 +29,11 @@ class Tensor(meta.TFLiteObject):
     # TODO shapeSignature
     # TODO variantTensors
 
-    def __init__(self, quantization: Quantization.Quantization,
-                shape: Shape,
+    def __init__(self, shape: Shape,
                 name: str = None, 
                 buffer: int = 0, 
                 type: tt.TensorType = tt.TensorType.FLOAT32,
+                quantization: Quantization.Quantization=None,
                 isVariable: bool = False, 
                 hasRank: bool = False) -> None:
         self.isVariable = isVariable
@@ -47,7 +47,9 @@ class Tensor(meta.TFLiteObject):
     def genTFLite(self, builder: fb.Builder):
         name = builder.CreateString(self.name)
         tflShape = self.shape.genTFLite(builder)
-        tflQuantization = self.quantization.genTFLite(builder)
+
+        if(self.quantization is not None):
+            tflQuantization = self.quantization.genTFLite(builder)
 
         t.Start(builder)
 
@@ -55,11 +57,14 @@ class Tensor(meta.TFLiteObject):
         t.AddIsVariable(builder, self.isVariable)
         t.AddHasRank(builder, self.hasRank)
         t.AddBuffer(builder, self.buffer)
+        
         if name is not None:
             t.AddName(builder, name)
 
         t.AddShape(builder,tflShape)
-        t.AddQuantization(builder,tflQuantization)
+
+        if(self.quantization is not None):
+            t.AddQuantization(builder,tflQuantization)
         
         return t.End(builder)
 
