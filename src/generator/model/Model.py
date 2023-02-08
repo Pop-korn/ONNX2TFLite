@@ -18,6 +18,13 @@ class Model(meta.TFLiteObject):
     # TODO metadata
     # TODO metadataBuffer
 
+    __fileIdentifier = "TFL3" # file_identifier from the used TFLite schema
+
+    @classmethod
+    def __genFileIdentifier(cls):
+        """ Generate byte-like object representing the TFLite format """
+        return cls.__fileIdentifier.encode("ascii")
+
     def __init__(self, version: int=1, description: str=None, buffers: b.Buffers=None
             , operatorCodes: oc.OperatorCodes=None, subGraphs: sg.SubGraphs=None) -> None:
         self.version = version
@@ -41,3 +48,13 @@ class Model(meta.TFLiteObject):
         m.AddBuffers(builder,tflBuffers)
 
         return m.End(builder)
+
+    def Finish(self, builder: fb.Builder, tflModel: int):
+        """ Finish generating TFLite for this model. Model must have been built with
+            the provided 'builder'. Resulting output will be stored in 'builder.Output()'.
+
+        Args:
+            builder (fb.Builder): flatbuffers.Builder object, that was used to build the flatbuffer
+            tflModel (int): offset of the built model (result of 'Model.genTFLite()')
+        """
+        builder.Finish(tflModel,Model.__genFileIdentifier())
