@@ -16,6 +16,7 @@ import generator.model.Buffers as b
 
 import generator.builtin.Conv2D as Conv2D
 import generator.builtin.MaxPool2D as MaxPool2D
+import generator.builtin.FullyConnected as FullyConnected
 
 def BuildOperators(operators: o.Operators):
     operators.append(o.Operator(o.Inputs([0,1,2]),o.Outputs([3]),
@@ -35,6 +36,9 @@ def BuildOperators(operators: o.Operators):
 
     operators.append(o.Operator(o.Inputs([11]),o.Outputs([12]),
                     MaxPool2D.MaxPool2D(p.Padding.VALID,2,2), 2))
+
+    operators.append(o.Operator(o.Inputs([12,13,14]), o.Outputs([15]),
+                    FullyConnected.FullyConnected(),1))
 
 def BuildTensors(tensors: t.Tensors):
     # Input
@@ -81,8 +85,8 @@ def BuildTensors(tensors: t.Tensors):
                     8, tt.TensorType.UINT8, maxPool1OutQ))
 
     # Conv3
-    conv3WQ = q.Quantization(q.Min([-0.490180641412735]),q.Max([0.4940822720527649])
-    ,q.Scale([0.003875050926581025]),q.ZeroPoint([127]))
+    conv3WQ = q.Quantization(q.Min([-0.490180641412735]),q.Max([0.4940822720527649]),
+                            q.Scale([0.003875050926581025]),q.ZeroPoint([127]))
     tensors.append(t.Tensor(t.Shape([64,5,5,32]),"CifarNet/conv3/weights_quant/FakeQuantWithMinMaxVars", 
                     9, tt.TensorType.UINT8, conv3WQ))
 
@@ -98,6 +102,18 @@ def BuildTensors(tensors: t.Tensors):
     maxPool1OutQ = q.Quantization(q.Min([0.0]), q.Max([26.186586380004883]), q.Scale([0.10269249230623245]))
     tensors.append(t.Tensor(t.Shape([1,4,4,64]), "CifarNet/pool3/MaxPool", 
                     12, tt.TensorType.UINT8, maxPool1OutQ))
+
+    # FullyConnected
+    fcWQ = q.Quantization(q.Min([-0.25385990738868713]), q.Max([0.38874608278274536]), 
+                            q.Scale([0.002529944758862257]), q.ZeroPoint([101]))
+    tensors.append(t.Tensor(t.Shape([10,1024]), "CifarNet/logits/weights_quant/FakeQuantWithMinMaxVars/transpose",
+                    13, tt.TensorType.UINT8, fcWQ))
+
+    fcBQ = q.Quantization(scale=q.Scale([0.00025980634381994605]))
+    tensors.append(t.Tensor(t.Shape([10]),"CifarNet/logits/MatMul_bias",
+                    14,tt.TensorType.INT32,fcBQ))
+
+
 
     # Output
     outputQ = q.Quantization(q.Min([0.0]),q.Max([0.99609375]), q.Scale([0.00390625]))

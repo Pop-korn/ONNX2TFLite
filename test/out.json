@@ -377,6 +377,53 @@
         },
         {
           "shape": [
+            10,
+            1024
+          ],
+          "type": "UINT8",
+          "buffer": 13,
+          "name": "CifarNet/logits/weights_quant/FakeQuantWithMinMaxVars/transpose",
+          "quantization": {
+            "min": [
+              -0.25386
+            ],
+            "max": [
+              0.388746
+            ],
+            "scale": [
+              0.00253
+            ],
+            "zero_point": [
+              101
+            ],
+            "details_type": "NONE",
+            "quantized_dimension": 0
+          },
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            10
+          ],
+          "type": "INT32",
+          "buffer": 14,
+          "name": "CifarNet/logits/MatMul_bias",
+          "quantization": {
+            "scale": [
+              0.00026
+            ],
+            "zero_point": [
+              0
+            ],
+            "details_type": "NONE",
+            "quantized_dimension": 0
+          },
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
             1,
             10
           ],
@@ -542,6 +589,28 @@
             "filter_width": 1,
             "filter_height": 1,
             "fused_activation_function": "NONE"
+          },
+          "custom_options_format": "FLEXBUFFERS",
+          "mutating_variable_inputs": [
+
+          ]
+        },
+        {
+          "opcode_index": 1,
+          "inputs": [
+            12,
+            13,
+            14
+          ],
+          "outputs": [
+            15
+          ],
+          "builtin_options_type": "FullyConnectedOptions",
+          "builtin_options": {
+            "fused_activation_function": "NONE",
+            "weights_format": "DEFAULT",
+            "keep_num_dims": false,
+            "asymmetric_quantize_inputs": false
           },
           "custom_options_format": "FLEXBUFFERS",
           "mutating_variable_inputs": [
