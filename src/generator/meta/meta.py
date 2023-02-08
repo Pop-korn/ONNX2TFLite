@@ -16,13 +16,14 @@ class TFLiteObject:
         err.eprint("TFLiteObject: genTFLite() is not defined!")
 
 class TFLiteVector(TFLiteObject):
+    """ Represents a TFLite vector of TFLiteObjects. Provides interface for storing data
+        and generating output TFLite code. """
+        
+    vector: list[TFLiteObject]
+
     """ Indicates if an empty vector should be generated if 'vector' attribute is
     empty, or to not generate anything in that case. """
     genEmpty: bool=True
-
-    """ Represents a TFLite vector of TFLiteObjects. Provides interface for storing data
-        and generating output TFLite code. """
-    vector: list[TFLiteObject]
 
     """ TFLite 'Start...Vector' function for the exact vector. Takes 2 arguments, 
     'floatbuffers.Builder' and number of vector elements """
