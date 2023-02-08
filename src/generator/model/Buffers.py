@@ -11,7 +11,8 @@ class Buffer(meta.TFLiteObject):
     data: list
     type: tt.TensorType
 
-    def __init__(self, data: list=[], type: tt.TensorType=tt.TensorType.INT32) -> None:
+    def __init__(self, data: list=[], 
+                type: tt.TensorType=tt.TensorType.INT32) -> None:
         self.data = data
         self.type = type
 

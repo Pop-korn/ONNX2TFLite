@@ -15,9 +15,10 @@ class Conv2D(meta.BuiltinOptions):
     dilationHFactor: int = 1
     fusedActivationFunction: aft.ActivationFunctionType = aft.ActivationFunctionType.NONE
 
-    def __init__(self, padding: p.Padding = p.Padding.SAME, strideW: int = 0
-    , strideH: int = 0, dilationWFactor: int = 1, dilationHFactor: int = 1
-    , fusedActivationFunction: aft.ActivationFunctionType = aft.ActivationFunctionType.NONE) -> None:
+    def __init__(self, padding: p.Padding = p.Padding.SAME,
+                strideW: int = 0, strideH: int = 0,
+                dilationWFactor: int = 1, dilationHFactor: int = 1,
+                fusedActivationFunction: aft.ActivationFunctionType = aft.ActivationFunctionType.NONE) -> None:
         super().__init__(bo.BuiltinOptions.Conv2DOptions)
         self.padding = padding
         self.strideW = strideW

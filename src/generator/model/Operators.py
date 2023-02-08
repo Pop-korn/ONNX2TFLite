@@ -29,10 +29,10 @@ class Operator(meta.TFLiteObject):
     # TODO customOptions
     # TODO intermediates
 
-    def __init__(self, inputs: Inputs=None, outputs: Outputs=None
-    , builtinOptions: meta.BuiltinOptions=None
-    , mutatingVariableInputs: MutatingVariableInputs=MutatingVariableInputs(), opcodeIndex: int = 0
-    , customOptionsFormat: cof.CustomOptionsFormat = cof.CustomOptionsFormat.FLEXBUFFERS) -> None:
+    def __init__(self, inputs: Inputs=None, outputs: Outputs=None,
+                builtinOptions: meta.BuiltinOptions=None,
+                mutatingVariableInputs: MutatingVariableInputs=MutatingVariableInputs(),
+                opcodeIndex: int = 0, customOptionsFormat: cof.CustomOptionsFormat = cof.CustomOptionsFormat.FLEXBUFFERS) -> None:
         self.opcodeIndex = opcodeIndex
         self.customOptionsFormat = customOptionsFormat
         self.mutatingVariableInputs = mutatingVariableInputs

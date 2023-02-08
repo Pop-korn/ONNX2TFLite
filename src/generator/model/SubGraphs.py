@@ -24,8 +24,9 @@ class SubGraph(meta.TFLiteObject):
     tensors: Tensors.Tensors
     operators: Operators.Operators
 
-    def __init__(self, inputs: Inputs=None, outputs: Outputs=None, tensors: Tensors.Tensors=None
-    , operators: Operators.Operators=None):
+    def __init__(self, inputs: Inputs=None, outputs: Outputs=None,
+                tensors: Tensors.Tensors=None,
+                operators: Operators.Operators=None):
         self.inputs = inputs
         self.outputs = outputs
         self.tensors = tensors

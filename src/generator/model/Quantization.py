@@ -35,8 +35,11 @@ class Quantization(meta.TFLiteObject):
     detailsType: qd.QuantizationDetails
     # TODO details
 
-    def __init__(self, min: Min=Min(), max: Max=Max(), scale: Scale=None, zeroPoint: ZeroPoint=ZeroPoint([0])
-                , quantizedDimension: int = 0, detailsType: qd.QuantizationDetails=qd.QuantizationDetails.NONE) -> None:
+    def __init__(self, min: Min=Min(), max: Max=Max(),
+                scale: Scale=None, 
+                zeroPoint: ZeroPoint=ZeroPoint([0]),
+                quantizedDimension: int = 0, 
+                detailsType: qd.QuantizationDetails=qd.QuantizationDetails.NONE) -> None:
         self.min = min
         self.max = max
         self.scale = scale

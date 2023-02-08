@@ -29,9 +29,13 @@ class Tensor(meta.TFLiteObject):
     # TODO shapeSignature
     # TODO variantTensors
 
-    def __init__(self, quantization: Quantization.Quantization, shape: Shape,
-     name: str = None, buffer: int = 0, type: tt.TensorType = tt.TensorType.FLOAT32,
-     isVariable: bool = False, hasRank: bool = False) -> None:
+    def __init__(self, quantization: Quantization.Quantization,
+                shape: Shape,
+                name: str = None, 
+                buffer: int = 0, 
+                type: tt.TensorType = tt.TensorType.FLOAT32,
+                isVariable: bool = False, 
+                hasRank: bool = False) -> None:
         self.isVariable = isVariable
         self.hasRank = hasRank
         self.type = type

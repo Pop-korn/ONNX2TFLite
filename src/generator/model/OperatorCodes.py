@@ -14,7 +14,8 @@ class OperatorCode(meta.TFLiteObject):
     version: int
     # TODO customCode
 
-    def __init__(self,builtinCode: bo.BuiltinOperator,version: int=1):
+    def __init__(self,builtinCode: bo.BuiltinOperator,
+                version: int=1):
         """
         Args:
             builtinCode (BuiltinOperator): operator code from the 'BuiltinOperator' enum

@@ -25,8 +25,11 @@ class Model(meta.TFLiteObject):
         """ Generate byte-like object representing the TFLite format """
         return cls.__fileIdentifier.encode("ascii")
 
-    def __init__(self, version: int=1, description: str=None, buffers: b.Buffers=None
-            , operatorCodes: oc.OperatorCodes=None, subGraphs: sg.SubGraphs=None) -> None:
+    def __init__(self, version: int=1,
+                description: str=None,
+                buffers: b.Buffers=None,
+                operatorCodes: oc.OperatorCodes=None,
+                subGraphs: sg.SubGraphs=None) -> None:
         self.version = version
         self.description = description
         self.operatorCodes = operatorCodes
