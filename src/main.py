@@ -22,15 +22,25 @@ def BuildOperators(operators: o.Operators):
                     Conv2D.Conv2D(strideH=1,strideW=1)))
 
     operators.append(o.Operator(o.Inputs([3]),o.Outputs([4]),
-                    MaxPool2D.MaxPool2D(p.Padding.VALID,2,2,2,2),2))
+                    MaxPool2D.MaxPool2D(p.Padding.VALID,2,2,2,2), 2))
 
     operators.append(o.Operator(o.Inputs([4,5,6]), o.Outputs([7]),
                     Conv2D.Conv2D(strideW=1, strideH=1)))
 
+    operators.append(o.Operator(o.Inputs([7]),o.Outputs([8]),
+                    MaxPool2D.MaxPool2D(p.Padding.VALID,2,2,2,2), 2))
+
+    operators.append(o.Operator(o.Inputs([8,9,10]), o.Outputs([11]),
+                    Conv2D.Conv2D(strideW=1, strideH=1)))
+
+    operators.append(o.Operator(o.Inputs([11]),o.Outputs([12]),
+                    MaxPool2D.MaxPool2D(p.Padding.VALID,2,2), 2))
+
 def BuildTensors(tensors: t.Tensors):
     # Input
     inputQ = q.Quantization(q.Min([-1.0078740119934082]),q.Max([1.0]),q.Scale([0.007874015718698502]),q.ZeroPoint([128]))
-    tensors.append(t.Tensor(t.Shape([1,32,32,3]),"input", 0, tt.TensorType.UINT8, inputQ))
+    tensors.append(t.Tensor(t.Shape([1,32,32,3]),"input", 
+                    0, tt.TensorType.UINT8, inputQ))
 
     # Conv1
     conv1WQ = q.Quantization(q.Min([-1.6849952936172485]),q.Max([1.2710195779800415])
@@ -65,6 +75,30 @@ def BuildTensors(tensors: t.Tensors):
     tensors.append(t.Tensor(t.Shape([1,16,16,32]), "CifarNet/conv2/Relu", 
                     7, tt.TensorType.UINT8, conv2OutQ))
 
+    # MaxPool2
+    maxPool1OutQ = q.Quantization(q.Min([0.0]), q.Max([21.17963981628418]), q.Scale([0.08305741101503372]))
+    tensors.append(t.Tensor(t.Shape([1,8,8,32]), "CifarNet/pool2/MaxPool", 
+                    8, tt.TensorType.UINT8, maxPool1OutQ))
+
+    # Conv3
+    conv3WQ = q.Quantization(q.Min([-0.490180641412735]),q.Max([0.4940822720527649])
+    ,q.Scale([0.003875050926581025]),q.ZeroPoint([127]))
+    tensors.append(t.Tensor(t.Shape([64,5,5,32]),"CifarNet/conv3/weights_quant/FakeQuantWithMinMaxVars", 
+                    9, tt.TensorType.UINT8, conv3WQ))
+
+    conv3BQ = q.Quantization(scale=q.Scale([0.0003218516940250993]))
+    tensors.append(t.Tensor(t.Shape([64]), "CifarNet/conv3/Conv2D_bias", 
+                    10, tt.TensorType.INT32, conv3BQ))
+
+    conv3OutQ = q.Quantization(q.Min([0.0]),q.Max([26.186586380004883]), q.Scale([0.10269249230623245]))
+    tensors.append(t.Tensor(t.Shape([1,8,8,64]), "CifarNet/conv3/Relu", 
+                    11, tt.TensorType.UINT8, conv3OutQ))
+
+    # MaxPool3
+    maxPool1OutQ = q.Quantization(q.Min([0.0]), q.Max([26.186586380004883]), q.Scale([0.10269249230623245]))
+    tensors.append(t.Tensor(t.Shape([1,4,4,64]), "CifarNet/pool3/MaxPool", 
+                    12, tt.TensorType.UINT8, maxPool1OutQ))
+
     # Output
     outputQ = q.Quantization(q.Min([0.0]),q.Max([0.99609375]), q.Scale([0.00390625]))
     tensors.append(t.Tensor(t.Shape([1,10]), "CifarNet/Predictions/Reshape_1", 
@@ -75,11 +109,11 @@ def BuildBuffers(buffers: b.Buffers):
     buffers.append(b.Buffer())
 
     # Conv1
-    c1w = np.load("data/buffers/conv1-weights").flatten().tolist()
-    buffers.append(b.Buffer(c1w,tt.TensorType.UINT8))
+    convW = np.load("data/buffers/conv1-weights").flatten().tolist()
+    buffers.append(b.Buffer(convW,tt.TensorType.UINT8))
 
-    c1b = np.load("data/buffers/conv1-bias").flatten().tolist()
-    buffers.append(b.Buffer(c1b))
+    convB = np.load("data/buffers/conv1-bias").flatten().tolist()
+    buffers.append(b.Buffer(convB))
 
     buffers.append(b.Buffer())
 
@@ -87,12 +121,27 @@ def BuildBuffers(buffers: b.Buffers):
     buffers.append(b.Buffer())
 
     # Conv2
-    c2w = np.load("data/buffers/conv2-weights").flatten().tolist()
-    buffers.append(b.Buffer(c2w,tt.TensorType.UINT8))
+    convW = np.load("data/buffers/conv2-weights").flatten().tolist()
+    buffers.append(b.Buffer(convW,tt.TensorType.UINT8))
 
-    c2b = np.load("data/buffers/conv2-bias").flatten().tolist()
-    buffers.append(b.Buffer(c2b))
+    convB = np.load("data/buffers/conv2-bias").flatten().tolist()
+    buffers.append(b.Buffer(convB))
 
+    buffers.append(b.Buffer())
+
+    #MaxPool2
+    buffers.append(b.Buffer())
+
+    # Conv3
+    convW = np.load("data/buffers/conv3-weights").flatten().tolist()
+    buffers.append(b.Buffer(convW,tt.TensorType.UINT8))
+
+    convB = np.load("data/buffers/conv3-bias").flatten().tolist()
+    buffers.append(b.Buffer(convB))
+
+    buffers.append(b.Buffer())
+
+    #MaxPool3
     buffers.append(b.Buffer())
 
     # Output
