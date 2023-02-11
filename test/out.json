@@ -448,6 +448,33 @@
           },
           "is_variable": false,
           "has_rank": false
+        },
+        {
+          "shape": [
+            1,
+            10
+          ],
+          "type": "UINT8",
+          "buffer": 16,
+          "name": "CifarNet/logits/BiasAdd",
+          "quantization": {
+            "min": [
+              -13.407316
+            ],
+            "max": [
+              22.580744
+            ],
+            "scale": [
+              0.14113
+            ],
+            "zero_point": [
+              95
+            ],
+            "details_type": "NONE",
+            "quantized_dimension": 0
+          },
+          "is_variable": false,
+          "has_rank": false
         }
       ],
       "inputs": [

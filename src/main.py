@@ -122,6 +122,11 @@ def BuildTensors(tensors: t.Tensors):
     tensors.append(t.Tensor(t.Shape([10]),"CifarNet/logits/MatMul_bias",
                     15,tt.TensorType.INT32,fcBQ))
 
+    fcOutQ = q.Quantization(q.Min([-13.407316207885742]),q.Max([22.58074378967285]),
+                    q.Scale([0.14112964272499084]),q.ZeroPoint([95]))
+    tensors.append(t.Tensor(t.Shape([1,10]),"CifarNet/logits/BiasAdd",
+                    16, tt.TensorType.UINT8,fcOutQ))
+
 
 
 def BuildBuffers(buffers: b.Buffers):
