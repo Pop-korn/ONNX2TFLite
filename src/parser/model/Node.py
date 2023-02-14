@@ -31,6 +31,8 @@ class Node:
         self.__assignAttributes()
 
     def __assignAttributes(self):
+        """ Assign the exact attributes based on the 'opType'. Each operator is represented
+            by a unique class in the '/builtin/' directory. """
         match self.opType:
             case "Conv":
                 self.attributes = conv.Conv(self.__node.attribute)
@@ -41,4 +43,5 @@ class Node:
 class Nodes(list[Node]):
     def __init__(self, descriptor: list[onnx.NodeProto]):
         for item in descriptor:
+            print(item)
             self.append(Node(item))
