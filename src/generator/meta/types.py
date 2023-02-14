@@ -17,7 +17,8 @@ def TypeSize(type: tt.TensorType):
         
         # TODO expand
     
-    err.eprint(f"Unsupported type '{type}'!")
+    err.wprint(f"Unsupported type '{type}'! Assuming 4B size.")
+    return 4
 
 
 def PrependFunction(builder: fb.Builder, type: tt.TensorType):
@@ -41,7 +42,8 @@ def PrependFunction(builder: fb.Builder, type: tt.TensorType):
             return builder.PrependInt64
             
         case tt.TensorType.FLOAT16:
-            err.eprint("FLOAT16 datatype is not supported!")
+            err.wprint("FLOAT16 datatype is not supported! Using default 16b alternative.")
+            return builder.PrependInt16 # TODO Might not work
         case tt.TensorType.FLOAT32:
             return builder.PrependFloat32
         case tt.TensorType.FLOAT64:
@@ -49,4 +51,5 @@ def PrependFunction(builder: fb.Builder, type: tt.TensorType):
         
         # TODO expand
     
-    err.eprint(f"Unsupported type '{type}'!")
+    err.wprint(f"Unsupported type '{type}'! Using default Float32.")
+    return builder.PrependFloat32
