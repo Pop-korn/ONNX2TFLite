@@ -9,7 +9,6 @@ class OperatorSetId:
         self.version = descriptor.version
 
 class OperatorSetIds(list[OperatorSetId]):
-
     def __init__(self, vectorDesc: list[onnx.OperatorSetIdProto]) -> None:
         for item in vectorDesc:
             self.append(OperatorSetId(item))
