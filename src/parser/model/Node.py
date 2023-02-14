@@ -4,23 +4,20 @@ import err
 
 import parser.meta.meta as meta
 
-import parser.builtin.Conv as conv
+import parser.builtin.Conv as c
+import parser.builtin.Relu as r
 
-class Node:
-    # Wrapped descriptor
-    __node: onnx.NodeProto
-
-    # Node attributes
+class Node(meta.ONNXObject):
     inputs: list[str]
     outputs: list[str]
     name: str
     opType: str
-    attributes: meta.OperatorAttributes
+    attributes: meta.ONNXOperatorAttributes
     domain: str
     docString: str
 
     def __init__(self, descriptor: onnx.NodeProto) -> None:
-        self.__node = descriptor
+        super().__init__(descriptor)
         self.inputs = descriptor.input
         self.outputs = descriptor.output
         self.name = descriptor.name
@@ -35,7 +32,9 @@ class Node:
             by a unique class in the '/builtin/' directory. """
         match self.opType:
             case "Conv":
-                self.attributes = conv.Conv(self.__node.attribute)
+                self.attributes = c.Conv(self._descriptor.attribute)
+            case "Relu":
+                self.attributes = r.Relu(self._descriptor.attribute)
             case _:
                 err.wprint(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
             
@@ -43,5 +42,6 @@ class Node:
 class Nodes(list[Node]):
     def __init__(self, descriptor: list[onnx.NodeProto]):
         for item in descriptor:
-            print(item)
             self.append(Node(item))
+            if self[-1].opType == "LRN":
+                print(item)

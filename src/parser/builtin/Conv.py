@@ -11,11 +11,7 @@ class Pads(meta.ONNXIntListAttribute):
 class Strides(meta.ONNXIntListAttribute):
     pass
 
-class Conv(meta.OperatorAttributes):
-    # Wrapped descriptor
-    __conv: list[onnx.AttributeProto]
-
-    # Conv attributes
+class Conv(meta.ONNXOperatorAttributes):
     # Attribute is 'None' if not present in the model
     autoPad: str
     kernelShape :KernelShape
@@ -23,7 +19,7 @@ class Conv(meta.OperatorAttributes):
     strides: Strides
 
     def __init__(self, descriptor: list[onnx.AttributeProto]) -> None:
-        self.__conv = descriptor
+        super().__init__(descriptor)
         self.autoPad = None
         self.kernelShape = None
         self.pads = None
@@ -31,7 +27,7 @@ class Conv(meta.OperatorAttributes):
         self.__initAttributes()
 
     def __initAttributes(self):
-        for attr in self.__conv:
+        for attr in self._descriptor:
             match attr.name:
                 case "auto_pad":
                     self.autoPad = attr.s # TODO Not tested!
