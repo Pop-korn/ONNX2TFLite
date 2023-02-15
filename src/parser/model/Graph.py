@@ -9,7 +9,7 @@ class Graph(meta.ONNXObject):
     # Graph attributes
     nodes: n.Nodes
     name: str
-    initializer: t.Tensors
+    initializers: t.Tensors
     # TODO sparseInitialize
     docString: str
     # TODO input

@@ -1,7 +1,6 @@
 import parser.model.Model as m
 
 import parser.builtin.Conv as Conv
-import parser.builtin.Dropout as Dropout
 import parser.builtin.Gemm as Gemm
 import parser.builtin.LRN as LRN
 import parser.builtin.MaxPool as MaxPool
@@ -9,11 +8,13 @@ import parser.builtin.Softmax as Softmax
 
 model = m.Model("data/onnx/bvlcalexnet-12.onnx")
 
-print(model.graph.initializer[0].rawData)
+for item in model.graph.initializer[0].rawData:
+    print(item)
+
+print(model.graph.initializer[0].rawData.__len__()) # 384 = 96 * 4 B
 
 
-
-# Operatro Tests...
+# Operator Tests...
 
 def handleConvOp(conv: Conv.Conv):
     print("Conv")
