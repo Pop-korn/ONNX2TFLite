@@ -6,6 +6,7 @@ import parser.meta.meta as meta
 
 import parser.builtin.Conv as c
 import parser.builtin.LRN as lrn
+import parser.builtin.MaxPool as mp
 import parser.builtin.Relu as r
 
 class Node(meta.ONNXObject):
@@ -36,6 +37,8 @@ class Node(meta.ONNXObject):
                 self.attributes = c.Conv(self._descriptor.attribute)
             case "LRN":
                 self.attributes = lrn.LRN(self._descriptor.attribute)
+            case "MaxPool":
+                self.attributes = mp.MaxPool(self._descriptor.attribute)
             case "Relu":
                 self.attributes = r.Relu(self._descriptor.attribute)
             case _:

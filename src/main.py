@@ -1,11 +1,12 @@
 import parser.model.Model as m
 
-import parser.builtin.Conv as Conv
-import parser.builtin.LRN as LRN
+import parser.builtin.Conv as c
+import parser.builtin.LRN as lrn
+import parser.builtin.MaxPool as mp
 
 model = m.Model("data/onnx/bvlcalexnet-12.onnx")
 
-def handleConvOp(conv: Conv.Conv):
+def handleConvOp(conv: c.Conv):
     print("Conv")
     print(conv.pads)
     print(conv.kernelShape)
@@ -13,7 +14,7 @@ def handleConvOp(conv: Conv.Conv):
     print(conv.group)
     print("")
 
-def handleLRN(lrn: LRN.LRN):
+def handleLRN(lrn: lrn.LRN):
     print("LRN")
     print(lrn.alpha)
     print(lrn.beta)
@@ -21,9 +22,23 @@ def handleLRN(lrn: LRN.LRN):
     print(lrn.size)
     print("")
 
+def handleMaxPool(mp: mp.MaxPool):
+    print("MaxPool")
+    print(mp.autoPad)
+    print(mp.ceilMode)
+    print(mp.dilations)
+    print(mp.kernelShape)
+    print(mp.pads)
+    print(mp.storageOrder)
+    print(mp.strides)
+    print("")
+
+
 for node in model.graph.nodes:
     if node.opType == "Conv":
         handleConvOp(node.attributes)
     elif node.opType == "LRN":
         handleLRN(node.attributes)
+    elif node.opType == "MaxPool":
+        handleMaxPool(node.attributes)
 
