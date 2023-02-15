@@ -9,6 +9,12 @@ import parser.builtin.Softmax as Softmax
 
 model = m.Model("data/onnx/bvlcalexnet-12.onnx")
 
+print(model.graph.initializer[0].rawData)
+
+
+
+# Operatro Tests...
+
 def handleConvOp(conv: Conv.Conv):
     print("Conv")
     print(conv.pads)
@@ -50,15 +56,15 @@ def handleSoftmaxOp(s: Softmax.Softmax):
     print("")
 
 
-for node in model.graph.nodes:
-    if node.opType == "Conv":
-        handleConvOp(node.attributes)
-    elif node.opType == "Softmax":
-        handleSoftmaxOp(node.attributes)
-    elif node.opType == "Gemm":
-        handleGemmOp(node.attributes)
-    elif node.opType == "LRN":
-        handleLRN(node.attributes)
-    elif node.opType == "MaxPool":
-        handleMaxPool(node.attributes)
+# for node in model.graph.nodes:
+#     if node.opType == "Conv":
+#         handleConvOp(node.attributes)
+#     elif node.opType == "Softmax":
+#         handleSoftmaxOp(node.attributes)
+#     elif node.opType == "Gemm":
+#         handleGemmOp(node.attributes)
+#     elif node.opType == "LRN":
+#         handleLRN(node.attributes)
+#     elif node.opType == "MaxPool":
+#         handleMaxPool(node.attributes)
 

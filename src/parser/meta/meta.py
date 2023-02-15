@@ -1,5 +1,10 @@
 import onnx.onnx.onnx_ml_pb2 as onnx
 
+""" Various ENUM references. Originals are 'difficult' to acces because of no intellisense. """
+AttributeType = onnx.AttributeProto.AttributeType
+DataType = onnx.TensorProto.DataType
+DataLocation = onnx.TensorProto.DataLocation
+
 class ONNXObject:
     _descriptor: onnx.DESCRIPTOR
 
@@ -29,9 +34,6 @@ class ONNXOperatorAttributes:
         """ Child class should initialize its attributes with values from the '_descriptor'. """
         pass
 
-""" AttributeType enum reference """
-AttributeType = onnx.AttributeProto.AttributeType
-
 class ONNXIntListAttribute(list [int]):
     """ Represents an ONNX operator attribute, that is a list of integers
         and has 'name' and 'type'.  """
@@ -48,4 +50,8 @@ class ONNXIntListAttribute(list [int]):
 
         for item in descriptor.ints:
             self.append(item)
+
+def isDefined(descriptor: onnx.DESCRIPTOR):
+    """ Tetermine if given descriptor is not empty. """
+    return descriptor != ""
         
