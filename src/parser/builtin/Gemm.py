@@ -30,6 +30,6 @@ class Gemm(meta.ONNXOperatorAttributes):
                 case "transA":
                     self.transA = attr.i # Not tested!
                 case "transB":
-                    self.transB = attr.i # Not tested!
+                    self.transB = attr.i
                 case _:
                     err.wprint(f"ONNX Gemm attribute '{attr.name}' is not supported!")

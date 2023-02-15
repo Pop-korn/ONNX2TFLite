@@ -4,12 +4,13 @@ import err
 
 import parser.meta.meta as meta
 
-import parser.builtin.Conv as conv
-import parser.builtin.Gemm as gemm
-import parser.builtin.LRN as lrn
-import parser.builtin.MaxPool as mp
-import parser.builtin.Relu as relu
-import parser.builtin.Reshape as r
+import parser.builtin.Conv as Conv
+import parser.builtin.Dropout as Dropout
+import parser.builtin.Gemm as Gemm
+import parser.builtin.LRN as LRN
+import parser.builtin.MaxPool as MaxPool
+import parser.builtin.Relu as Relu
+import parser.builtin.Reshape as Reshape
 
 class Node(meta.ONNXObject):
     inputs: list[str]
@@ -36,17 +37,19 @@ class Node(meta.ONNXObject):
             by a unique class in the '/builtin/' directory. """
         match self.opType:
             case "Conv":
-                self.attributes = conv.Conv(self._descriptor.attribute)
+                self.attributes = Conv.Conv(self._descriptor.attribute)
+            case "Dropout":
+                self.attributes = Dropout.Dropout(self._descriptor.attribute)
             case "Gemm":
-                self.attributes = gemm.Gemm(self._descriptor.attribute)
+                self.attributes = Gemm.Gemm(self._descriptor.attribute)
             case "LRN":
-                self.attributes = lrn.LRN(self._descriptor.attribute)
+                self.attributes = LRN.LRN(self._descriptor.attribute)
             case "MaxPool":
-                self.attributes = mp.MaxPool(self._descriptor.attribute)
+                self.attributes = MaxPool.MaxPool(self._descriptor.attribute)
             case "Relu":
-                self.attributes = relu.Relu(self._descriptor.attribute)
+                self.attributes = Relu.Relu(self._descriptor.attribute)
             case "Reshape":
-                self.attributes = r.Reshape(self._descriptor.attribute)
+                self.attributes = Reshape.Reshape(self._descriptor.attribute)
             case _:
                 err.wprint(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
             
