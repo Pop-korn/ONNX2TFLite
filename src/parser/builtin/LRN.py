@@ -12,16 +12,14 @@ class LRN(meta.ONNXOperatorAttributes):
 
     def __init__(self, descriptor: list[onnx.AttributeProto]) -> None:
         super().__init__(descriptor)
-        self.__defaultValues()
-        self.__initAttributes()
 
-    def __defaultValues(self):
+    def _defaultValues(self):
         self.alpha = 0.0001
         self.beta = 0.75
         self.bias = 1.0
         self.size = None
 
-    def __initAttributes(self):
+    def _initAttributes(self):
         for attr in self._descriptor:
             match attr.name:
                 case "alpha":

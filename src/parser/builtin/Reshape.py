@@ -10,13 +10,11 @@ class Reshape(meta.ONNXOperatorAttributes):
 
     def __init__(self, descriptor: list[onnx.AttributeProto]) -> None:
         super().__init__(descriptor)
-        self.__defaultValues()
-        self.__initAttributes()
 
-    def __defaultValues(self):
+    def _defaultValues(self):
         self.allowZero = 0
             
-    def __initAttributes(self):
+    def _initAttributes(self):
         for attr in self._descriptor:
             match attr.name:
                 case "allowzero": # Not tested!

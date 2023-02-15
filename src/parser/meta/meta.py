@@ -17,7 +17,17 @@ class ONNXOperatorAttributes:
 
     def __init__(self, descriptor: onnx.AttributeProto) -> None:
         self._descriptor = descriptor
+        self._defaultValues()
+        self._initAttributes()
 
+    def _defaultValues(self):
+        """ Chlid class should assing default values to its attributes or 'None'
+            if it doesn't have a default value. """
+        pass
+
+    def _initAttributes(self):
+        """ Child class should initialize its attributes with values from the '_descriptor'. """
+        pass
 
 """ AttributeType enum reference """
 AttributeType = onnx.AttributeProto.AttributeType

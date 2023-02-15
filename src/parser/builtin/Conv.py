@@ -15,10 +15,8 @@ class Conv(meta.ONNXOperatorAttributes):
 
     def __init__(self, descriptor: list[onnx.AttributeProto]) -> None:
         super().__init__(descriptor)
-        self.__defaultValues()
-        self.__initAttributes()
 
-    def __defaultValues(self):
+    def _defaultValues(self):
         self.autoPad = "NOTSET"
         self.dilations = None
         self.group = 1
@@ -26,7 +24,7 @@ class Conv(meta.ONNXOperatorAttributes):
         self.pads = None
         self.strides = None
 
-    def __initAttributes(self):
+    def _initAttributes(self):
         for attr in self._descriptor:
             match attr.name:
                 case "auto_pad":
