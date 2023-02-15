@@ -2,6 +2,8 @@ import onnx.onnx.onnx_ml_pb2 as onnx
 
 import parser.meta.meta as meta
 
+import err
+
 class Conv(meta.ONNXOperatorAttributes):
     # Attribute is 'None' if not present in the model
     autoPad: str
@@ -39,3 +41,5 @@ class Conv(meta.ONNXOperatorAttributes):
                     self.pads = meta.ONNXIntListAttribute(attr)
                 case "strides":
                     self.strides = meta.ONNXIntListAttribute(attr)
+                case _:
+                    err.wprint(f"ONNX Conv attribute '{attr.name}' is not supported!")

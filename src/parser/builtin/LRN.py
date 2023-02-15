@@ -2,6 +2,8 @@ import onnx.onnx.onnx_ml_pb2 as onnx
 
 import parser.meta.meta as meta
 
+import err
+
 class LRN(meta.ONNXOperatorAttributes):
     alpha: float
     beta: float
@@ -30,3 +32,5 @@ class LRN(meta.ONNXOperatorAttributes):
                     self.bias = attr.f
                 case "size":
                     self.size = attr.i
+                case _:
+                    err.wprint(f"ONNX LRN attribute '{attr.name}' is not supported!")
