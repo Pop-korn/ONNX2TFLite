@@ -18,8 +18,8 @@ class Node(meta.ONNXObject):
     outputs: list[str]
     name: str
     opType: str
-    attributes: meta.ONNXOperatorAttributes
     domain: str
+    attributes: meta.ONNXOperatorAttributes
     docString: str
 
     def __init__(self, descriptor: onnx.NodeProto) -> None:
@@ -61,5 +61,3 @@ class Nodes(list[Node]):
     def __init__(self, descriptor: list[onnx.NodeProto]):
         for item in descriptor:
             self.append(Node(item))
-            if self[-1].opType == "":
-                print(item)
