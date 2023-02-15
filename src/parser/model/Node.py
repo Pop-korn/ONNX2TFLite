@@ -5,6 +5,7 @@ import err
 import parser.meta.meta as meta
 
 import parser.builtin.Conv as conv
+import parser.builtin.Gemm as gemm
 import parser.builtin.LRN as lrn
 import parser.builtin.MaxPool as mp
 import parser.builtin.Relu as relu
@@ -36,6 +37,8 @@ class Node(meta.ONNXObject):
         match self.opType:
             case "Conv":
                 self.attributes = conv.Conv(self._descriptor.attribute)
+            case "Gemm":
+                self.attributes = gemm.Gemm(self._descriptor.attribute)
             case "LRN":
                 self.attributes = lrn.LRN(self._descriptor.attribute)
             case "MaxPool":
