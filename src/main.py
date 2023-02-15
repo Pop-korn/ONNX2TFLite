@@ -5,6 +5,7 @@ import parser.builtin.Dropout as Dropout
 import parser.builtin.Gemm as Gemm
 import parser.builtin.LRN as LRN
 import parser.builtin.MaxPool as MaxPool
+import parser.builtin.Softmax as Softmax
 
 model = m.Model("data/onnx/bvlcalexnet-12.onnx")
 
@@ -43,17 +44,17 @@ def handleGemmOp(gemm: Gemm.Gemm):
     print(gemm.transB)
     print("")
 
-def handleDropoutOp(d: Dropout.Dropout):
-    print("Dropout")
-    print(d.seed)
+def handleSoftmaxOp(s: Softmax.Softmax):
+    print("Softmax")
+    print(s.axis)
     print("")
 
 
 for node in model.graph.nodes:
     if node.opType == "Conv":
         handleConvOp(node.attributes)
-    elif node.opType == "Dropout":
-        handleDropoutOp(node.attributes)
+    elif node.opType == "Softmax":
+        handleSoftmaxOp(node.attributes)
     elif node.opType == "Gemm":
         handleGemmOp(node.attributes)
     elif node.opType == "LRN":

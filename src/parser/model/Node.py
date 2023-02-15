@@ -11,6 +11,7 @@ import parser.builtin.LRN as LRN
 import parser.builtin.MaxPool as MaxPool
 import parser.builtin.Relu as Relu
 import parser.builtin.Reshape as Reshape
+import parser.builtin.Softmax as Softmax
 
 class Node(meta.ONNXObject):
     inputs: list[str]
@@ -50,6 +51,8 @@ class Node(meta.ONNXObject):
                 self.attributes = Relu.Relu(self._descriptor.attribute)
             case "Reshape":
                 self.attributes = Reshape.Reshape(self._descriptor.attribute)
+            case "Softmax":
+                self.attributes = Softmax.Softmax(self._descriptor.attribute)
             case _:
                 err.wprint(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
             
