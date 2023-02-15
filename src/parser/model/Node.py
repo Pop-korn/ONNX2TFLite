@@ -4,10 +4,11 @@ import err
 
 import parser.meta.meta as meta
 
-import parser.builtin.Conv as c
+import parser.builtin.Conv as conv
 import parser.builtin.LRN as lrn
 import parser.builtin.MaxPool as mp
-import parser.builtin.Relu as r
+import parser.builtin.Relu as relu
+import parser.builtin.Reshape as r
 
 class Node(meta.ONNXObject):
     inputs: list[str]
@@ -34,13 +35,15 @@ class Node(meta.ONNXObject):
             by a unique class in the '/builtin/' directory. """
         match self.opType:
             case "Conv":
-                self.attributes = c.Conv(self._descriptor.attribute)
+                self.attributes = conv.Conv(self._descriptor.attribute)
             case "LRN":
                 self.attributes = lrn.LRN(self._descriptor.attribute)
             case "MaxPool":
                 self.attributes = mp.MaxPool(self._descriptor.attribute)
             case "Relu":
-                self.attributes = r.Relu(self._descriptor.attribute)
+                self.attributes = relu.Relu(self._descriptor.attribute)
+            case "Reshape":
+                self.attributes = r.Reshape(self._descriptor.attribute)
             case _:
                 err.wprint(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
             
