@@ -2,38 +2,40 @@ import onnx.onnx.onnx_ml_pb2 as onnx
 
 import parser.meta.meta as meta
 
-class KernelShape(meta.ONNXIntListAttribute):
-    pass
-
-class Pads(meta.ONNXIntListAttribute):
-    pass
-
-class Strides(meta.ONNXIntListAttribute):
-    pass
-
 class Conv(meta.ONNXOperatorAttributes):
     # Attribute is 'None' if not present in the model
     autoPad: str
-    kernelShape :KernelShape
-    pads: Pads
-    strides: Strides
+    dilations: meta.ONNXIntListAttribute
+    group: int
+    kernelShape :meta.ONNXIntListAttribute
+    pads: meta.ONNXIntListAttribute
+    strides: meta.ONNXIntListAttribute
 
     def __init__(self, descriptor: list[onnx.AttributeProto]) -> None:
         super().__init__(descriptor)
-        self.autoPad = None
+        self.__defaultValues()
+        self.__initAttributes()
+
+    def __defaultValues(self):
+        self.autoPad = "NOTSET"
+        self.dilations = None
+        self.group = 1
         self.kernelShape = None
         self.pads = None
         self.strides = None
-        self.__initAttributes()
 
     def __initAttributes(self):
         for attr in self._descriptor:
             match attr.name:
                 case "auto_pad":
-                    self.autoPad = attr.s # TODO Not tested!
+                    self.autoPad = attr.s # Not tested!
+                case "dilations":
+                    self.dilations = meta.ONNXIntListAttribute(attr) # Not tested!
+                case "group":
+                    self.group = attr.i 
                 case "kernel_shape":
-                    self.kernelShape = KernelShape(attr)
+                    self.kernelShape = meta.ONNXIntListAttribute(attr)
                 case "pads":
-                    self.pads = Pads(attr)
+                    self.pads = meta.ONNXIntListAttribute(attr)
                 case "strides":
-                    self.strides = Strides(attr)
+                    self.strides = meta.ONNXIntListAttribute(attr)

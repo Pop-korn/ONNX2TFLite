@@ -5,6 +5,7 @@ import err
 import parser.meta.meta as meta
 
 import parser.builtin.Conv as c
+import parser.builtin.LRN as lrn
 import parser.builtin.Relu as r
 
 class Node(meta.ONNXObject):
@@ -33,6 +34,8 @@ class Node(meta.ONNXObject):
         match self.opType:
             case "Conv":
                 self.attributes = c.Conv(self._descriptor.attribute)
+            case "LRN":
+                self.attributes = lrn.LRN(self._descriptor.attribute)
             case "Relu":
                 self.attributes = r.Relu(self._descriptor.attribute)
             case _:
@@ -43,5 +46,5 @@ class Nodes(list[Node]):
     def __init__(self, descriptor: list[onnx.NodeProto]):
         for item in descriptor:
             self.append(Node(item))
-            if self[-1].opType == "LRN":
+            if self[-1].opType == "":
                 print(item)

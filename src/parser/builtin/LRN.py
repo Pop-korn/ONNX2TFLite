@@ -17,6 +17,7 @@ class LRN(meta.ONNXOperatorAttributes):
         self.alpha = 0.0001
         self.beta = 0.75
         self.bias = 1.0
+        self.size = None
 
     def __initAttributes(self):
         for attr in self._descriptor:
