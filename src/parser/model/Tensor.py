@@ -47,34 +47,34 @@ class Tensor(meta.ONNXObject):
 
         # 'raw_data' is not given. One of the 'data' fields must contain tensor values
 
-        if meta.isDefined(self._descriptor.float_data): # Not checked!
+        if meta.isDefined(self._descriptor.float_data): # TODO Not checked!
             self.data = self._descriptor.float_data
             self.__assertTypeAllowed([meta.DataType.FLOAT, meta.DataType.COMPLEX64],"float_data") # 'onnx-ml.proto' line '540'
             return
 
-        if meta.isDefined(self._descriptor.int32_data): # Not checked!
+        if meta.isDefined(self._descriptor.int32_data): # TODO Not checked!
             self.data = self._descriptor.int32_data
             self.__assertTypeAllowed([meta.DataType.INT32, meta.DataType.INT16, meta.DataType.INT8, 
-                                        meta.DataType.UINT16, meta.DataType.UINT8, meta.DataType.BOOL, 
-                                        meta.DataType.FLOAT16, meta.DataType.BFLOAT16],"int32_data") # 'onnx-ml.proto' line '547'
+                                    meta.DataType.UINT16, meta.DataType.UINT8, meta.DataType.BOOL, 
+                                    meta.DataType.FLOAT16, meta.DataType.BFLOAT16],"int32_data") # 'onnx-ml.proto' line '547'
             return
 
-        if meta.isDefined(self._descriptor.string_data): # Not checked!
+        if meta.isDefined(self._descriptor.string_data): # TODO Not checked!
             self.data = self._descriptor.string_data
             self.__assertTypeAllowed([meta.DataType.STRING],"string_data") # 'onnx-ml.proto' line '555'
             return
 
-        if meta.isDefined(self._descriptor.int64_data): # Not checked!
+        if meta.isDefined(self._descriptor.int64_data): # TODO Not checked!
             self.data = self._descriptor.int64_data
             self.__assertTypeAllowed([meta.DataType.INT64],"int64_data") # 'onnx-ml.proto' line '558'
             return
 
-        if meta.isDefined(self._descriptor.double_data): # Not checked!
+        if meta.isDefined(self._descriptor.double_data): # TODO Not checked!
             self.data = self._descriptor.double_data
             self.__assertTypeAllowed([meta.DataType.DOUBLE, meta.DataType.COMPLEX128],"double_data") # 'onnx-ml.proto' line '612'
             return
 
-        if meta.isDefined(self._descriptor.uint64_data): # Not checked!
+        if meta.isDefined(self._descriptor.uint64_data): # TODO Not checked!
             self.data = self._descriptor.uint64_data
             self.__assertTypeAllowed([meta.DataType.UINT32, meta.DataType.UINT64],"uint64_data") # 'onnx-ml.proto' line '617'
             return
