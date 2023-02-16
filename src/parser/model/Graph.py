@@ -21,6 +21,6 @@ class Graph(meta.ONNXObject):
         super().__init__(descriptor)
         self.name = descriptor.name
         self.nodes = n.Nodes(descriptor.node)
-        self.initializer = t.Tensors(descriptor.initializer)
+        self.initializers = t.Tensors(descriptor.initializer)
 
         self.docString = descriptor.doc_string

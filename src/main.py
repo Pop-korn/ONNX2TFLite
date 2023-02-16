@@ -8,10 +8,8 @@ import parser.builtin.Softmax as Softmax
 
 model = m.Model("data/onnx/bvlcalexnet-12.onnx")
 
-for item in model.graph.initializer[0].rawData:
-    print(item)
-
-print(model.graph.initializer[0].rawData.__len__()) # 384 = 96 * 4 B
+for tensor in model.graph.initializers:
+    print(tensor.name,"  ",tensor.rawData.__len__()/4) 
 
 
 # Operator Tests...
