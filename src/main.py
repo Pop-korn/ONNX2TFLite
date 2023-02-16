@@ -8,9 +8,10 @@ import parser.builtin.Softmax as Softmax
 
 model = m.Model("data/onnx/bvlcalexnet-12.onnx")
 
-for tensor in model.graph.initializers:
-    print(tensor.name,"  ",tensor.rawData.__len__()/4) 
-
+inputT = model.graph.inputs[0].type
+if not inputT.tensorType is None:
+    for dim in inputT.tensorType.shape.dims:
+        print(dim.value)
 
 # Operator Tests...
 

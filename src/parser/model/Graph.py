@@ -2,6 +2,7 @@ import onnx.onnx.onnx_ml_pb2 as onnx
 
 import parser.model.Node as n
 import parser.model.Tensor as t
+import parser.model.ValueInfo as vi
 
 import parser.meta.meta as meta
 
@@ -10,11 +11,11 @@ class Graph(meta.ONNXObject):
     nodes: n.Nodes
     name: str
     initializers: t.Tensors
-    # TODO sparseInitialize
+    # TODO sparseInitializers
     docString: str
-    # TODO input
-    # TODO output
-    # TODO valueInfo
+    inputs: list[vi.ValueInfo]
+    outputs: list[vi.ValueInfo]
+    valueInfo: list[vi.ValueInfo]
     # TODO quantizationAnnotation
 
     def __init__(self, descriptor: onnx.GraphProto) -> None:
@@ -22,5 +23,14 @@ class Graph(meta.ONNXObject):
         self.name = descriptor.name
         self.nodes = n.Nodes(descriptor.node)
         self.initializers = t.Tensors(descriptor.initializer)
-
         self.docString = descriptor.doc_string
+        self.inputs = []
+        self.__initList(self.inputs, descriptor.input, vi.ValueInfo)
+        self.outputs = []
+        self.__initList(self.outputs, descriptor.output, vi.ValueInfo)
+        self.valueInfo = []
+        self.__initList(self.valueInfo, descriptor.value_info, vi.ValueInfo)
+
+    def __initList(self,list,descriptor,object):
+        for item in descriptor:
+            list.append(object(item))
