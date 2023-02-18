@@ -2,6 +2,10 @@ import flatbuffers as fb
 
 import numpy as np
 
+import tensorflow as tf
+
+from PIL import Image
+
 import lib.tflite.BuiltinOperator as bo
 import lib.tflite.TensorType as tt
 import lib.tflite.Padding as p
@@ -18,6 +22,7 @@ import src.generator.builtin.Conv2D as Conv2D
 import src.generator.builtin.MaxPool2D as MaxPool2D
 import src.generator.builtin.FullyConnected as FullyConnected
 import src.generator.builtin.Softmax as Softmax
+
 
 """ Generate a basic .tflite model. 
 Should behave identically to the '/data/cifar10/cifar10_model.tflite'.
@@ -230,20 +235,17 @@ tflModel = model.genTFLite(builder)
 model.Finish(builder, tflModel)
 
 # Write the TFLite data to file
+genModelFile = "test/cifar10_model_GENERATED.tflite"
 buffer = builder.Output()
-with open("test/out.tflite","wb") as f:
+with open(genModelFile,"wb") as f:
     f.write(buffer)
 
 
 """ Compare the output of generated model with the pre-trained model. """
 
 
-import tensorflow as tf
-
-from PIL import Image
-
 def loadModels():
-    generatedModel = tf.lite.Interpreter(model_path = "./test/out.tflite")
+    generatedModel = tf.lite.Interpreter(model_path = genModelFile)
     generatedModel.allocate_tensors()
 
     premadeModel = tf.lite.Interpreter(model_path = "./data/cifar10/cifar10_model.tflite")
