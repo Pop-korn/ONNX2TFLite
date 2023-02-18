@@ -1,0 +1,20 @@
+{
+  "version": 0,
+  "subgraphs": [
+    {
+      "tensors": [
+        {
+          "shape": [
+            1,
+            1000
+          ],
+          "type": "FLOAT32",
+          "buffer": 0,
+          "name": "prob_1",
+          "is_variable": false,
+          "has_rank": false
+        }
+      ]
+    }
+  ]
+}

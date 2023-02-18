@@ -7,7 +7,7 @@ import src.generator.model.Tensors as Tensors
 import src.generator.model.Operators as Operators
 import src.generator.meta.meta as meta
 
-""" Classes representing the 'SubGraph' structure and its parameters """
+""" Classes representing the 'SubGraph' st  ructure and its parameters """
 
 class Inputs(meta.IntVector):
     def __init__(self, inputs: list[int]):
@@ -33,17 +33,25 @@ class SubGraph(meta.TFLiteObject):
         self.operators = operators
 
     def genTFLite(self, builder: fb.Builder):
-        tflInputs = self.inputs.genTFLite(builder)
-        tflOutputs = self.outputs.genTFLite(builder)
-        tflTensors = self.tensors.genTFLite(builder)
-        tflOperators = self.operators.genTFLite(builder)
+        if self.inputs is not None:
+            tflInputs = self.inputs.genTFLite(builder)
+        if self.outputs is not None:
+            tflOutputs = self.outputs.genTFLite(builder)
+        if self.tensors is not None:
+            tflTensors = self.tensors.genTFLite(builder)
+        if self.operators is not None:
+            tflOperators = self.operators.genTFLite(builder)
 
         sg.Start(builder)
-
-        sg.AddInputs(builder, tflInputs)
-        sg.AddOutputs(builder, tflOutputs)
-        sg.AddTensors(builder, tflTensors)
-        sg.AddOperators(builder, tflOperators)
+        
+        if self.inputs is not None:
+            sg.AddInputs(builder, tflInputs)
+        if self.outputs is not None:
+            sg.AddOutputs(builder, tflOutputs)
+        if self.tensors is not None:
+            sg.AddTensors(builder, tflTensors)
+        if self.operators is not None:
+            sg.AddOperators(builder, tflOperators)
 
         return sg.End(builder)
 

@@ -48,6 +48,9 @@ class TFLiteVector(TFLiteObject):
     def get(self, index: int):
         return self.vector[index]
 
+    def len(self):
+        return self.vector.__len__()
+
     def genTFLite(self, builder: fb.Builder):
         """ Generates TFLite code for the vector """
 

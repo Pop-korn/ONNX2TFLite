@@ -37,27 +37,26 @@ class Model(meta.TFLiteObject):
         self.buffers = buffers
 
     def genTFLite(self, builder: fb.Builder):
-        tflDescription = builder.CreateString(self.description)
-        tflOperatorCodes = self.operatorCodes.genTFLite(builder)
-        tflSubGraphs = self.subGraphs.genTFLite(builder)
-        tflBuffers = self.buffers.genTFLite(builder)
+        if self.description is not None:
+            tflDescription = builder.CreateString(self.description)
+        if self.operatorCodes is not None:
+            tflOperatorCodes = self.operatorCodes.genTFLite(builder)
+        if self.subGraphs is not None:
+            tflSubGraphs = self.subGraphs.genTFLite(builder)
+        if self.buffers is not None:
+            tflBuffers = self.buffers.genTFLite(builder)
 
         m.Start(builder)
-
+            
         m.AddVersion(builder,self.version)
-        m.AddDescription(builder,tflDescription)
-        m.AddOperatorCodes(builder,tflOperatorCodes)
-        m.AddSubgraphs(builder,tflSubGraphs)
-        m.AddBuffers(builder,tflBuffers)
 
-        return m.End(builder)
+        if self.description is not None:
+            m.AddDescription(builder,tflDescription)
+        if self.operatorCodes is not None:
+            m.AddOperatorCodes(builder,tflOperatorCodes)
+        if self.subGraphs is not None:
+            m.AddSubgraphs(builder,tflSubGraphs)
+        if self.buffers is not None:
+            m.AddBuffers(builder,tflBuffers)
 
-    def Finish(self, builder: fb.Builder, tflModel: int):
-        """ Finish generating TFLite for this model. Model must have been built with
-            the provided 'builder'. Resulting output will be stored in 'builder.Output()'.
-
-        Args:
-            builder (fb.Builder): flatbuffers.Builder object, that was used to build the flatbuffer
-            tflModel (int): offset of the built model (result of 'Model.genTFLite()')
-        """
-        builder.Finish(tflModel,Model.__genFileIdentifier())
+        builder.Finish(m.End(builder),Model.__genFileIdentifier())

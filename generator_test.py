@@ -232,7 +232,6 @@ model = BuildModel()
 
 # Generate the TFLite fot the model
 tflModel = model.genTFLite(builder)
-model.Finish(builder, tflModel)
 
 # Write the TFLite data to file
 genModelFile = "test/cifar10_model_GENERATED.tflite"

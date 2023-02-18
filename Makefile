@@ -4,7 +4,7 @@ all:
 	python3 ./main.py
 
 test: all
-	flatc -t --strict-json --defaults-json -o test data/schemas/tflite/schema.fbs -- test/cifar10_model_GENERATED.tflite --raw-binary 
+	flatc -t --strict-json --defaults-json -o test data/schemas/tflite/schema.fbs -- test/alexnet.tflite --raw-binary 
 
 generator_test:
 	export TF_CPP_MIN_LOG_LEVEL="2"

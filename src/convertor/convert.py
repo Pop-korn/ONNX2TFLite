@@ -1,11 +1,25 @@
-import src.convertor.tensors.TensorConvertor as tc
+import src.generator.model.Model as tflM
 
-import src.generator.model.Model as tflModel
+import src.parser.model.Model as onnxM
 
-import src.parser.model.Model as onnxModel # onnxModel
+import src.convertor.ModelBuilder as ModelBuilder
+
+import flatbuffers as fb
+
+def convertModel(oM: onnxM.Model) -> tflM.Model:
+
+    builder = ModelBuilder.Builder(oM.modelVersion)
+
+    builder.buildOutputTensors(oM.graph.outputs)
+
     
+    tflModel = builder.finish()
 
-def convertModel(oM: onnxModel.Model) -> tflModel.Model:
+    fbB = fb.Builder()
+    tflModel.genTFLite(fbB)
 
-    tM = tflModel.Model()
+    genModelFile = "test/alexnet.tflite"
+    buffer = fbB.Output()
+    with open(genModelFile,"wb") as f:
+        f.write(buffer)
 

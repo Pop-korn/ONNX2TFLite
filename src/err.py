@@ -4,6 +4,7 @@ from enum import Enum
 class Code(Enum):
     INPUT_FILE_ERR = 1
     UNSUPPORTED_OPERATOR = 2
+    UNSUPPORTED_ONNX_TYPE = 3
 
 def eprint(err_code, *args, **kwargs):
     """ Print error message with given parameters and exit execution with given exit code. """
