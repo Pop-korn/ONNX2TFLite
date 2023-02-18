@@ -3,6 +3,10 @@
 all:
 	python3 ./main.py
 
+test_generator:
+	export TF_CPP_MIN_LOG_LEVEL="2"
+	python3 ./generator_test.py
+
 get_schemas:
 	wget -P ./data/schemas/tflite/ https://raw.githubusercontent.com/tensorflow/tensorflow/master/tensorflow/lite/schema/schema.fbs
 	wget -P ./data/schemas/onnx/onnx/ https://raw.githubusercontent.com/onnx/onnx/main/onnx/onnx-ml.proto

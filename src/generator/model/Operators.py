@@ -1,10 +1,10 @@
 import flatbuffers as fb
 
-import tflite.SubGraph as sg
-import tflite.Operator as op
-import tflite.CustomOptionsFormat as cof
+import lib.tflite.SubGraph as sg
+import lib.tflite.Operator as op
+import lib.tflite.CustomOptionsFormat as cof
 
-import generator.meta.meta as meta
+import src.generator.meta.meta as meta
 
 class Inputs(meta.IntVector):
     def __init__(self, inputs: list[int]):

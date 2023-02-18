@@ -1,11 +1,11 @@
 import flatbuffers as fb
 
-import tflite.FullyConnectedOptions as fco
-import tflite.ActivationFunctionType as aft
-import tflite.FullyConnectedOptionsWeightsFormat as wf
-import tflite.BuiltinOptions as bo
+import lib.tflite.FullyConnectedOptions as fco
+import lib.tflite.ActivationFunctionType as aft
+import lib.tflite.FullyConnectedOptionsWeightsFormat as wf
+import lib.tflite.BuiltinOptions as bo
 
-import generator.meta.meta as meta
+import src.generator.meta.meta as meta
 
 class FullyConnected(meta.BuiltinOptions):
     fusedActivationFunction: aft.ActivationFunctionType

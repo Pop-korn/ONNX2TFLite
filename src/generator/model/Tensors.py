@@ -1,11 +1,11 @@
 import flatbuffers as fb
 
-import tflite.SubGraph as sg
-import tflite.Tensor as t
-import tflite.TensorType as tt
+import lib.tflite.SubGraph as sg
+import lib.tflite.Tensor as t
+import lib.tflite.TensorType as tt
 
-import generator.model.Quantization as Quantization
-import generator.meta.meta as meta
+import src.generator.model.Quantization as Quantization
+import src.generator.meta.meta as meta
 
 """ Classes representing 'Tensor' structure and its Parameters. 'Tensor' is part of the 
     'SubGraph' structure represented in the 'model/SubGraph.py' file.

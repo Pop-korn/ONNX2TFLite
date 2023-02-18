@@ -1,11 +1,11 @@
 import flatbuffers as fb
 
-import tflite.Pool2DOptions as pool
-import tflite.BuiltinOptions as bo
-import tflite.Padding as p
-import tflite.ActivationFunctionType as aft
+import lib.tflite.Pool2DOptions as pool
+import lib.tflite.BuiltinOptions as bo
+import lib.tflite.Padding as p
+import lib.tflite.ActivationFunctionType as aft
 
-import generator.meta.meta as meta
+import src.generator.meta.meta as meta
 
 class MaxPool2D(meta.BuiltinOptions):
     padding: p.Padding

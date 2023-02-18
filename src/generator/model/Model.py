@@ -1,12 +1,12 @@
 import flatbuffers as fb
 
-import generator.model.OperatorCodes as oc
-import generator.model.SubGraphs as sg
-import generator.model.Buffers as b
+import src.generator.model.OperatorCodes as oc
+import src.generator.model.SubGraphs as sg
+import src.generator.model.Buffers as b
 
-import generator.meta.meta as meta
+import src.generator.meta.meta as meta
 
-import tflite.Model as m
+import lib.tflite.Model as m
 
 class Model(meta.TFLiteObject):
     version: int

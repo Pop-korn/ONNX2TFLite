@@ -3,34 +3,39 @@ import numpy as np
 
 from PIL import Image
 
-my_inter = tf.lite.Interpreter(model_path = "../../test/out.tflite")
-my_inter.allocate_tensors()
+def loadModels():
+    generatedModel = tf.lite.Interpreter(model_path = "./test/out.tflite")
+    generatedModel.allocate_tensors()
 
-cifar_inter = tf.lite.Interpreter(model_path = "../../data/cifar10_model.tflite")
-cifar_inter.allocate_tensors()
+    premadeModel = tf.lite.Interpreter(model_path = "./data/cifar10/cifar10_model.tflite")
+    premadeModel.allocate_tensors()
+
+    return (generatedModel,premadeModel)
+
+def loadData():
+    image = Image.open("./data/cifar10/airplane1.png")
+    image = [np.asarray(image).tolist()]
+    image = np.asarray(image,np.uint8)
+
+    return image
 
 
-image = Image.open("../../data/cifar10/airplane1.png")
-image = [np.asarray(image).tolist()]
-image = np.asarray(image,np.uint8)
-
-print(image.shape)
-# print(image)
-
-def classify(interpreter, image):
+def classify(model, image):
     # Get input and output tensors.
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
+    input_details = model.get_input_details()
+    output_details = model.get_output_details()
 
-    interpreter.set_tensor(input_details[0]['index'], image)
+    model.set_tensor(input_details[0]['index'], image)
 
-    interpreter.invoke()
+    model.invoke()
 
-    output_data = interpreter.get_tensor(output_details[0]['index'])
+    output_data = model.get_tensor(output_details[0]['index'])
     print(output_data)
 
 
-    
+def runTest():
+    generatedModel, premadeModel = loadModels()
+    image = loadData()
 
-classify(my_inter, image)
-classify(cifar_inter, image)
+    classify(generatedModel, image)
+    classify(premadeModel, image)

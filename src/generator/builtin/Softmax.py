@@ -1,9 +1,9 @@
 import flatbuffers as fb
 
-import tflite.SoftmaxOptions as so
-import tflite.BuiltinOptions as bo
+import lib.tflite.SoftmaxOptions as so
+import lib.tflite.BuiltinOptions as bo
 
-import generator.meta.meta as meta
+import src.generator.meta.meta as meta
 
 class Softmax(meta.BuiltinOptions):
     beta: float

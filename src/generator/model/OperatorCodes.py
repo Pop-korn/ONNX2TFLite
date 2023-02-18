@@ -1,10 +1,10 @@
 import flatbuffers as fb
 
-import generator.meta.meta as meta
+import src.generator.meta.meta as meta
 
-import tflite.OperatorCode as oc
-import tflite.Model as Model
-import tflite.BuiltinOperator as bo
+import lib.tflite.OperatorCode as oc
+import lib.tflite.Model as Model
+import lib.tflite.BuiltinOperator as bo
 
 class OperatorCode(meta.TFLiteObject):
     """ Represents an OperatorCode object, used in the vector 'operator_codes' in the model.

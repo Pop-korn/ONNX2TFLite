@@ -1,11 +1,11 @@
 import flatbuffers as fb
 
-import tflite.Buffer as b
-import tflite.Model as m
-import tflite.TensorType as tt
+import lib.tflite.Buffer as b
+import lib.tflite.Model as m
+import lib.tflite.TensorType as tt
 
-import generator.meta.meta as meta
-import generator.meta.types as types
+import src.generator.meta.meta as meta
+import src.generator.meta.types as types
 
 class Buffer(meta.TFLiteObject):
     data: list

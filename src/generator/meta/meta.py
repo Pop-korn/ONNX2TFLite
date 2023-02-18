@@ -2,9 +2,9 @@ from typing_extensions import override
 import flatbuffers as fb
 from typing import Callable
 
-import tflite.BuiltinOptions as bo
+import lib.tflite.BuiltinOptions as bo
 
-import err
+import src.err as err
 
 """ This file contains parent classes for simple classes used in the '/model' directory. """
 

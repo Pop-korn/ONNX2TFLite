@@ -1,8 +1,8 @@
 import flatbuffers as fb
 
-import err
+import src.err as err
 
-import tflite.TensorType as tt
+import lib.tflite.TensorType as tt
 
 def TypeSize(type: tt.TensorType):
     match type:

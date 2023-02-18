@@ -1,11 +1,11 @@
 import flatbuffers as fb
 
-import generator.meta.meta as meta
+import src.generator.meta.meta as meta
 
-import tflite.BuiltinOptions as bo
-import tflite.Conv2DOptions as conv
-import tflite.Padding as p
-import tflite.ActivationFunctionType as aft
+import lib.tflite.BuiltinOptions as bo
+import lib.tflite.Conv2DOptions as conv
+import lib.tflite.Padding as p
+import lib.tflite.ActivationFunctionType as aft
 
 class Conv2D(meta.BuiltinOptions):
     padding: p.Padding

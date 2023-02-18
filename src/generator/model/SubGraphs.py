@@ -1,11 +1,11 @@
 import flatbuffers as fb
 
-import tflite.SubGraph as sg
-import tflite.Model as Model
+import lib.tflite.SubGraph as sg
+import lib.tflite.Model as Model
 
-import generator.model.Tensors as Tensors
-import generator.model.Operators as Operators
-import generator.meta.meta as meta
+import src.generator.model.Tensors as Tensors
+import src.generator.model.Operators as Operators
+import src.generator.meta.meta as meta
 
 """ Classes representing the 'SubGraph' structure and its parameters """
 

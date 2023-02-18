@@ -2,22 +2,24 @@ import flatbuffers as fb
 
 import numpy as np
 
-import tflite.BuiltinOperator as bo
-import tflite.TensorType as tt
-import tflite.Padding as p
+import lib.tflite.BuiltinOperator as bo
+import lib.tflite.TensorType as tt
+import lib.tflite.Padding as p
 
-import generator.model.Model as m
-import generator.model.OperatorCodes as oc
-import generator.model.SubGraphs as sg
-import generator.model.Tensors as t
-import generator.model.Quantization as q
-import generator.model.Operators as o
-import generator.model.Buffers as b
+import src.generator.model.Model as m
+import src.generator.model.OperatorCodes as oc
+import src.generator.model.SubGraphs as sg
+import src.generator.model.Tensors as t
+import src.generator.model.Quantization as q
+import src.generator.model.Operators as o
+import src.generator.model.Buffers as b
 
-import generator.builtin.Conv2D as Conv2D
-import generator.builtin.MaxPool2D as MaxPool2D
-import generator.builtin.FullyConnected as FullyConnected
-import generator.builtin.Softmax as Softmax
+import src.generator.builtin.Conv2D as Conv2D
+import src.generator.builtin.MaxPool2D as MaxPool2D
+import src.generator.builtin.FullyConnected as FullyConnected
+import src.generator.builtin.Softmax as Softmax
+
+import src.infer.main as infer
 
 """ Generate a basic .tflite model. 
 Should behave identically to the '/data/cifar10/cifar10_model.tflite'.
@@ -233,3 +235,6 @@ model.Finish(builder, tflModel)
 buffer = builder.Output()
 with open("test/out.tflite","wb") as f:
     f.write(buffer)
+
+
+infer.runTest()

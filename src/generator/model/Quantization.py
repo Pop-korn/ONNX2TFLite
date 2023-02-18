@@ -1,9 +1,9 @@
 import flatbuffers as fb
 
-import tflite.QuantizationParameters as qp
-import tflite.QuantizationDetails as qd
+import lib.tflite.QuantizationParameters as qp
+import lib.tflite.QuantizationDetails as qd
 
-import generator.meta.meta as meta
+import src.generator.meta.meta as meta
 
 """ Classes representing 'Quantization' structure and its Parameters. 'Quantization' is part 
     of the 'Tensor' structure, which is represented in the 'model/Tensor.py' file.
