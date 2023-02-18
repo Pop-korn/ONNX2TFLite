@@ -11,40 +11,62 @@ import src.err as err
 
 class Builder:
     __tflModel: tflM.Model
+    __bufferNameIndexMap: dict[str : int]
 
     def __init__(self, modelVersion: int) -> None:
         self.__tflModel = tflM.Model(modelVersion)
+        self.__bufferNameIndexMap = {}
 
     def buildOutputTensors(self, oOutputs: list[onnxVI.ValueInfo]):
-        subGraph = self.__getSubgraph()
-
         for oOutput in oOutputs:
             if oOutput.type.tensorType is None:
                 err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported yet!")
 
-            self.__buildTensor(oOutput)
+            self.__buildEmptyTensor(oOutput)
 
 
     def finish(self) -> tflM.Model:
         return self.__tflModel
 
+
+    """ -------------------- Private 'quality of life' functions. -------------------- """
+
+
+    def __bufferIndexForName(self, name: str):
+        """ Return the index to the 'buffers' vector in the TFLite model for the tensor with
+            given name """
+        if name not in self.__bufferNameIndexMap.keys():
+            self.__bufferNameIndexMap[name] = len(self.__bufferNameIndexMap.keys())
+
+        return self.__bufferNameIndexMap[name]
+
+
+    """ -------------------- Private generic build functions. -------------------- """
     
-    def __buildTensor(self, oVI :onnxVI.ValueInfo):
+
+    def __buildEmptyTensor(self, oVI :onnxVI.ValueInfo):
+        """ Build a 'Tensor' object from am ONNX ValueInfo object. So the resulting tensor has
+            no data, just properties. """
         oTensor = oVI.type.tensorType
         if oTensor is None:
             err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported yet!")
 
-        shape = Convertor.convertShape(oTensor.shape)
+        shape = Convertor.convertShape(oTensor.shape, keepDims=True)
         name = oVI.name
+        bufferIndex = self.__bufferIndexForName(name)
 
-        tensor = tflT.Tensor(shape, name)
+        tensor = tflT.Tensor(shape, name, bufferIndex)
+        self.__getTensors().append(tensor)
 
-        tensors = self.__getTensors()
+        self.__buildEmptyBuffer()
 
-        tensors.append(tensor)
+    def __buildEmptyBuffer(self):
+        buffers = self.__getBuffers()
+        buffers.append(tflB.Buffer([]))
 
-    """ Private functions to get an element of the TFLite model. If the element doesn't exist,
-        it is created. So functions always return a valid object. """
+
+    """ ---------------- Private functions to get an element of the TFLite model. ----------------
+     If the element doesn't exist, it is created. So functions always return a valid object. """
 
     def __getSubgraphs(self) -> tflSG.SubGraphs:
         if self.__tflModel.subGraphs is None:
