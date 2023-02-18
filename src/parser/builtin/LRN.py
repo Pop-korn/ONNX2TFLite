@@ -1,8 +1,8 @@
-import onnx.onnx.onnx_ml_pb2 as onnx
+import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
-import parser.meta.meta as meta
+import src.parser.meta.meta as meta
 
-import err
+import src.err as err
 
 class LRN(meta.ONNXOperatorAttributes):
     alpha: float

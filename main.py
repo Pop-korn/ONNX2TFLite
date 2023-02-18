@@ -1,10 +1,10 @@
-import parser.model.Model as m
+import src.parser.model.Model as m
 
-import parser.builtin.Conv as Conv
-import parser.builtin.Gemm as Gemm
-import parser.builtin.LRN as LRN
-import parser.builtin.MaxPool as MaxPool
-import parser.builtin.Softmax as Softmax
+import src.parser.builtin.Conv as Conv
+import src.parser.builtin.Gemm as Gemm
+import src.parser.builtin.LRN as LRN
+import src.parser.builtin.MaxPool as MaxPool
+import src.parser.builtin.Softmax as Softmax
 
 model = m.Model("data/onnx/bvlcalexnet-12.onnx")
 

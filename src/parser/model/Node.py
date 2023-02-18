@@ -1,17 +1,17 @@
-import onnx.onnx.onnx_ml_pb2 as onnx
+import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
-import err
+import src.err as err
 
-import parser.meta.meta as meta
+import src.parser.meta.meta as meta
 
-import parser.builtin.Conv as Conv
-import parser.builtin.Dropout as Dropout
-import parser.builtin.Gemm as Gemm
-import parser.builtin.LRN as LRN
-import parser.builtin.MaxPool as MaxPool
-import parser.builtin.Relu as Relu
-import parser.builtin.Reshape as Reshape
-import parser.builtin.Softmax as Softmax
+import src.parser.builtin.Conv as Conv
+import src.parser.builtin.Dropout as Dropout
+import src.parser.builtin.Gemm as Gemm
+import src.parser.builtin.LRN as LRN
+import src.parser.builtin.MaxPool as MaxPool
+import src.parser.builtin.Relu as Relu
+import src.parser.builtin.Reshape as Reshape
+import src.parser.builtin.Softmax as Softmax
 
 class Node(meta.ONNXObject):
     inputs: list[str]

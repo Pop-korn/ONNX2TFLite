@@ -1,10 +1,10 @@
-import onnx.onnx.onnx_ml_pb2 as onnx
+import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
-import parser.model.Node as n
-import parser.model.Tensor as t
-import parser.model.ValueInfo as vi
+import src.parser.model.Node as n
+import src.parser.model.Tensor as t
+import src.parser.model.ValueInfo as vi
 
-import parser.meta.meta as meta
+import src.parser.meta.meta as meta
 
 class Graph(meta.ONNXObject):
     nodes: n.Nodes

@@ -1,6 +1,6 @@
-import onnx.onnx.onnx_ml_pb2 as onnx
+import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
-import parser.meta.meta as meta
+import src.parser.meta.meta as meta
 
 class Relu(meta.ONNXOperatorAttributes):
     def __init__(self, descriptor: list[onnx.AttributeProto]) -> None:

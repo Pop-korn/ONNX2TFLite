@@ -1,4 +1,4 @@
-import onnx.onnx.onnx_ml_pb2 as onnx
+import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
 class OperatorSetId:
     domain: str

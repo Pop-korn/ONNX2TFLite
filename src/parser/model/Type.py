@@ -1,8 +1,8 @@
-import onnx.onnx.onnx_ml_pb2 as onnx
+import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
-import parser.meta.meta as meta
+import src.parser.meta.meta as meta
 
-import parser.model.TensorShape as ts
+import src.parser.model.TensorShape as ts
 
 class Tensor(meta.ONNXObject):
     elemType: meta.DataType

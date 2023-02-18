@@ -1,7 +1,7 @@
 .PHONY: all get_schema gen_json parse_json test
 
 all:
-	python3 ./src/main.py
+	python3 ./main.py
 
 get_schemas:
 	wget -P ./data/schemas/tflite/ https://raw.githubusercontent.com/tensorflow/tensorflow/master/tensorflow/lite/schema/schema.fbs

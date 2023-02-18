@@ -1,7 +1,7 @@
-import onnx.onnx.onnx_ml_pb2 as onnx
+import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
-import parser.meta.meta as meta
-import parser.model.Type as t
+import src.parser.meta.meta as meta
+import src.parser.model.Type as t
 
 class ValueInfo(meta.ONNXObject):
     name: str

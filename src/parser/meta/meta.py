@@ -1,4 +1,4 @@
-import onnx.onnx.onnx_ml_pb2 as onnx
+import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
 """ Various ENUM references. Originals are 'difficult' to acces because of no intellisense. """
 AttributeType = onnx.AttributeProto.AttributeType

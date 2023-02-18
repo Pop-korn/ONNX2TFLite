@@ -1,11 +1,11 @@
-import onnx.onnx.onnx_ml_pb2 as onnx
+import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
-import err
+import src.err as err
 
-import parser.meta.meta as meta
+import src.parser.meta.meta as meta
 
-import parser.model.OperatorSetId as osi
-import parser.model.Graph as g
+import src.parser.model.OperatorSetId as osi
+import src.parser.model.Graph as g
 
 class Model(meta.ONNXObject):
     irVersion: int
