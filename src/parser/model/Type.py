@@ -13,21 +13,21 @@ class Tensor(meta.ONNXObject):
         self.shape = ts.TensorShape(descriptor.shape)
 
 class Sequence(meta.ONNXObject):
-    elemType: meta.ONNXObject # Type object
+    elemType: meta.ONNXObject # 'Type' object!
     def __init__(self, descriptor: onnx.TypeProto.Sequence) -> None:
         super().__init__(descriptor)
         self.elemType = Type(descriptor.elem_type)
 
 class Map(meta.ONNXObject):
     keyType: meta.DataType
-    valueType: meta.ONNXObject # Type object
+    valueType: meta.ONNXObject # 'Type' object!
     def __init__(self, descriptor: onnx.TypeProto.Map) -> None:
         super().__init__(descriptor)
         self.keyType = descriptor.key_type
         self.valueType = Type(descriptor.value_type)
 
 class Optional(meta.ONNXObject):
-    elemType: meta.ONNXObject # Type object
+    elemType: meta.ONNXObject # 'Type' object!
     def __init__(self, descriptor: onnx.TypeProto.Optional) -> None:
         super().__init__(descriptor)
         self.elemType = Type(descriptor.elem_type)

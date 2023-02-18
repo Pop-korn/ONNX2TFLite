@@ -8,10 +8,17 @@ import parser.builtin.Softmax as Softmax
 
 model = m.Model("data/onnx/bvlcalexnet-12.onnx")
 
-inputT = model.graph.inputs[0].type
-if not inputT.tensorType is None:
-    for dim in inputT.tensorType.shape.dims:
+print(model.docString,model.domain,model.irVersion,model.modelVersion,model.producerName,model.producerVersion)
+print(model.opsetImport[0].domain, model.opsetImport[0].version)
+
+input = model.graph.inputs[0]
+
+print(input.name,input.docString)
+
+if not input.type.tensorType is None:
+    for dim in input.type.tensorType.shape.dims:
         print(dim.value)
+
 
 # Operator Tests...
 

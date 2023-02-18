@@ -7,7 +7,6 @@ import parser.model.ValueInfo as vi
 import parser.meta.meta as meta
 
 class Graph(meta.ONNXObject):
-    # Graph attributes
     nodes: n.Nodes
     name: str
     initializers: t.Tensors
