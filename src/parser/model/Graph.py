@@ -1,7 +1,7 @@
 import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
-import src.parser.model.Node as n
-import src.parser.model.Tensor as t
+import src.parser.model.Nodes as n
+import src.parser.model.Tensors as t
 import src.parser.model.ValueInfo as vi
 
 import src.parser.meta.meta as meta

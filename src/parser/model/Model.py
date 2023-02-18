@@ -4,7 +4,7 @@ import src.err as err
 
 import src.parser.meta.meta as meta
 
-import src.parser.model.OperatorSetId as osi
+import src.parser.model.OperatorSetIds as osi
 import src.parser.model.Graph as g
 
 class Model(meta.ONNXObject):
