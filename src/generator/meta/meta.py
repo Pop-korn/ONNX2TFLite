@@ -37,6 +37,8 @@ class TFLiteVector(TFLiteObject):
                 StartFunction: Callable[[fb.Builder, int],None],
                 PrependFunction: Callable[[fb.Builder],Callable[[int],None]] = lambda builder: builder.PrependUOffsetTRelative,
                 genEmpty: bool=True) -> None:
+        if vector is None:
+            vector = []
         self.vector = vector
         self.StartFunction = StartFunction
         self.PrependFunction = PrependFunction

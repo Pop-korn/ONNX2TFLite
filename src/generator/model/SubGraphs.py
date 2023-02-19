@@ -10,11 +10,13 @@ import src.generator.meta.meta as meta
 """ Classes representing the 'SubGraph' st  ructure and its parameters """
 
 class Inputs(meta.IntVector):
-    def __init__(self, inputs: list[int]):
+    def __init__(self, inputs: list[int] = None):
+        """ 'inputs' is a list of indices into the 'tensors' vector. """
         super().__init__(inputs,sg.StartInputsVector)
 
 class Outputs(meta.IntVector):
-    def __init__(self, outputs: list[int]):
+    def __init__(self, outputs: list[int] = None):
+        """ 'outputs' is a list of indices into the 'tensors' vector. """
         super().__init__(outputs,sg.StartOutputsVector)
 
 

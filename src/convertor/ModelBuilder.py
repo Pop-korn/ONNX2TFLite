@@ -12,17 +12,24 @@ import src.err as err
 class Builder:
     __tflModel: tflM.Model
     __bufferNameIndexMap: dict[str : int]
+    __tensorNameIndexMap: dict[str : int]
 
     def __init__(self, modelVersion: int) -> None:
         self.__tflModel = tflM.Model(modelVersion)
         self.__bufferNameIndexMap = {}
+        self.__tensorNameIndexMap = {}
 
     def buildOutputTensors(self, oOutputs: list[onnxVI.ValueInfo]):
+        outputs = tflSG.Outputs()
+
         for oOutput in oOutputs:
             if oOutput.type.tensorType is None:
                 err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported yet!")
 
             self.__buildEmptyTensor(oOutput)
+            outputs.append(self.__tensorIndexForName(oOutput.name))
+
+        self.__getSubgraph().outputs = outputs
 
 
     def finish(self) -> tflM.Model:
@@ -36,9 +43,25 @@ class Builder:
         """ Return the index to the 'buffers' vector in the TFLite model for the tensor with
             given name """
         if name not in self.__bufferNameIndexMap.keys():
-            self.__bufferNameIndexMap[name] = len(self.__bufferNameIndexMap.keys())
+            self.__bufferNameIndexMap[name] = self.__bufferSize()
 
         return self.__bufferNameIndexMap[name]
+
+    def __tensorIndexForName(self, name: str):
+        """ Return the index to the 'tensors' vector in the TFLite subGraph for the tensor with
+            given name """
+        if name not in self.__tensorNameIndexMap.keys():
+            self.__tensorNameIndexMap[name] = self.__tensorsSize()
+
+        return self.__tensorNameIndexMap[name]
+
+    def __bufferSize(self):
+        """ Return the number of buffers that are currently in the model. """
+        return len(self.__bufferNameIndexMap.keys())
+
+    def __tensorsSize(self):
+        """ Return the number of tensors that are currently in the subGraph. """
+        return len(self.__tensorNameIndexMap.keys())
 
 
     """ -------------------- Private generic build functions. -------------------- """
@@ -57,6 +80,7 @@ class Builder:
         type = Convertor.convertDataType(oTensor.elemType)
 
         tensor = tflT.Tensor(shape, name, bufferIndex, type)
+        self.__tensorIndexForName(name) # Register the new tensor 
         self.__getTensors().append(tensor)
 
         self.__buildEmptyBuffer()
