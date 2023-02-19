@@ -36,6 +36,7 @@
       ]
     }
   ],
+  "description": "doc:'' domain:'' producer:'onnx-caffe2 '",
   "buffers": [
     {
     },

@@ -14,8 +14,8 @@ class Builder:
     __bufferNameIndexMap: dict[str : int]
     __tensorNameIndexMap: dict[str : int]
 
-    def __init__(self, modelVersion: int) -> None:
-        self.__tflModel = tflM.Model(modelVersion)
+    def __init__(self, modelVersion: int, modelDescription: str) -> None:
+        self.__tflModel = tflM.Model(modelVersion,modelDescription)
         self.__bufferNameIndexMap = {}
         self.__tensorNameIndexMap = {}
 
