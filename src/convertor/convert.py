@@ -9,6 +9,7 @@ def convertModel(oM: onnxM.Model) -> tflM.Model:
     builder = ModelBuilder.Builder(oM.modelVersion)
 
     builder.buildOutputTensors(oM.graph.outputs)
+    builder.buildInputTensors(oM.graph.inputs)
     
     return builder.finish()
 

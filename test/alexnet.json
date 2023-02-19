@@ -13,7 +13,23 @@
           "name": "prob_1",
           "is_variable": false,
           "has_rank": false
+        },
+        {
+          "shape": [
+            1,
+            224,
+            224,
+            3
+          ],
+          "type": "FLOAT32",
+          "buffer": 1,
+          "name": "data_0",
+          "is_variable": false,
+          "has_rank": false
         }
+      ],
+      "inputs": [
+        1
       ],
       "outputs": [
         0
@@ -21,6 +37,8 @@
     }
   ],
   "buffers": [
+    {
+    },
     {
     }
   ]

@@ -7,8 +7,34 @@ import lib.tflite.TensorType as tflTT
 
 import src.err as err
 
-def convertShape(oShape: onnxTS.TensorShape, keepDims: bool = False) -> tflT.Shape:
+def __isNCHW(list: list[int]) -> bool:
+    """ Figure out if given 'list' is in the 'nchw' format. """
+
+    # TODO Imporove
+    if len(list) >= 4:
+        return True
+
+    return False
+
+def __dimsToNHWC(nchwList: list[int]) -> list[int]:
+    """ Convert a list of ints which represent dimensions from NCHW to NHWC. """
+
+    res = [nchwList[0]] # First element is 'n'
+
+    channels = nchwList[1] # Save the channels
+
+    res[1:] = nchwList[2:] # Move h,w,... one to the left
+
+    res.append(channels) # Add channels at the end
+
+    return res
+
+def convertShape(oShape: onnxTS.TensorShape) -> tflT.Shape:
     dims = [ dim.value for dim in oShape.dims]
+
+    if __isNCHW(dims):
+        dims = __dimsToNHWC(dims)
+
     return tflT.Shape(dims)
 
 def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:

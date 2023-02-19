@@ -20,16 +20,34 @@ class Builder:
         self.__tensorNameIndexMap = {}
 
     def buildOutputTensors(self, oOutputs: list[onnxVI.ValueInfo]):
+        """ Create 'tensor' tables in the 'tensors' vector of the subGraph for the 'oOutputs'.
+            Also create empty buffers in the 'buffers' vector of the model. """
+
         outputs = tflSG.Outputs()
 
         for oOutput in oOutputs:
             if oOutput.type.tensorType is None:
-                err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported yet!")
+                err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for Outputs yet!")
 
             self.__buildEmptyTensor(oOutput)
             outputs.append(self.__tensorIndexForName(oOutput.name))
 
         self.__getSubgraph().outputs = outputs
+
+    def buildInputTensors(self, oInputs: list[onnxVI.ValueInfo]):
+        """ Create 'tensor' tables in the 'tensors' vector of the subGraph for the 'oInputs'.
+            Also create empty buffers in the 'buffers' vector of the model. """
+
+        inputs = tflSG.Inputs()
+
+        for oInput in oInputs:
+            if oInput.type.tensorType is None:
+                err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for Inputs yet!")
+
+            self.__buildEmptyTensor(oInput)
+            inputs.append(self.__tensorIndexForName(oInput.name))
+
+        self.__getSubgraph().inputs = inputs
 
 
     def finish(self) -> tflM.Model:
@@ -74,7 +92,7 @@ class Builder:
         if oTensor is None:
             err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported yet!")
 
-        shape = Convertor.convertShape(oTensor.shape, keepDims=True)
+        shape = Convertor.convertShape(oTensor.shape)
         name = oVI.name
         bufferIndex = self.__bufferIndexForName(name)
         type = Convertor.convertDataType(oTensor.elemType)
