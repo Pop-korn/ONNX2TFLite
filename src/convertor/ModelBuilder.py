@@ -54,8 +54,9 @@ class Builder:
         shape = Convertor.convertShape(oTensor.shape, keepDims=True)
         name = oVI.name
         bufferIndex = self.__bufferIndexForName(name)
+        type = Convertor.convertDataType(oTensor.elemType)
 
-        tensor = tflT.Tensor(shape, name, bufferIndex)
+        tensor = tflT.Tensor(shape, name, bufferIndex, type)
         self.__getTensors().append(tensor)
 
         self.__buildEmptyBuffer()
