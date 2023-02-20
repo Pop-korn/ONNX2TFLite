@@ -1,3 +1,5 @@
+import lib.tflite.TensorType as tflTT
+
 import src.generator.model.Model as tflM
 import src.generator.model.SubGraphs as tflSG
 import src.generator.model.Buffers as tflB
@@ -22,14 +24,14 @@ class Builder:
 
     
 
-    
+
     """ -------------------- Public Builder functions -------------------- """
 
 
     def buildConstantTensors(self, oTensors: onnxT.Tensors):
         for oTensor in oTensors:
+            self.__buildBuffer(oTensor)
             self.__buildConstantTensor(oTensor)
-
             
 
     def buildOutputTensors(self, oOutputs: list[onnxVI.ValueInfo]):
@@ -75,7 +77,24 @@ class Builder:
 
 
     """ -------------------- Private generic build functions. -------------------- """
-    
+
+
+    def __buildBuffer(self, oTensor: onnxT.Tensor):
+        buffer = tflB.Buffer()
+
+        if oTensor.rawData is not None:
+            # Rawdata is used
+            buffer.type = tflTT.TensorType.UINT8
+            buffer.data = [data for data in oTensor.rawData]
+            
+        elif oTensor.data is not None:
+            buffer.type = Convertor.convertDataType(oTensor.dataType)
+            buffer.data = oTensor.data
+        else:
+            err.wprint(f"ONNX Tensor '{oTensor.name}' should contain data but doesn't! Generating empty buffer!")
+
+        self.__appendNewBuffer(buffer, oTensor.name)
+
 
     def __buildConstantTensor(self, oTensor: onnxT.Tensor):
             shape = Convertor.convertShapeDims(oTensor.dims)

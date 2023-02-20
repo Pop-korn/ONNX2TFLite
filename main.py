@@ -8,7 +8,8 @@ onnxModel = m.Model("data/onnx/bvlcalexnet-12.onnx")
 
 tflModel = convert.convertModel(onnxModel)
 
-fbB = fb.Builder()
+
+fbB = fb.Builder(2000000000)
 
 tflModel.genTFLite(fbB)
 

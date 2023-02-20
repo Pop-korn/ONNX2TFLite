@@ -48,6 +48,7 @@ def convertShapeDims(oDims: list[int]) -> tflT.Shape:
 
 
 def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
+    """ Convert ONNX DataType to TFLite TensorType """
     match oType:
         case onnxMeta.DataType.UNDEFINED:
             err.wprint("Cannot convert ONNX DataType 'UNDEFINED' to TFLite. Using 'UINT8'.")

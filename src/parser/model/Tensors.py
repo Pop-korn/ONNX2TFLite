@@ -39,6 +39,8 @@ class Tensor(meta.ONNXObject):
 
     def __assignData(self):
         """ Assign data to either the 'data' or 'rawData' attribute correctly. """
+        self.rawData = None
+        self.data = None
         
         if meta.isDefined(self._descriptor.raw_data):
             # 'raw_data' is present
