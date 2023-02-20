@@ -26,6 +26,214 @@
           "name": "data_0",
           "is_variable": false,
           "has_rank": false
+        },
+        {
+          "shape": [
+            96
+          ],
+          "type": "FLOAT32",
+          "buffer": 2,
+          "name": "conv1_b_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            96,
+            11,
+            11,
+            3
+          ],
+          "type": "FLOAT32",
+          "buffer": 3,
+          "name": "conv1_w_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            256
+          ],
+          "type": "FLOAT32",
+          "buffer": 4,
+          "name": "conv2_b_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            256,
+            5,
+            5,
+            48
+          ],
+          "type": "FLOAT32",
+          "buffer": 5,
+          "name": "conv2_w_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "FLOAT32",
+          "buffer": 6,
+          "name": "conv3_b_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            384,
+            3,
+            3,
+            256
+          ],
+          "type": "FLOAT32",
+          "buffer": 7,
+          "name": "conv3_w_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            384
+          ],
+          "type": "FLOAT32",
+          "buffer": 8,
+          "name": "conv4_b_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            384,
+            3,
+            3,
+            192
+          ],
+          "type": "FLOAT32",
+          "buffer": 9,
+          "name": "conv4_w_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            256
+          ],
+          "type": "FLOAT32",
+          "buffer": 10,
+          "name": "conv5_b_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            256,
+            3,
+            3,
+            192
+          ],
+          "type": "FLOAT32",
+          "buffer": 11,
+          "name": "conv5_w_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            4096
+          ],
+          "type": "FLOAT32",
+          "buffer": 12,
+          "name": "fc6_b_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            4096,
+            9216
+          ],
+          "type": "FLOAT32",
+          "buffer": 13,
+          "name": "fc6_w_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            4096
+          ],
+          "type": "FLOAT32",
+          "buffer": 14,
+          "name": "fc7_b_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            4096,
+            4096
+          ],
+          "type": "FLOAT32",
+          "buffer": 15,
+          "name": "fc7_w_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            1000
+          ],
+          "type": "FLOAT32",
+          "buffer": 16,
+          "name": "fc8_b_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            1000,
+            4096
+          ],
+          "type": "FLOAT32",
+          "buffer": 17,
+          "name": "fc8_w_0",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+            2
+          ],
+          "type": "INT64",
+          "buffer": 18,
+          "name": "OC2_DUMMY_1",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+
+          ],
+          "type": "FLOAT32",
+          "buffer": 19,
+          "name": "46",
+          "is_variable": false,
+          "has_rank": false
+        },
+        {
+          "shape": [
+
+          ],
+          "type": "FLOAT32",
+          "buffer": 20,
+          "name": "48",
+          "is_variable": false,
+          "has_rank": false
         }
       ],
       "inputs": [

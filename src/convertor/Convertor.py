@@ -35,9 +35,10 @@ def convertShape(oShape: onnxTS.TensorShape) -> tflT.Shape:
 
     return convertShapeDims(dims)
 
+
 def convertShapeDims(oDims: list[int]) -> tflT.Shape:
     """ Convert list of ints representing the shape of an ONNX Tensor to a TFLite 'Shape' object. """
-    dims = [dim for dim in oDims]
+    dims = [dim for dim in oDims] # Copy just in case
 
     if __isNCHW(dims):
         dims = __dimsToNHWC(dims)

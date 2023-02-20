@@ -22,13 +22,9 @@ class Builder:
 
     def buildConstantTensors(self, oTensors: onnxT.Tensors):
         for oTensor in oTensors:
-            shape = Convertor.convertShapeDims(oTensor.dims)
-            name = oTensor.name
-            bufferIndex = self.__bufferIndexForName(name)
-            type = Convertor.convertDataType(oTensor.dataType)
+            pass
 
-            tTensor = tflT.Tensor(shape,name,bufferIndex,type)
-
+            
 
     def buildOutputTensors(self, oOutputs: list[onnxVI.ValueInfo]):
         """ Create 'tensor' tables in the 'tensors' vector of the subGraph for the 'oOutputs'.
@@ -40,7 +36,9 @@ class Builder:
             if oOutput.type.tensorType is None:
                 err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for Outputs yet!")
 
+            self.__buildEmptyBuffer(oOutput.name)
             self.__buildEmptyTensor(oOutput)
+
             outputs.append(self.__tensorIndexForName(oOutput.name))
 
         self.__getSubgraph().outputs = outputs
@@ -55,7 +53,9 @@ class Builder:
             if oInput.type.tensorType is None:
                 err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for Inputs yet!")
 
+            self.__buildEmptyBuffer(oInput.name)
             self.__buildEmptyTensor(oInput)
+
             inputs.append(self.__tensorIndexForName(oInput.name))
 
         self.__getSubgraph().inputs = inputs
@@ -70,17 +70,22 @@ class Builder:
 
     def __bufferIndexForName(self, name: str):
         """ Return the index to the 'buffers' vector in the TFLite model for the tensor with
-            given name """
+            given name.
+            If 'name' is not yet in the 'buffers', mapping will be added and warning will be printed. """
         if name not in self.__bufferNameIndexMap.keys():
             self.__bufferNameIndexMap[name] = self.__bufferSize()
+            err.wprint(f"Tensor '{name}' is not yet in the buffer. Adding it on index '{self.__bufferNameIndexMap[name]}!'") 
 
         return self.__bufferNameIndexMap[name]
 
     def __tensorIndexForName(self, name: str):
         """ Return the index to the 'tensors' vector in the TFLite subGraph for the tensor with
-            given name """
+            given name 
+            If 'name' is not yet in the 'tensors', mapping will be added and warning will be printed. """
         if name not in self.__tensorNameIndexMap.keys():
             self.__tensorNameIndexMap[name] = self.__tensorsSize()
+            err.wprint(f"Tensor '{name}' is not yet in the tensors. Adding it on index '{self.__bufferNameIndexMap[name]}!'") 
+
 
         return self.__tensorNameIndexMap[name]
 
@@ -118,12 +123,31 @@ class Builder:
                
 
     def __appendNewTensor(self, tTensor: tflT.Tensor):
+        """ Add 'tTensor' to the end of the 'Tensors' vector.
+            Function also assigns new index to the 'Tensors' vector for 'tTensor'. """
         self.__newTensorIndexForName(tTensor.name) # Register the new tensor 
         self.__getTensors().append(tTensor)
+
+    def __appendNewBuffer(self, buffer: tflB.Buffer, name: str):
+        """ Add 'buffer' to the end of the 'Buffers' vector.
+            Function also assigns new index to the 'Buffers' vector for 'buffer'. 
+            'name' is the name of the Tensor, the 'buffer' belongs to. """
+        self.__newBufferIndexForName(name) # Register the new tensor 
+        self.__getBuffers().append(buffer)
 
 
     """ -------------------- Private generic build functions. -------------------- """
     
+
+    def __buildConstantTensor(self, oTensor: onnxT.Tensor):
+            shape = Convertor.convertShapeDims(oTensor.dims)
+            name = oTensor.name
+            bufferIndex = self.__bufferIndexForName(name)
+            type = Convertor.convertDataType(oTensor.dataType)
+
+            tTensor = tflT.Tensor(shape,name,bufferIndex,type)
+            self.__appendNewTensor(tTensor)
+
 
     def __buildEmptyTensor(self, oVI :onnxVI.ValueInfo):
         """ Build a 'Tensor' object from am ONNX ValueInfo object. So the resulting tensor has
@@ -134,17 +158,18 @@ class Builder:
 
         shape = Convertor.convertShape(oTensor.shape)
         name = oVI.name
-        bufferIndex = self.__newBufferIndexForName(name)
+        bufferIndex = self.__bufferIndexForName(name)
         type = Convertor.convertDataType(oTensor.elemType)
 
         tensor = tflT.Tensor(shape, name, bufferIndex, type)
         self.__appendNewTensor(tensor)
 
-        self.__buildEmptyBuffer()
-
-    def __buildEmptyBuffer(self):
+    def __buildEmptyBuffer(self, name: str):
+        """ Add an empty buffer to the 'buffers' vector and map 'name' to the corresponding index. 
+            'name' is the name of the Tensor, the 'buffer' belongs to. """
         buffers = self.__getBuffers()
         buffers.append(tflB.Buffer([]))
+        self.__newBufferIndexForName(name)
 
 
     """ ---------------- Private functions to get an element of the TFLite model. ----------------
