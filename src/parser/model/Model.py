@@ -9,7 +9,7 @@ import src.parser.model.Graph as g
 
 class Model(meta.ONNXObject):
     irVersion: int
-    opsetImport: osi.OperatorSetIds
+    opsetImports: osi.OperatorSetIds
     producerName: str
     producerVersion: str
     domain: str
@@ -29,7 +29,7 @@ class Model(meta.ONNXObject):
     def __initAttributes(self):
         """ Initialize object attributes from the '_descriptor' attribute of the parent object. """
         self.irVersion = self._descriptor.ir_version
-        self.opsetImport = osi.OperatorSetIds(self._descriptor.opset_import)
+        self.opsetImports = osi.OperatorSetIds(self._descriptor.opset_import)
         self.producerName = self._descriptor.producer_name
         self.producerVersion = self._descriptor.producer_version
         self.domain = self._descriptor.domain

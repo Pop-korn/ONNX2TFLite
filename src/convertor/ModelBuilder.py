@@ -4,6 +4,7 @@ import src.generator.model.Buffers as tflB
 import src.generator.model.Tensors as tflT
 
 import src.parser.model.ValueInfo as onnxVI
+import src.parser.model.Tensors as onnxT
 
 import src.convertor.Convertor as Convertor
 
@@ -18,6 +19,16 @@ class Builder:
         self.__tflModel = tflM.Model(modelVersion,modelDescription)
         self.__bufferNameIndexMap = {}
         self.__tensorNameIndexMap = {}
+
+    def buildConstantTensors(self, oTensors: onnxT.Tensors):
+        for oTensor in oTensors:
+            shape = Convertor.convertShapeDims(oTensor.dims)
+            name = oTensor.name
+            bufferIndex = self.__bufferIndexForName(name)
+            type = Convertor.convertDataType(oTensor.dataType)
+
+            tTensor = tflT.Tensor(shape,name,bufferIndex,type)
+
 
     def buildOutputTensors(self, oOutputs: list[onnxVI.ValueInfo]):
         """ Create 'tensor' tables in the 'tensors' vector of the subGraph for the 'oOutputs'.
@@ -81,6 +92,35 @@ class Builder:
         """ Return the number of tensors that are currently in the subGraph. """
         return len(self.__tensorNameIndexMap.keys())
 
+    def __newBufferIndexForName(self, name: str):
+        """ Return the index to the 'buffers' vector in the TFLite model for the tensor with
+            given name. Just like in '__bufferIndexForName'.
+            Howerver if 'name' is already in, warning message will be printed."""
+        if name in self.__bufferNameIndexMap.keys():
+            err.wprint(f"Tensor '{name}' is already in the buffer on index '{self.__bufferNameIndexMap[name]}!'")   
+        else:
+            # Add the new tensor
+            self.__bufferNameIndexMap[name] =self.__bufferSize()
+
+        return self.__bufferNameIndexMap[name]
+
+    def __newTensorIndexForName(self, name: str):
+        """ Return the index to the 'tensors' vector in the TFLite subGraph for the tensor with
+            given name. Just like in '__tensorIndexForName'.
+            Howerver if 'name' is already in, warning message will be printed."""
+        if name in self.__tensorNameIndexMap.keys():
+            err.wprint(f"Tensor '{name}' is already in the tensors on index '{self.__tensorNameIndexMap[name]}!'")   
+        else:
+            # Add the new tensor
+            self.__tensorNameIndexMap[name] =self.__tensorsSize()
+
+        return self.__tensorNameIndexMap[name]
+               
+
+    def __appendNewTensor(self, tTensor: tflT.Tensor):
+        self.__newTensorIndexForName(tTensor.name) # Register the new tensor 
+        self.__getTensors().append(tTensor)
+
 
     """ -------------------- Private generic build functions. -------------------- """
     
@@ -94,12 +134,11 @@ class Builder:
 
         shape = Convertor.convertShape(oTensor.shape)
         name = oVI.name
-        bufferIndex = self.__bufferIndexForName(name)
+        bufferIndex = self.__newBufferIndexForName(name)
         type = Convertor.convertDataType(oTensor.elemType)
 
         tensor = tflT.Tensor(shape, name, bufferIndex, type)
-        self.__tensorIndexForName(name) # Register the new tensor 
-        self.__getTensors().append(tensor)
+        self.__appendNewTensor(tensor)
 
         self.__buildEmptyBuffer()
 

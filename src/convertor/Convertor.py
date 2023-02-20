@@ -30,12 +30,21 @@ def __dimsToNHWC(nchwList: list[int]) -> list[int]:
     return res
 
 def convertShape(oShape: onnxTS.TensorShape) -> tflT.Shape:
-    dims = [ dim.value for dim in oShape.dims]
+    """ Convert ONNX 'TensorShape', to TFLite 'Shape'. """
+    dims = [dim.value for dim in oShape.dims]
+
+    return convertShapeDims(dims)
+
+def convertShapeDims(oDims: list[int]) -> tflT.Shape:
+    """ Convert list of ints representing the shape of an ONNX Tensor to a TFLite 'Shape' object. """
+    dims = [dim for dim in oDims]
 
     if __isNCHW(dims):
         dims = __dimsToNHWC(dims)
 
     return tflT.Shape(dims)
+
+
 
 def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
     match oType:
