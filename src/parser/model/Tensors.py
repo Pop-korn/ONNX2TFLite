@@ -44,7 +44,7 @@ class Tensor(meta.ONNXObject):
 
 
     def __assignData(self):
-        """ Assign data to either the 'data' or 'rawData' attribute correctly. """
+        """ Assign data to either the 'data' attribute correctly. """
         self.rawData = None
         self.data = None
 
