@@ -1,4 +1,6 @@
 bvlcalexnet-12.onnx
+alexnet.tflite
+alexnet.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
