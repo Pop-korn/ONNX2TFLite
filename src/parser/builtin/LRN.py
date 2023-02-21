@@ -31,4 +31,4 @@ class LRN(meta.ONNXOperatorAttributes):
                 case "size":
                     self.size = attr.i
                 case _:
-                    err.wprint(f"ONNX LRN attribute '{attr.name}' is not supported!")
+                    err.warning(f"ONNX LRN attribute '{attr.name}' is not supported!")

@@ -20,4 +20,4 @@ class Reshape(meta.ONNXOperatorAttributes):
                 case "allowzero": # Not tested!
                     self.allowZero = attr.i 
                 case _:
-                    err.wprint(f"ONNX Reshape attribute '{attr.name}' is not supported!")
+                    err.warning(f"ONNX Reshape attribute '{attr.name}' is not supported!")

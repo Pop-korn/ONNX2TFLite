@@ -46,7 +46,7 @@ class Model(meta.ONNXObject):
             try:
                 self._descriptor.ParseFromString(raw_data)
             except:
-                err.eprint(err.Code.INPUT_FILE_ERR, f"Cannot parse file '{srcFile}'")
+                err.error(err.Code.INPUT_FILE_ERR, f"Cannot parse file '{srcFile}'")
         except:
-            err.eprint(err.Code.INPUT_FILE_ERR, f"Cannot read from file '{srcFile}'")
+            err.error(err.Code.INPUT_FILE_ERR, f"Cannot read from file '{srcFile}'")
 

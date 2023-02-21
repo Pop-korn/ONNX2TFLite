@@ -20,4 +20,4 @@ class Dropout(meta.ONNXOperatorAttributes):
                 case "seed": # Not tested!
                     self.seed = attr.i
                 case _:
-                    err.wprint(f"ONNX Dropout attribute '{attr.name}' is not supported!")
+                    err.warning(f"ONNX Dropout attribute '{attr.name}' is not supported!")

@@ -40,4 +40,4 @@ class Conv(meta.ONNXOperatorAttributes):
                 case "strides":
                     self.strides = meta.ONNXIntListAttribute(attr)
                 case _:
-                    err.wprint(f"ONNX Conv attribute '{attr.name}' is not supported!")
+                    err.warning(f"ONNX Conv attribute '{attr.name}' is not supported!")

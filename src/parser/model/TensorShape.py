@@ -17,7 +17,7 @@ class Dimention(meta.ONNXObject):
         elif descriptor.HasField("dim_param"):
             self.value = descriptor.dim_param
         else:
-            err.wprint("ONNX TensorShape.Dimension has no valid value!")
+            err.warning("ONNX TensorShape.Dimension has no valid value!")
 
 class TensorShape(meta.ONNXObject):
     dims: list[Dimention]

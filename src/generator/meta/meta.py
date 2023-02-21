@@ -13,7 +13,7 @@ class TFLiteObject:
     
     """ Generates tflite representation for this object. MUST be overriden! """
     def genTFLite(self, builder: fb.Builder):
-        err.wprint("TFLiteObject: genTFLite() is not defined!")
+        err.warning("TFLiteObject: genTFLite() is not defined!")
 
 class TFLiteVector(TFLiteObject):
     """ Represents a TFLite vector of TFLiteObjects. Provides interface for storing data
@@ -141,4 +141,4 @@ class BuiltinOptions(TFLiteObject):
 
     """ Function has to be overwritten """
     def genTFLite(self, builder: fb.Builder):
-        err.wprint(f"BuiltinOperator '{self.builtinOptionsType}': genTFLite() is not defined!")
+        err.warning(f"BuiltinOperator '{self.builtinOptionsType}': genTFLite() is not defined!")

@@ -81,13 +81,13 @@ class Tensor(meta.ONNXObject):
     def __assertTypeAllowed(self, allowedTypes: list[meta.DataType], forField: str):
         """ Check that 'self.dataType' is in 'allowedTypes'. If it isn't, print warning message. """
         if self.dataType not in allowedTypes:
-            err.wprint(f"""ONNX Tensor '{forField}' is used and 'data_type' is '{self.dataType}'!
+            err.warning(f"""ONNX Tensor '{forField}' is used and 'data_type' is '{self.dataType}'!
                 MUST be one of '{allowedTypes}'""")
 
     def __assertTypeNotBanned(self, bannedTypes: list[meta.DataType], forField: str):
         """ Check that 'self.dataType' is NOT in 'bannedTypes'. If it IS, print warning message. """
         if self.dataType in bannedTypes:
-            err.wprint(f"""ONNX Tensor '{forField}' is used and 'data_type' is '{self.dataType}'!
+            err.warning(f"""ONNX Tensor '{forField}' is used and 'data_type' is '{self.dataType}'!
                 must NOT be one of '{bannedTypes}'""")
 
 

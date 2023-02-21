@@ -46,4 +46,4 @@ class MaxPool(meta.ONNXOperatorAttributes):
                 case "strides":
                     self.strides = meta.ONNXIntListAttribute(attr)
                 case _:
-                    err.wprint(f"ONNX MaxPool attribute '{attr.name}' is not supported!")
+                    err.warning(f"ONNX MaxPool attribute '{attr.name}' is not supported!")

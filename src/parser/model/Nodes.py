@@ -54,7 +54,7 @@ class Node(meta.ONNXObject):
             case "Softmax":
                 self.attributes = Softmax.Softmax(self._descriptor.attribute)
             case _:
-                err.wprint(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
+                err.warning(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
             
 
 class Nodes(list[Node]):

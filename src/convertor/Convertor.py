@@ -52,7 +52,7 @@ def toNumpyType(oType: onnxMeta.DataType):
     """ Convert ONNX DataType to numpy dtype """
     match oType:
         case onnxMeta.DataType.UNDEFINED:
-            err.wprint("Cannot convert ONNX DataType 'UNDEFINED' to numpy dtype. Using 'UINT8'.")
+            err.warning("Cannot convert ONNX DataType 'UNDEFINED' to numpy dtype. Using 'UINT8'.")
             return np.uint8
 
         case onnxMeta.DataType.FLOAT:
@@ -101,14 +101,14 @@ def toNumpyType(oType: onnxMeta.DataType):
             return np.clongdouble
             
         case onnxMeta.DataType.BFLOAT16:
-            err.wprint("Cannot convert ONNX DataType 'BFLOAT16' to numpy dtype. Using 'FLOAT16'.")
+            err.warning("Cannot convert ONNX DataType 'BFLOAT16' to numpy dtype. Using 'FLOAT16'.")
             return np.uint8
 
 def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
     """ Convert ONNX DataType to TFLite TensorType """
     match oType:
         case onnxMeta.DataType.UNDEFINED:
-            err.wprint("Cannot convert ONNX DataType 'UNDEFINED' to TFLite. Using 'UINT8'.")
+            err.warning("Cannot convert ONNX DataType 'UNDEFINED' to TFLite. Using 'UINT8'.")
             return tflTT.TensorType.UINT8
 
         case onnxMeta.DataType.FLOAT:
@@ -157,5 +157,5 @@ def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
             return tflTT.TensorType.COMPLEX128
             
         case onnxMeta.DataType.BFLOAT16:
-            err.wprint("Cannot convert ONNX DataType 'BFLOAT16' to TFLite. Using 'FLOAT16'.")
+            err.warning("Cannot convert ONNX DataType 'BFLOAT16' to TFLite. Using 'FLOAT16'.")
             return tflTT.TensorType.FLOAT16

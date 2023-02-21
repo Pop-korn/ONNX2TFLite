@@ -44,7 +44,7 @@ class Builder:
 
         for oOutput in oOutputs:
             if oOutput.type.tensorType is None:
-                err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for Outputs yet!")
+                err.error(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for Outputs yet!")
 
             self.__buildEmptyBuffer(oOutput.name)
             self.__buildEmptyTensor(oOutput)
@@ -62,7 +62,7 @@ class Builder:
 
         for oInput in oInputs:
             if oInput.type.tensorType is None:
-                err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for Inputs yet!")
+                err.error(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for Inputs yet!")
 
             self.__buildEmptyBuffer(oInput.name)
             self.__buildEmptyTensor(oInput)
@@ -92,7 +92,7 @@ class Builder:
             buffer.type = Convertor.convertDataType(oTensor.dataType)
             buffer.data = np.array(oTensor.data, Convertor.toNumpyType(oTensor.dataType))
         else:
-            err.wprint(f"ONNX Tensor '{oTensor.name}' should contain data but doesn't! Generating empty buffer!")
+            err.warning(f"ONNX Tensor '{oTensor.name}' should contain data but doesn't! Generating empty buffer!")
 
         self.__appendNewBuffer(buffer, oTensor.name)
 
@@ -112,7 +112,7 @@ class Builder:
             no data, just properties. """
         oTensor = oVI.type.tensorType
         if oTensor is None:
-            err.eprint(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported yet!")
+            err.error(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported yet!")
 
         shape = Convertor.convertShape(oTensor.shape)
         name = oVI.name
@@ -142,7 +142,7 @@ class Builder:
             If 'name' is not yet in the 'buffers', mapping will be added and warning will be printed. """
         if name not in self.__bufferNameIndexMap.keys():
             self.__bufferNameIndexMap[name] = self.__bufferSize()
-            err.wprint(f"Tensor '{name}' is not yet in the buffer. Adding it on index '{self.__bufferNameIndexMap[name]}'!") 
+            err.warning(f"Tensor '{name}' is not yet in the buffer. Adding it on index '{self.__bufferNameIndexMap[name]}'!") 
 
         return self.__bufferNameIndexMap[name]
 
@@ -153,7 +153,7 @@ class Builder:
             If 'name' is not yet in the 'tensors', mapping will be added and warning will be printed. """
         if name not in self.__tensorNameIndexMap.keys():
             self.__tensorNameIndexMap[name] = self.__tensorsSize()
-            err.wprint(f"Tensor '{name}' is not yet in the tensors. Adding it on index '{self.__bufferNameIndexMap[name]}'!") 
+            err.warning(f"Tensor '{name}' is not yet in the tensors. Adding it on index '{self.__bufferNameIndexMap[name]}'!") 
 
         return self.__tensorNameIndexMap[name]
 
@@ -173,7 +173,7 @@ class Builder:
             given name. Just like in '__bufferIndexForName'.
             Howerver if 'name' is already in, warning message will be printed."""
         if name in self.__bufferNameIndexMap.keys():
-            err.wprint(f"Tensor '{name}' is already in the buffer on index '{self.__bufferNameIndexMap[name]}'!")   
+            err.warning(f"Tensor '{name}' is already in the buffer on index '{self.__bufferNameIndexMap[name]}'!")   
         else:
             # Add the new tensor
             self.__bufferNameIndexMap[name] =self.__bufferSize()
@@ -186,7 +186,7 @@ class Builder:
             given name. Just like in '__tensorIndexForName'.
             Howerver if 'name' is already in, warning message will be printed."""
         if name in self.__tensorNameIndexMap.keys():
-            err.wprint(f"Tensor '{name}' is already in the tensors on index '{self.__tensorNameIndexMap[name]}'!")   
+            err.warning(f"Tensor '{name}' is already in the tensors on index '{self.__tensorNameIndexMap[name]}'!")   
         else:
             # Add the new tensor
             self.__tensorNameIndexMap[name] =self.__tensorsSize()
