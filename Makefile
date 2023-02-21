@@ -6,11 +6,11 @@ all:
 test: all
 	flatc -t --strict-json --defaults-json -o test data/schemas/tflite/schema.fbs -- test/alexnet.tflite --raw-binary 
 
-generator_test:
+generator-test:
 	export TF_CPP_MIN_LOG_LEVEL="2"
 	python3 ./generator_test.py
 
-get_schemas:
+get-schemas:
 	wget -P ./data/schemas/tflite/ https://raw.githubusercontent.com/tensorflow/tensorflow/master/tensorflow/lite/schema/schema.fbs
 	wget -P ./data/schemas/onnx/onnx/ https://raw.githubusercontent.com/onnx/onnx/main/onnx/onnx-ml.proto
 	wget -P ./data/schemas/onnx/ https://raw.githubusercontent.com/onnx/onnx/main/onnx/onnx-data.proto
@@ -20,3 +20,6 @@ LB := (
 RB := )
 clear-pycache:
 	find . | grep -E "$(LB)/__pycache__$$|\.pyc$$|\.pyo$$$(RB)" | xargs rm -rf
+
+total-line-count:
+	find src/ | xargs wc -l
