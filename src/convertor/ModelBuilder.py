@@ -1,3 +1,5 @@
+import numpy as np
+
 import lib.tflite.TensorType as tflTT
 
 import src.generator.model.Model as tflM
@@ -85,11 +87,10 @@ class Builder:
         if oTensor.rawData is not None:
             # Rawdata is used
             buffer.type = tflTT.TensorType.UINT8
-            buffer.data = [data for data in oTensor.rawData]
-            
+            buffer.data = np.frombuffer(oTensor.rawData)
         elif oTensor.data is not None:
             buffer.type = Convertor.convertDataType(oTensor.dataType)
-            buffer.data = oTensor.data
+            buffer.data = np.array(oTensor.data, Convertor.toNumpyType(oTensor.dataType))
         else:
             err.wprint(f"ONNX Tensor '{oTensor.name}' should contain data but doesn't! Generating empty buffer!")
 

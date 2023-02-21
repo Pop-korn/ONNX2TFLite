@@ -9,7 +9,7 @@ import src.generator.meta.meta as meta
 import src.generator.meta.types as types
 
 class Buffer(meta.TFLiteObject):
-    data: list
+    data: np.ndarray
     type: tt.TensorType
 
     def __init__(self, data: list=None, 
@@ -28,28 +28,23 @@ class Buffer(meta.TFLiteObject):
             b.Start(builder)
             return b.End(builder)
 
-        # TODO MASSIVE CHECK NEEDED
-        if types.TypeSize(self.type) == 1:
-            array = np.array(self.data,np.uint8)
-            tflData = builder.CreateNumpyVector(array)
-        else:
-            PrependFunction = self.getPrependFunction(builder)
+        # -------------------- OLD IMPLEMENTATION (SLOW) --------------------
+        # PrependFunction = self.getPrependFunction(builder)
+        # """ 'data' length has to be multiplied by item size, because tflite.Buffer is
+        #     a vector of 'UBYTE's. So e.g. one 'INT32' item will take up 4 spaces in the vector. """
+        # lenBytes = len(self.data) * types.TypeSize(self.type)
+        # b.StartDataVector(builder, lenBytes)
+        # """ IMPORTANT! Flatbuffer is built in reverse, so for correct order,
+        #     data MUST be iterated in revese. """
+        # for val in reversed(self.data): 
+        #     PrependFunction(val)
+        # tflData = builder.EndVector()
 
-            """ 'data' length has to be multiplied by item size, because tflite.Buffer is
-                a vector of 'UBYTE's. So e.g. one 'INT32' item will take up 4 spaces in the vector. """
-            lenBytes = len(self.data) * types.TypeSize(self.type)
-            b.StartDataVector(builder, lenBytes)
-
-            """ IMPORTANT! Flatbuffer is built in reverse, so for correct order,
-                data MUST be iterated in revese. """
-            for val in reversed(self.data): 
-                PrependFunction(val)
-
-            tflData = builder.EndVector()
-
+        tflData = builder.CreateNumpyVector(self.data)
 
         b.Start(builder)
         b.AddData(builder, tflData)
+
         return b.End(builder)
 
 

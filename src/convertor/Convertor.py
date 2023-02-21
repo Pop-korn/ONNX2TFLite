@@ -1,11 +1,13 @@
+import numpy as np
+
 import src.generator.model.Tensors as tflT
 
 import src.parser.meta.meta as onnxMeta
 import src.parser.model.TensorShape as onnxTS
 
-import lib.tflite.TensorType as tflTT
-
 import src.err as err
+
+import lib.tflite.TensorType as tflTT
 
 def __isNCHW(list: list[int]) -> bool:
     """ Figure out if given 'list' is in the 'nchw' format. """
@@ -46,6 +48,61 @@ def convertShapeDims(oDims: list[int]) -> tflT.Shape:
     return tflT.Shape(dims)
 
 
+def toNumpyType(oType: onnxMeta.DataType):
+    """ Convert ONNX DataType to numpy dtype """
+    match oType:
+        case onnxMeta.DataType.UNDEFINED:
+            err.wprint("Cannot convert ONNX DataType 'UNDEFINED' to numpy dtype. Using 'UINT8'.")
+            return np.uint8
+
+        case onnxMeta.DataType.FLOAT:
+            return np.float32
+
+        case onnxMeta.DataType.UINT8:
+            return np.uint8
+
+        case onnxMeta.DataType.INT8:
+            return np.int8
+
+        case onnxMeta.DataType.UINT16:
+            return np.uint16
+
+        case onnxMeta.DataType.INT16:
+            return np.int16
+
+        case onnxMeta.DataType.INT32:
+            return np.int32
+
+        case onnxMeta.DataType.INT64:
+            return np.int64
+
+        case onnxMeta.DataType.STRING:
+            return np.string_
+
+        case onnxMeta.DataType.BOOL:
+            return np.bool_
+
+        case onnxMeta.DataType.FLOAT16:
+            return np.float16
+
+        case onnxMeta.DataType.DOUBLE:
+            return np.float64
+
+        case onnxMeta.DataType.UINT32:
+            return np.uint32
+
+        case onnxMeta.DataType.UINT64:
+            return np.uint64
+
+        case onnxMeta.DataType.COMPLEX64:
+            return np.cdouble
+
+        case onnxMeta.DataType.COMPLEX128:
+            return np.clongdouble
+            
+        case onnxMeta.DataType.BFLOAT16:
+            err.wprint("Cannot convert ONNX DataType 'BFLOAT16' to numpy dtype. Using 'FLOAT16'.")
+            return np.uint8
 
 def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
     """ Convert ONNX DataType to TFLite TensorType """

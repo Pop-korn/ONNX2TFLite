@@ -12,7 +12,7 @@ def convertModel(oM: onnxM.Model) -> tflM.Model:
     builder.buildOutputTensors(oM.graph.outputs)
     builder.buildInputTensors(oM.graph.inputs)
 
-    builder.buildConstantTensors(oM.graph.initializers[1:2])
+    builder.buildConstantTensors(oM.graph.initializers)
 
     return builder.finish()
 

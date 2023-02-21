@@ -21,7 +21,7 @@ class Tensor(meta.ONNXObject):
     data: list[ float | int | str ]
     name: str
     docString: str
-    """ Alternative to 'data'. Only 1 can be used! """
+    """ Alternative to 'data'. Only one of the two can be used! """
     rawData: bytes 
     # TODO externalData
     dataLocation: meta.DataLocation

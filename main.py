@@ -3,6 +3,7 @@ import src.parser.model.Model as m
 import src.convertor.convert as convert
 
 import flatbuffers as fb
+import numpy as np
 
 onnxModel = m.Model("data/onnx/bvlcalexnet-12.onnx")
 
