@@ -2,7 +2,7 @@
 ## **Work In Progress**
 Open project to convert models from the *.onnx* to *.tflite* format.
 
-Currently *.tflite* model generation from code and *.onnx* model loading is supported. Conversion between them is in very early stages.
+Currently *.tflite* model generation from code, *.onnx* model loading and conversion of tensors are supported. Working on converting operators.
 
 Project should be in a usable state by June 2023.
 
@@ -10,7 +10,8 @@ Project should be in a usable state by June 2023.
 ## Structure
 The entry point of the program is the *main.py* file in the root directory. To run the program use Makefile in the root directory. A *.tflite* model will be generated in the **/test** directory.
 
-The **/data** directory contains pre-trained models, tensor values input images for inference testing and schemas.
+The **/data** directory contains pre-trained models, tensor values input images for inference testing and schemas. Some models are not included on GitHub because of size restrictions.
+
 
 The code in the **/src** diroctory is split into multiple subdirectories.
 
