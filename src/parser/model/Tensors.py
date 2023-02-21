@@ -1,6 +1,9 @@
+import numpy as np
+
 import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
 import src.parser.meta.meta as meta
+import src.parser.meta.types as types
 
 import src.err as err
 
@@ -17,12 +20,10 @@ class Tensor(meta.ONNXObject):
     dataType: meta.DataType
     segment: Segment
     """ Data of the tensor. Can be of type float, double, int32, int64, uint64 or string.
-        Type is given in 'dataType'. """
-    data: list[ float | int | str ]
+        Type is given in 'dataType' and should also be specified in the 'data.dtype'. """
+    data: np.ndarray
     name: str
     docString: str
-    """ Alternative to 'data'. Only one of the two can be used! """
-    rawData: bytes 
     # TODO externalData
     dataLocation: meta.DataLocation
 
@@ -47,47 +48,50 @@ class Tensor(meta.ONNXObject):
         self.rawData = None
         self.data = None
 
+        # Raw data
         if self.__hasRawData():
-            self.rawData = self._descriptor.raw_data
+            self.data = np.frombuffer(self._descriptor.raw_data, types.toNumpyType(self.dataType))
             self.__assertTypeNotBanned([meta.DataType.STRING, meta.DataType.UNDEFINED],"raw_data") # 'onnx-ml.proto' line '581'
             return
         
 
         """ 'raw_data' is not given. One of the 'data' fields must contain tensor values. """
 
+        # Float data
         if meta.isDefined(self._descriptor.float_data): 
-            self.data = self._descriptor.float_data
+            self.data = np.array(self._descriptor.float_data, types.toNumpyType(self.dataType))
             self.__assertTypeAllowed([meta.DataType.FLOAT, meta.DataType.COMPLEX64],"float_data") # 'onnx-ml.proto' line '540'
 
+        # Int32 data
         elif meta.isDefined(self._descriptor.int32_data): 
             err.unchecked("Tensors.__assignData(): int32_data")
-            self.data = self._descriptor.int32_data
+            self.data = np.array(self._descriptor.int32_data, types.toNumpyType(self.dataType))
             self.__assertTypeAllowed([meta.DataType.INT32, meta.DataType.INT16, meta.DataType.INT8, 
                                     meta.DataType.UINT16, meta.DataType.UINT8, meta.DataType.BOOL, 
                                     meta.DataType.FLOAT16, meta.DataType.BFLOAT16],"int32_data") # 'onnx-ml.proto' line '547'
 
-
+        # String data
         elif meta.isDefined(self._descriptor.string_data):
             err.unchecked("Tensors.__assignData(): string_data")
-            self.data = self._descriptor.string_data
+            self.data = np.array(self._descriptor.string_data, types.toNumpyType(self.dataType))
             self.__assertTypeAllowed([meta.DataType.STRING],"string_data") # 'onnx-ml.proto' line '555'
 
-
+        # Int64 data
         elif meta.isDefined(self._descriptor.int64_data):
             err.unchecked("Tensors.__assignData(): int64_data")
-            self.data = self._descriptor.int64_data
+            self.data = np.array(self._descriptor.int64_data, types.toNumpyType(self.dataType))
             self.__assertTypeAllowed([meta.DataType.INT64],"int64_data") # 'onnx-ml.proto' line '558'
 
-
+        # Double data
         elif meta.isDefined(self._descriptor.double_data):
             err.unchecked("Tensors.__assignData(): double_data")
-            self.data = self._descriptor.double_data
+            self.data = np.array(self._descriptor.double_data, types.toNumpyType(self.dataType))
             self.__assertTypeAllowed([meta.DataType.DOUBLE, meta.DataType.COMPLEX128],"double_data") # 'onnx-ml.proto' line '612'
 
-
+        # Uint64 data
         elif meta.isDefined(self._descriptor.uint64_data):
             err.unchecked("Tensors.__assignData(): uint64_data")
-            self.data = self._descriptor.uint64_data
+            self.data = np.array(self._descriptor.uint64_data, types.toNumpyType(self.dataType))
             self.__assertTypeAllowed([meta.DataType.UINT32, meta.DataType.UINT64],"uint64_data") # 'onnx-ml.proto' line '617'
 
 

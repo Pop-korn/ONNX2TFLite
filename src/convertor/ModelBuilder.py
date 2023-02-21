@@ -110,17 +110,16 @@ class Builder:
     def __buildBuffer(self, oTensor: onnxT.Tensor):
         buffer = tflB.Buffer()
 
-        if oTensor.rawData is not None:
-            # Rawdata is used
-            buffer.type = Convertor.convertDataType(oTensor.dataType)
-            data = np.frombuffer(oTensor.rawData,Convertor.toNumpyType(oTensor.dataType))
-
-            buffer.data = Convertor.convertTensorData(data, oTensor.dims)
-        elif oTensor.data is not None:
-            buffer.type = Convertor.convertDataType(oTensor.dataType)
-            buffer.data = np.array(oTensor.data, Convertor.toNumpyType(oTensor.dataType))
-        else:
+        if oTensor.data is None:
+            # No data was provided in the tensor
             err.warning(f"ONNX Tensor '{oTensor.name}' should contain data but doesn't! Generating empty buffer!")
+            self.__appendNewBuffer(buffer, oTensor.name)
+            return
+
+
+        # Convert the data
+        buffer.type = Convertor.convertDataType(oTensor.dataType)
+        buffer.data = Convertor.convertTensorData(oTensor.data, oTensor.dims)
 
         self.__appendNewBuffer(buffer, oTensor.name)
 
