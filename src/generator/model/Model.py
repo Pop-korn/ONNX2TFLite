@@ -43,15 +43,15 @@ class Model(meta.TFLiteObject):
             err.expectType(self.description, str, "Model.description")
             tflDescription = builder.CreateString(self.description)
         
-        err.expectType(self.operatorCodes, oc.OperatorCodes, "Model.operatorCodes")
+        err.expectType(self.operatorCodes, oc.OperatorCodes, "Model.operatorCodes") # TODO change to 'requireType'
         if self.operatorCodes is not None:
             tflOperatorCodes = self.operatorCodes.genTFLite(builder)
         
-        err.expectType(self.subGraphs, sg.SubGraphs, "Model.subGraphs")
+        err.expectType(self.subGraphs, sg.SubGraphs, "Model.subGraphs") # TODO change to 'requireType'
         if self.subGraphs is not None:
             tflSubGraphs = self.subGraphs.genTFLite(builder)
         
-        err.expectType(self.buffers, b.Buffers, "Model.buffers")
+        err.expectType(self.buffers, b.Buffers, "Model.buffers") # TODO change to 'requireType'
         if self.buffers is not None:
             tflBuffers = self.buffers.genTFLite(builder)
 

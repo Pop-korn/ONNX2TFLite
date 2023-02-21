@@ -30,7 +30,26 @@ class Builder:
     """ -------------------- Public Builder functions -------------------- """
 
 
+    def buildInternalTensors(self, oTensors: list[onnxVI.ValueInfo]):
+        """ Create 'tensor' tables in the 'tensors' vecotr of the subGraph for oTensors.
+            The 'oTensors' do NOT contain data. They should be the inputs and outputs of
+            operators in the graph. 
+            Designed for the 'value_info' field in ONNX 'Graph'."""
+        for oTensor in oTensors:
+            if oTensor.type.tensorType is None:
+                err.error(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for ValueInfo yet!")
+
+            if self.__tensorExists(oTensor.name):
+                # Tensor was already created using a different function
+                return 
+
+            self.__buildEmptyBuffer(oTensor.name)
+            self.__buildEmptyTensor(oTensor)
+
     def buildConstantTensors(self, oTensors: onnxT.Tensors):
+        """ Create 'tensor' and 'buffer' tables for the ONNX 'oTensors'.
+            The 'oTensors' should have data in them. 
+            Designed for the 'initializer' field of the ONNX 'Graph'. """
         for oTensor in oTensors:
             self.__buildBuffer(oTensor)
             self.__buildConstantTensor(oTensor)
@@ -38,7 +57,12 @@ class Builder:
 
     def buildOutputTensors(self, oOutputs: list[onnxVI.ValueInfo]):
         """ Create 'tensor' tables in the 'tensors' vector of the subGraph for the 'oOutputs'.
-            Also create empty buffers in the 'buffers' vector of the model. """
+            Also create empty buffers in the 'buffers' vector of the model. 
+            SHOULD be called before any other tensor building function!
+            Designed for the 'output' field of the ONNX 'Graph'. """
+
+        if self.__bufferSize() != 0:
+            err.internal("'Builder.buildOutputTensors()' should be called before any other Tensor building function!")
 
         outputs = tflSG.Outputs()
 
@@ -49,6 +73,7 @@ class Builder:
             self.__buildEmptyBuffer(oOutput.name)
             self.__buildEmptyTensor(oOutput)
 
+            # Add the tensor index to the 'outputs' field of the subGraph
             outputs.append(self.__tensorIndexForName(oOutput.name))
 
         self.__getSubgraph().outputs = outputs
@@ -67,6 +92,7 @@ class Builder:
             self.__buildEmptyBuffer(oInput.name)
             self.__buildEmptyTensor(oInput)
 
+            # Add the tensor index to the 'input' field of the subGraph
             inputs.append(self.__tensorIndexForName(oInput.name))
 
         self.__getSubgraph().inputs = inputs
@@ -134,6 +160,11 @@ class Builder:
 
 
     """ -------------------- Private 'quality of life' functions. -------------------- """
+
+
+    def __tensorExists(self, name: str):
+        """ Determine if a tensor with 'name' already exists or not. """
+        return name in self.__tensorNameIndexMap.keys()
 
 
     def __bufferIndexForName(self, name: str):
