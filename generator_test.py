@@ -146,10 +146,10 @@ def BuildBuffers(buffers: b.Buffers):
     buffers.append(b.Buffer())
 
     # Conv1
-    convW = np.load("data/buffers/conv1-weights").flatten().tolist()
+    convW = np.load("data/buffers/conv1-weights").flatten()
     buffers.append(b.Buffer(convW,tt.TensorType.UINT8))
 
-    convB = np.load("data/buffers/conv1-bias").flatten().tolist()
+    convB = np.load("data/buffers/conv1-bias").flatten()
     buffers.append(b.Buffer(convB))
 
     buffers.append(b.Buffer())
@@ -158,10 +158,10 @@ def BuildBuffers(buffers: b.Buffers):
     buffers.append(b.Buffer())
 
     # Conv2
-    convW = np.load("data/buffers/conv2-weights").flatten().tolist()
+    convW = np.load("data/buffers/conv2-weights",).flatten()
     buffers.append(b.Buffer(convW,tt.TensorType.UINT8))
 
-    convB = np.load("data/buffers/conv2-bias").flatten().tolist()
+    convB = np.load("data/buffers/conv2-bias").flatten()
     buffers.append(b.Buffer(convB))
 
     buffers.append(b.Buffer())
@@ -170,10 +170,10 @@ def BuildBuffers(buffers: b.Buffers):
     buffers.append(b.Buffer())
 
     # Conv3
-    convW = np.load("data/buffers/conv3-weights").flatten().tolist()
+    convW = np.load("data/buffers/conv3-weights").flatten()
     buffers.append(b.Buffer(convW,tt.TensorType.UINT8))
 
-    convB = np.load("data/buffers/conv3-bias").flatten().tolist()
+    convB = np.load("data/buffers/conv3-bias").flatten()
     buffers.append(b.Buffer(convB))
 
     buffers.append(b.Buffer())
@@ -182,10 +182,10 @@ def BuildBuffers(buffers: b.Buffers):
     buffers.append(b.Buffer())
 
     # Fully Connected
-    fcW = np.load("data/buffers/fc-weights").flatten().tolist()
+    fcW = np.load("data/buffers/fc-weights").flatten()
     buffers.append(b.Buffer(fcW,tt.TensorType.UINT8))
 
-    fcB = np.load("data/buffers/fc-bias").flatten().tolist()
+    fcB = np.load("data/buffers/fc-bias").flatten()
     buffers.append(b.Buffer(fcB))
 
     buffers.append(b.Buffer())

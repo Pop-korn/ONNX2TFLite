@@ -9,13 +9,12 @@ import src.generator.meta.meta as meta
 import src.generator.meta.types as types
 
 class Buffer(meta.TFLiteObject):
+    """ 'data' is an array of any type, but MUST have the correct 'dtype' specified! """
     data: np.ndarray
     type: tt.TensorType
 
-    def __init__(self, data: list=None, 
+    def __init__(self, data: np.ndarray=None, 
                 type: tt.TensorType=tt.TensorType.INT32) -> None:
-        if data is None:
-            data = []
         self.data = data
         self.type = type
 
@@ -23,7 +22,7 @@ class Buffer(meta.TFLiteObject):
         return types.PrependFunction(builder, self.type)
 
     def genTFLite(self, builder: fb.Builder):
-        if len(self.data) == 0:
+        if self.data is None or len(self.data) == 0:
             # If there is no data, table is empty
             b.Start(builder)
             return b.End(builder)
@@ -39,6 +38,9 @@ class Buffer(meta.TFLiteObject):
         # for val in reversed(self.data): 
         #     PrependFunction(val)
         # tflData = builder.EndVector()
+
+        if self.data.dtype.itemsize != 1:
+            self.data = np.frombuffer(self.data.tobytes(),np.uint8)
 
         tflData = builder.CreateNumpyVector(self.data)
 
