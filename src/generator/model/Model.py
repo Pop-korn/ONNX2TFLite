@@ -6,6 +6,8 @@ import src.generator.model.Buffers as b
 
 import src.generator.meta.meta as meta
 
+import src.err as err
+
 import lib.tflite.Model as m
 
 class Model(meta.TFLiteObject):
@@ -38,11 +40,18 @@ class Model(meta.TFLiteObject):
 
     def genTFLite(self, builder: fb.Builder):
         if self.description is not None:
+            err.expectType(self.description, str, "Model.description")
             tflDescription = builder.CreateString(self.description)
+        
+        err.expectType(self.operatorCodes, oc.OperatorCodes, "Model.operatorCodes")
         if self.operatorCodes is not None:
             tflOperatorCodes = self.operatorCodes.genTFLite(builder)
+        
+        err.expectType(self.subGraphs, sg.SubGraphs, "Model.subGraphs")
         if self.subGraphs is not None:
             tflSubGraphs = self.subGraphs.genTFLite(builder)
+        
+        err.expectType(self.buffers, b.Buffers, "Model.buffers")
         if self.buffers is not None:
             tflBuffers = self.buffers.genTFLite(builder)
 

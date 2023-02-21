@@ -7,6 +7,8 @@ import lib.tflite.TensorType as tt
 import src.generator.model.Quantization as Quantization
 import src.generator.meta.meta as meta
 
+import src.err as err
+
 """ Classes representing 'Tensor' structure and its Parameters. 'Tensor' is part of the 
     'SubGraph' structure represented in the 'model/SubGraph.py' file.
 """
@@ -49,6 +51,7 @@ class Tensor(meta.TFLiteObject):
         tflShape = self.shape.genTFLite(builder)
 
         if(self.quantization is not None):
+            err.requireType(self.quantization, Quantization.Quantization, "Tensor.quantization")
             tflQuantization = self.quantization.genTFLite(builder)
 
         t.Start(builder)

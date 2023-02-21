@@ -8,6 +8,8 @@ import lib.tflite.TensorType as tt
 import src.generator.meta.meta as meta
 import src.generator.meta.types as types
 
+import src.err as err
+
 class Buffer(meta.TFLiteObject):
     """ 'data' is an array of any type, but MUST have the correct 'dtype' specified! """
     data: np.ndarray
@@ -18,11 +20,16 @@ class Buffer(meta.TFLiteObject):
         self.data = data
         self.type = type
 
-    def getPrependFunction(self, builder: fb.Builder):
-        return types.PrependFunction(builder, self.type)
+    def __dataIsEmpty(self):
+        """ Determine if the buffer data is empty. """
+        return (self.data is None) or (len(self.data) == 0)
+
+    # -------------------- OLD IMPLEMENTATION (SLOW) --------------------
+    # def getPrependFunction(self, builder: fb.Builder):
+    #     return types.PrependFunction(builder, self.type)
 
     def genTFLite(self, builder: fb.Builder):
-        if self.data is None or len(self.data) == 0:
+        if self.__dataIsEmpty():
             # If there is no data, table is empty
             b.Start(builder)
             return b.End(builder)
@@ -38,6 +45,8 @@ class Buffer(meta.TFLiteObject):
         # for val in reversed(self.data): 
         #     PrependFunction(val)
         # tflData = builder.EndVector()
+
+        err.requireType(self.data,np.ndarray,"Buffer.data")
 
         if self.data.dtype.itemsize != 1:
             self.data = np.frombuffer(self.data.tobytes(),np.uint8)

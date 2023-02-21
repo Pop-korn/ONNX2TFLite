@@ -12,7 +12,7 @@ import lib.tflite.TensorType as tflTT
 def __isNCHW(list: list[int]) -> bool:
     """ Figure out if given 'list' is in the 'nchw' format. """
 
-    # TODO Imporove
+    # TODO Improve
     if len(list) >= 4:
         return True
 

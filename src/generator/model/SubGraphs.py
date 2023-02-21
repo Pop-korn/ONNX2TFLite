@@ -7,6 +7,8 @@ import src.generator.model.Tensors as Tensors
 import src.generator.model.Operators as Operators
 import src.generator.meta.meta as meta
 
+import src.err as err
+
 """ Classes representing the 'SubGraph' st  ructure and its parameters """
 
 class Inputs(meta.IntVector):
@@ -35,12 +37,19 @@ class SubGraph(meta.TFLiteObject):
         self.operators = operators
 
     def genTFLite(self, builder: fb.Builder):
+        err.expectType(self.inputs, Inputs, "SubGraph.inputs")
         if self.inputs is not None:
             tflInputs = self.inputs.genTFLite(builder)
+
+        err.expectType(self.outputs, Outputs, "SubGraph.outputs")
         if self.outputs is not None:
             tflOutputs = self.outputs.genTFLite(builder)
+
+        err.expectType(self.tensors, Tensors.Tensors, "SubGraph.tensors")
         if self.tensors is not None:
             tflTensors = self.tensors.genTFLite(builder)
+
+        err.expectType(self.operators, Operators.Operators, "SubGraph.operators")
         if self.operators is not None:
             tflOperators = self.operators.genTFLite(builder)
 
