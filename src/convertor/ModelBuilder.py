@@ -112,8 +112,10 @@ class Builder:
 
         if oTensor.rawData is not None:
             # Rawdata is used
-            buffer.type = tflTT.TensorType.UINT8
-            buffer.data = np.frombuffer(oTensor.rawData)
+            buffer.type = Convertor.convertDataType(oTensor.dataType)
+            data = np.frombuffer(oTensor.rawData,Convertor.toNumpyType(oTensor.dataType))
+
+            buffer.data = Convertor.convertTensorData(data, oTensor.dims)
         elif oTensor.data is not None:
             buffer.type = Convertor.convertDataType(oTensor.dataType)
             buffer.data = np.array(oTensor.data, Convertor.toNumpyType(oTensor.dataType))

@@ -1,4 +1,5 @@
 import numpy as np
+import functools as ft
 
 import src.generator.model.Tensors as tflT
 
@@ -17,6 +18,14 @@ def __isNCHW(list: list[int]) -> bool:
         return True
 
     return False
+
+def convertTensorData(data: np.ndarray, shape: list[int]):
+    """ Convert the data of a tensor from the 'NCHW' to 'NHWC' format. """
+
+    if not __isNCHW(shape):
+        size = ft.reduce(lambda a,b : a*b, shape)
+        print(shape, size, len(data))
+    return data
 
 def __dimsToNHWC(nchwList: list[int]) -> list[int]:
     """ Convert a list of ints which represent dimensions from NCHW to NHWC. """
