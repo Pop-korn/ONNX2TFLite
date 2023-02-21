@@ -158,7 +158,7 @@ def BuildBuffers(buffers: b.Buffers):
     buffers.append(b.Buffer())
 
     # Conv2
-    convW = np.load("data/buffers/conv2-weights",).flatten()
+    convW = np.load("data/buffers/conv2-weights").flatten()
     buffers.append(b.Buffer(convW,tt.TensorType.UINT8))
 
     convB = np.load("data/buffers/conv2-bias").flatten()
