@@ -52,6 +52,7 @@ class Buffer(meta.TFLiteObject):
             self.data = np.frombuffer(self.data.tobytes(),np.uint8)
 
         tflData = builder.CreateNumpyVector(self.data)
+        # In case of problems, see 'https://github.com/google/flatbuffers/issues/4668'.
 
         b.Start(builder)
         b.AddData(builder, tflData)
