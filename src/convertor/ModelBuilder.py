@@ -46,6 +46,7 @@ class Builder:
             self.__buildEmptyBuffer(oTensor.name)
             self.__buildEmptyTensor(oTensor)
 
+
     def buildConstantTensors(self, oTensors: onnxT.Tensors):
         """ Create 'tensor' and 'buffer' tables for the ONNX 'oTensors'.
             The 'oTensors' should have data in them. 

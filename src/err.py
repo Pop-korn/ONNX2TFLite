@@ -6,6 +6,7 @@ class Code(Enum):
     UNSUPPORTED_OPERATOR = 2
     UNSUPPORTED_ONNX_TYPE = 3
     INVALID_TYPE = 4
+    INVALID_TENSOR_SHAPE = 5
 
 def error(err_code, *args, **kwargs):
     """ Print error message with given parameters and exit execution with given exit code. """

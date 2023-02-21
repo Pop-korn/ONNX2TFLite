@@ -49,9 +49,14 @@ def convertTensorData(data: np.ndarray, shape: list[int]):
     """ Convert the data of a tensor from the 'NCHW' to 'NHWC' format. """
 
     if __isNCHW(shape):
-        print(shape)
-        size = ft.reduce(lambda a,b : a*b, shape)
-        print(shape, size, len(data))
+        size = ft.reduce(lambda a,b : a*b, shape) # Product of all dimensions multiplied together
+        if size != len(data):
+            err.error(err.Code.INVALID_TENSOR_SHAPE,
+                f"Numpy array for tensor of shape '{shape}' should have '{size}' elements, but has '{len(data)}'!",
+                "Make sure the 'parser/Tensor.data' is flat. i.e. has no shape!")
+
+
+
     return data
 
 

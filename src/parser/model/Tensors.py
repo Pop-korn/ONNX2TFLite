@@ -19,7 +19,7 @@ class Tensor(meta.ONNXObject):
     dims: list[int]
     dataType: meta.DataType
     segment: Segment
-    """ Data of the tensor. Can be of type float, double, int32, int64, uint64 or string.
+    """ Data of the tensor. Shape is given in 'dims' and the ndarray itself MUST BE FLAT.
         Type is given in 'dataType' and should also be specified in the 'data.dtype'. """
     data: np.ndarray
     name: str
