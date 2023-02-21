@@ -29,7 +29,7 @@ class Buffer(meta.TFLiteObject):
     #     return types.PrependFunction(builder, self.type)
 
     def genTFLite(self, builder: fb.Builder):
-        if self.__dataIsEmpty():
+        if self.__dataIsEmpty() or len(self.data) > 10000: # TODO REMOVE len > 10000!
             # If there is no data, table is empty
             b.Start(builder)
             return b.End(builder)

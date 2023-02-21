@@ -36,50 +36,56 @@ class Tensor(meta.ONNXObject):
         self.dataLocation = descriptor.data_location
         self.__assignData()
 
+    
+    def __hasRawData(self):
+        """ Figure out if 'raw_data' field is present in the '_descriptor'. """
+        return meta.isDefined(self._descriptor.raw_data) and len(self._descriptor.raw_data) > 0
+
 
     def __assignData(self):
         """ Assign data to either the 'data' or 'rawData' attribute correctly. """
         self.rawData = None
         self.data = None
-        
-        if meta.isDefined(self._descriptor.raw_data):
 
-            # 'raw_data' is present
+        if self.__hasRawData():
             self.rawData = self._descriptor.raw_data
             self.__assertTypeNotBanned([meta.DataType.STRING, meta.DataType.UNDEFINED],"raw_data") # 'onnx-ml.proto' line '581'
             return
+        
 
+        """ 'raw_data' is not given. One of the 'data' fields must contain tensor values. """
 
-        # 'raw_data' is not given. One of the 'data' fields must contain tensor values
-
-        if meta.isDefined(self._descriptor.float_data): # TODO Not checked!
-            err.unchecked("Tensors.__assignData(): float_data")
+        if meta.isDefined(self._descriptor.float_data): 
             self.data = self._descriptor.float_data
             self.__assertTypeAllowed([meta.DataType.FLOAT, meta.DataType.COMPLEX64],"float_data") # 'onnx-ml.proto' line '540'
 
-        elif meta.isDefined(self._descriptor.int32_data): # TODO Not checked!
+        elif meta.isDefined(self._descriptor.int32_data): 
             err.unchecked("Tensors.__assignData(): int32_data")
             self.data = self._descriptor.int32_data
             self.__assertTypeAllowed([meta.DataType.INT32, meta.DataType.INT16, meta.DataType.INT8, 
                                     meta.DataType.UINT16, meta.DataType.UINT8, meta.DataType.BOOL, 
                                     meta.DataType.FLOAT16, meta.DataType.BFLOAT16],"int32_data") # 'onnx-ml.proto' line '547'
 
-        elif meta.isDefined(self._descriptor.string_data): # TODO Not checked!
+
+        elif meta.isDefined(self._descriptor.string_data):
             err.unchecked("Tensors.__assignData(): string_data")
             self.data = self._descriptor.string_data
             self.__assertTypeAllowed([meta.DataType.STRING],"string_data") # 'onnx-ml.proto' line '555'
 
-        elif meta.isDefined(self._descriptor.int64_data): # TODO Not checked!
+
+        elif meta.isDefined(self._descriptor.int64_data):
             err.unchecked("Tensors.__assignData(): int64_data")
             self.data = self._descriptor.int64_data
             self.__assertTypeAllowed([meta.DataType.INT64],"int64_data") # 'onnx-ml.proto' line '558'
 
-        elif meta.isDefined(self._descriptor.double_data): # TODO Not checked!
+
+        elif meta.isDefined(self._descriptor.double_data):
             err.unchecked("Tensors.__assignData(): double_data")
             self.data = self._descriptor.double_data
             self.__assertTypeAllowed([meta.DataType.DOUBLE, meta.DataType.COMPLEX128],"double_data") # 'onnx-ml.proto' line '612'
 
-        elif meta.isDefined(self._descriptor.uint64_data): # TODO Not checked!
+
+        elif meta.isDefined(self._descriptor.uint64_data):
             err.unchecked("Tensors.__assignData(): uint64_data")
             self.data = self._descriptor.uint64_data
             self.__assertTypeAllowed([meta.DataType.UINT32, meta.DataType.UINT64],"uint64_data") # 'onnx-ml.proto' line '617'

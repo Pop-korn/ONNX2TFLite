@@ -14,6 +14,8 @@ def convertModel(oM: onnxM.Model) -> tflM.Model:
 
     builder.buildConstantTensors(oM.graph.initializers)
 
+    print(oM.graph.initializers[17].rawData)
+
     return builder.finish()
 
 
