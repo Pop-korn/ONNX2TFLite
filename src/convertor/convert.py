@@ -16,8 +16,9 @@ def convertModel(oM: onnxM.Model) -> tflM.Model:
 
     builder.buildInternalTensors(oM.graph.valueInfo)
 
-    for oOp in oM.graph.nodes:
-        pass
+
+    for oNode in oM.graph.nodes:
+        builder.buildOperator(oNode)
 
     return builder.finish()
 

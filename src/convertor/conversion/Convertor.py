@@ -2,13 +2,40 @@ import numpy as np
 import functools as ft
 
 import src.generator.model.Tensors as tflT
+import src.generator.model.Operators as tflO
+
+import src.generator.builtin.Conv2D as tflConv2D
 
 import src.parser.meta.meta as onnxMeta
 import src.parser.model.TensorShape as onnxTS
+import src.parser.model.Nodes as onnxN
+
+import src.parser.builtin.Conv as onnxConv
 
 import src.err as err
 
 import lib.tflite.TensorType as tflTT
+
+
+""" -------------------- Operator Conversion --------------------"""
+
+
+def convertNode(oNode: onnxN.Node, tensorIndexForName) -> tflO.Operator:
+    tOp = tflO.Operator()
+    
+    for name in oNode.inputs:
+        print(name)
+    tOp.inputs = tflO.Inputs([ tensorIndexForName(name) for name in oNode.inputs ])
+    tOp.outputs = tflO.Outputs([ tensorIndexForName(name) for name in oNode.outputs ])
+
+    return tOp
+
+
+def convertConv(oConv: onnxConv.Conv) -> tflConv2D.Conv2D:
+    print(oConv.pads)
+    return tflConv2D.Conv2D()
+
+
 
 
 

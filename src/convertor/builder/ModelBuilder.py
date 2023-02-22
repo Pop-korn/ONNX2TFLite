@@ -1,14 +1,14 @@
 import numpy as np
 
-import lib.tflite.TensorType as tflTT
-
 import src.generator.model.Model as tflM
 import src.generator.model.SubGraphs as tflSG
 import src.generator.model.Buffers as tflB
 import src.generator.model.Tensors as tflT
+import src.generator.model.Operators as tflO
 
 import src.parser.model.ValueInfo as onnxVI
 import src.parser.model.Tensors as onnxT
+import src.parser.model.Nodes as onnxN
 
 import src.convertor.conversion.Convertor as Convertor
 
@@ -31,6 +31,20 @@ class ModelBuilder:
 
     """ -------------------- Public Builder functions -------------------- """
 
+
+    def buildOperator(self, oNode:onnxN.Node):
+        """ Convert an ONNX Node to a corresponding TFLite operator.
+            This is ALWAYS a 1 to 1 conversion. """
+
+        tflOp = Convertor.convertNode(oNode, self.__tensorIndexForName)
+
+        match(oNode.opType):
+            case "Conv":
+                tflOp.builtinOptions = Convertor.convertConv(oNode.attributes)
+            case _:
+                err.warning(f"Conversion of ONNX Operator '{oNode.opType}' is not yet supported!")
+
+        self.__getOperators().append(tflOp)
 
 
     def buildInternalTensors(self, oTensors: list[onnxVI.ValueInfo]):
@@ -189,7 +203,7 @@ class ModelBuilder:
             If 'name' is not yet in the 'tensors', mapping will be added and warning will be printed. """
         if name not in self.__tensorNameIndexMap.keys():
             self.__tensorNameIndexMap[name] = self.__tensorsSize()
-            err.warning(f"Tensor '{name}' is not yet in the tensors. Adding it on index '{self.__bufferNameIndexMap[name]}'!") 
+            err.warning(f"Tensor '{name}' is not yet in the tensors. Adding it on index '{self.__tensorNameIndexMap[name]}'!") 
 
         return self.__tensorNameIndexMap[name]
 
@@ -279,3 +293,11 @@ class ModelBuilder:
             self.__tflModel.buffers = tflB.Buffers()
 
         return self.__tflModel.buffers
+
+    
+    def __getOperators(self) -> tflO.Operators:
+        subGraph = self.__getSubgraph()
+        if subGraph.operators is None:
+            subGraph.operators = tflO.Operators()
+
+        return subGraph.operators

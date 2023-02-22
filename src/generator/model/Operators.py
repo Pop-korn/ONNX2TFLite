@@ -42,19 +42,27 @@ class Operator(meta.TFLiteObject):
         self.builtinOptions = builtinOptions
 
     def genTFLite(self, builder: fb.Builder):
-        tflMutatingVariableInputs = self.mutatingVariableInputs.genTFLite(builder)
-        tflInputs = self.inputs.genTFLite(builder)
-        tflOutputs = self.outputs.genTFLite(builder)
-        tflBuiltinOptions = self.builtinOptions.genTFLite(builder)
+        if self.mutatingVariableInputs is not None:
+            tflMutatingVariableInputs = self.mutatingVariableInputs.genTFLite(builder)
+        if self.inputs is not None:
+            tflInputs = self.inputs.genTFLite(builder)
+        if self.outputs is not None:
+            tflOutputs = self.outputs.genTFLite(builder)
+        if self.builtinOptions is not None:
+            tflBuiltinOptions = self.builtinOptions.genTFLite(builder)
 
         op.Start(builder)
 
         op.AddOpcodeIndex(builder, self.opcodeIndex)
-        op.AddMutatingVariableInputs(builder, tflMutatingVariableInputs)
-        op.AddInputs(builder, tflInputs)
-        op.AddOutputs(builder, tflOutputs)
-        op.AddBuiltinOptions(builder, tflBuiltinOptions)
-        op.AddBuiltinOptionsType(builder, self.builtinOptions.builtinOptionsType)
+        if self.mutatingVariableInputs is not None:
+            op.AddMutatingVariableInputs(builder, tflMutatingVariableInputs)
+        if self.inputs is not None:
+            op.AddInputs(builder, tflInputs)
+        if self.outputs is not None:
+            op.AddOutputs(builder, tflOutputs)
+        if self.builtinOptions is not None:
+            op.AddBuiltinOptions(builder, tflBuiltinOptions)
+            op.AddBuiltinOptionsType(builder, self.builtinOptions.builtinOptionsType)
 
         return op.End(builder)
 
