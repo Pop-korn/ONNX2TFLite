@@ -15,16 +15,24 @@ import src.parser.builtin.Conv as onnxConv
 import src.err as err
 
 import lib.tflite.TensorType as tflTT
+import lib.tflite.Padding as tflPad
 
 
-""" -------------------- Operator Conversion --------------------"""
+""" -------------------- Helper Operator Functions -------------------- """
+
+
+def __convertPadding(oPads: list[int]) -> tflPad.Padding:
+    return tflPad.Padding.SAME
+
+
+
+
+""" -------------------- Operator Conversion -------------------- """
 
 
 def convertNode(oNode: onnxN.Node, tensorIndexForName) -> tflO.Operator:
     tOp = tflO.Operator()
-    
-    for name in oNode.inputs:
-        print(name)
+
     tOp.inputs = tflO.Inputs([ tensorIndexForName(name) for name in oNode.inputs ])
     tOp.outputs = tflO.Outputs([ tensorIndexForName(name) for name in oNode.outputs ])
 
@@ -32,8 +40,19 @@ def convertNode(oNode: onnxN.Node, tensorIndexForName) -> tflO.Operator:
 
 
 def convertConv(oConv: onnxConv.Conv) -> tflConv2D.Conv2D:
-    print(oConv.pads)
-    return tflConv2D.Conv2D()
+    tConv = tflConv2D.Conv2D()
+
+    if len(oConv.strides) == 2:
+        tConv.strideH = oConv.strides[0]
+        tConv.strideW = oConv.strides[1]
+
+    if oConv.dilations is not None and len(oConv.dilations) == 2:
+        tConv.dilationHFactor = oConv.dilations[0]
+        tConv.dilationHFactor = oConv.dilations[1]
+
+    tConv.padding = __convertPadding(oConv.pads)
+
+    return tConv
 
 
 

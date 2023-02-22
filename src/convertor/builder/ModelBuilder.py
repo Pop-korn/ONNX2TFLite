@@ -1,5 +1,7 @@
 import numpy as np
 
+import lib.tflite.BuiltinOptions as tflBO
+
 import src.generator.model.Model as tflM
 import src.generator.model.SubGraphs as tflSG
 import src.generator.model.Buffers as tflB
@@ -40,6 +42,7 @@ class ModelBuilder:
 
         match(oNode.opType):
             case "Conv":
+                tflOp.opcodeIndex
                 tflOp.builtinOptions = Convertor.convertConv(oNode.attributes)
             case _:
                 err.warning(f"Conversion of ONNX Operator '{oNode.opType}' is not yet supported!")
@@ -180,6 +183,9 @@ class ModelBuilder:
 
     """ -------------------- Private 'quality of life' functions. -------------------- """
 
+
+    def __opCodeIndexForOpType(self, opType: tflBO.BuiltinOptions):
+        pass
 
     def __tensorExists(self, name: str):
         """ Determine if a tensor with 'name' already exists or not. """
