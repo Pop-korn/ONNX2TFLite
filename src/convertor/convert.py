@@ -2,12 +2,12 @@ import src.generator.model.Model as tflM
 
 import src.parser.model.Model as onnxM
 
-import src.convertor.ModelBuilder as ModelBuilder
+import src.convertor.builder.ModelBuilder as ModelBuilder
 
 def convertModel(oM: onnxM.Model) -> tflM.Model:
     description="doc:'"+oM.docString+f"' domain:'"+oM.domain+"' producer:'"+oM.producerName+" "+oM.producerVersion+"'"
 
-    builder = ModelBuilder.Builder(oM.modelVersion, description)
+    builder = ModelBuilder.ModelBuilder(oM.modelVersion, description)
 
     builder.buildOutputTensors(oM.graph.outputs)
     builder.buildInputTensors(oM.graph.inputs)
@@ -15,6 +15,9 @@ def convertModel(oM: onnxM.Model) -> tflM.Model:
     builder.buildConstantTensors(oM.graph.initializers)
 
     builder.buildInternalTensors(oM.graph.valueInfo)
+
+    for oOp in oM.graph.nodes:
+        pass
 
     return builder.finish()
 

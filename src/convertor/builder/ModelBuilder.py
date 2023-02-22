@@ -10,11 +10,13 @@ import src.generator.model.Tensors as tflT
 import src.parser.model.ValueInfo as onnxVI
 import src.parser.model.Tensors as onnxT
 
-import src.convertor.Convertor as Convertor
+import src.convertor.conversion.Convertor as Convertor
 
 import src.err as err
 
-class Builder:
+class ModelBuilder:
+    """ This class provides methods to build a TFLite model by parts.
+        Uses functions defined in the 'TensorBuilder' and 'OperatorBuilder'. """
     __tflModel: tflM.Model
     __bufferNameIndexMap: dict[str : int]
     __tensorNameIndexMap: dict[str : int]
@@ -28,6 +30,7 @@ class Builder:
 
 
     """ -------------------- Public Builder functions -------------------- """
+
 
 
     def buildInternalTensors(self, oTensors: list[onnxVI.ValueInfo]):
