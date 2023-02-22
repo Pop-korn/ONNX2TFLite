@@ -1,18 +1,18 @@
-import numpy as np
-
-import lib.tflite.BuiltinOptions as tflBO
+import lib.tflite.BuiltinOperator as tflBO
 
 import src.generator.model.Model as tflM
 import src.generator.model.SubGraphs as tflSG
 import src.generator.model.Buffers as tflB
 import src.generator.model.Tensors as tflT
 import src.generator.model.Operators as tflO
+import src.generator.model.OperatorCodes as tflOC
 
 import src.parser.model.ValueInfo as onnxVI
 import src.parser.model.Tensors as onnxT
 import src.parser.model.Nodes as onnxN
 
 import src.convertor.conversion.Convertor as Convertor
+import src.convertor.conversion.OperatorConverter as opConvertor
 
 import src.err as err
 
@@ -22,11 +22,13 @@ class ModelBuilder:
     __tflModel: tflM.Model
     __bufferNameIndexMap: dict[str : int]
     __tensorNameIndexMap: dict[str : int]
+    __opCodeTypeIndexMap: dict[tflBO.BuiltinOperator : int]
 
     def __init__(self, modelVersion: int, modelDescription: str) -> None:
         self.__tflModel = tflM.Model(modelVersion,modelDescription)
         self.__bufferNameIndexMap = {}
         self.__tensorNameIndexMap = {}
+        self.__opCodeTypeIndexMap = {}
 
     
 
@@ -38,16 +40,16 @@ class ModelBuilder:
         """ Convert an ONNX Node to a corresponding TFLite operator.
             This is ALWAYS a 1 to 1 conversion. """
 
-        tflOp = Convertor.convertNode(oNode, self.__tensorIndexForName)
+        tOperator = opConvertor.convertNode(oNode, self.__tensorIndexForName)
 
         match(oNode.opType):
             case "Conv":
-                tflOp.opcodeIndex
-                tflOp.builtinOptions = Convertor.convertConv(oNode.attributes)
+                tOperator.builtinOptions = opConvertor.convertConv(oNode.attributes)
+                tOperator.opcodeIndex = self.__opCodeIndexForOpType(tflBO.BuiltinOperator.CONV_2D)
             case _:
                 err.warning(f"Conversion of ONNX Operator '{oNode.opType}' is not yet supported!")
 
-        self.__getOperators().append(tflOp)
+        self.__getOperators().append(tOperator)
 
 
     def buildInternalTensors(self, oTensors: list[onnxVI.ValueInfo]):
@@ -128,6 +130,13 @@ class ModelBuilder:
     """ -------------------- Private generic build functions. -------------------- """
 
 
+    def __buildOperatorCode(self, opType: tflBO.BuiltinOperator):
+        """ Add a new OperatorCode for given 'opType' to the 'operator_codes' vector. """
+        opCode = tflOC.OperatorCode(opType)
+
+        self.__getOperatorCodes().append(opCode)
+
+
     def __buildBuffer(self, oTensor: onnxT.Tensor):
         buffer = tflB.Buffer()
 
@@ -184,8 +193,17 @@ class ModelBuilder:
     """ -------------------- Private 'quality of life' functions. -------------------- """
 
 
-    def __opCodeIndexForOpType(self, opType: tflBO.BuiltinOptions):
-        pass
+    def __opCodeIndexForOpType(self, opType: tflBO.BuiltinOperator):
+        """ Return the index to the 'operator_codes' vector in the TFLite model for
+            the operator with given 'opType'.
+            If corresponding opCode doesn't exist, create new mapping and a new OperatorCode. """
+        if opType not in self.__opCodeTypeIndexMap.keys():
+            self.__opCodeTypeIndexMap[opType] = self.__operatorCodesSize()
+            self.__buildOperatorCode(opType)
+        
+        return self.__opCodeTypeIndexMap[opType]
+
+
 
     def __tensorExists(self, name: str):
         """ Determine if a tensor with 'name' already exists or not. """
@@ -222,6 +240,11 @@ class ModelBuilder:
     def __tensorsSize(self):
         """ Return the number of tensors that are currently in the subGraph. """
         return len(self.__tensorNameIndexMap.keys())
+
+
+    def __operatorCodesSize(self):
+        """ Return the number of buffers that are currently in the model. """
+        return len(self.__opCodeTypeIndexMap.keys())
 
 
     def __newBufferIndexForName(self, name: str):
@@ -307,3 +330,9 @@ class ModelBuilder:
             subGraph.operators = tflO.Operators()
 
         return subGraph.operators
+
+    def __getOperatorCodes(self) -> tflOC.OperatorCodes:
+        if self.__tflModel.operatorCodes is None:
+            self.__tflModel.operatorCodes = tflOC.OperatorCodes()
+
+        return self.__tflModel.operatorCodes

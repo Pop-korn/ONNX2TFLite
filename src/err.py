@@ -17,6 +17,10 @@ def warning(*args, **kwargs):
     """ Print warning message with given parameters. """
     print("\tWARNING: ", *args, file=sys.stderr, **kwargs)
 
+def note(*args, **kwargs):
+    """ Print note message with given parameters. """
+    print("\tNOTE: ", *args, file=sys.stderr, **kwargs)
+
 def internal(*args, **kwargs):
     """ Print internal debug/warning message with given parameters. """
     print("\tINTERNAL: ", *args, file=sys.stderr, **kwargs)

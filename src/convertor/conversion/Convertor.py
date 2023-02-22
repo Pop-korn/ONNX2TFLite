@@ -2,61 +2,15 @@ import numpy as np
 import functools as ft
 
 import src.generator.model.Tensors as tflT
-import src.generator.model.Operators as tflO
 
-import src.generator.builtin.Conv2D as tflConv2D
 
 import src.parser.meta.meta as onnxMeta
 import src.parser.model.TensorShape as onnxTS
-import src.parser.model.Nodes as onnxN
 
-import src.parser.builtin.Conv as onnxConv
 
 import src.err as err
 
 import lib.tflite.TensorType as tflTT
-import lib.tflite.Padding as tflPad
-
-
-""" -------------------- Helper Operator Functions -------------------- """
-
-
-def __convertPadding(oPads: list[int]) -> tflPad.Padding:
-    return tflPad.Padding.SAME
-
-
-
-
-""" -------------------- Operator Conversion -------------------- """
-
-
-def convertNode(oNode: onnxN.Node, tensorIndexForName) -> tflO.Operator:
-    tOp = tflO.Operator()
-
-    tOp.inputs = tflO.Inputs([ tensorIndexForName(name) for name in oNode.inputs ])
-    tOp.outputs = tflO.Outputs([ tensorIndexForName(name) for name in oNode.outputs ])
-
-    return tOp
-
-
-def convertConv(oConv: onnxConv.Conv) -> tflConv2D.Conv2D:
-    tConv = tflConv2D.Conv2D()
-
-    if len(oConv.strides) == 2:
-        tConv.strideH = oConv.strides[0]
-        tConv.strideW = oConv.strides[1]
-
-    if oConv.dilations is not None and len(oConv.dilations) == 2:
-        tConv.dilationHFactor = oConv.dilations[0]
-        tConv.dilationHFactor = oConv.dilations[1]
-
-    tConv.padding = __convertPadding(oConv.pads)
-
-    return tConv
-
-
-
-
 
 
 """ -------------------- Private Helper Functions -------------------- """
@@ -94,6 +48,7 @@ def __collectionsEqual(colA, colB):
         if a != b:
             return False
     return True
+
 
 
 
@@ -200,8 +155,3 @@ def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
         case onnxMeta.DataType.BFLOAT16:
             err.warning("Cannot convert ONNX DataType 'BFLOAT16' to TFLite. Using 'FLOAT16'.")
             return tflTT.TensorType.FLOAT16
-
-
-
-
-
