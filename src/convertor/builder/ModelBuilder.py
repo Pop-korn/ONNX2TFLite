@@ -40,22 +40,25 @@ class ModelBuilder:
         """ Convert an ONNX Node to a corresponding TFLite operator.
             This is ALWAYS a 1 to 1 conversion. """
 
-        tOperator = opConvertor.convertNode(oNode, self.__tensorIndexForName)
+        tOp = opConvertor.convertNode(oNode, self.__tensorIndexForName)
 
         match(oNode.opType):
             case "Conv":
-                tOperator.builtinOptions = opConvertor.convertConv(oNode.attributes)
-                tOperator.opcodeIndex = self.__opCodeIndexForOpType(tflBO.BuiltinOperator.CONV_2D)
+                tOp.builtinOptions, opCode = opConvertor.convertConv(oNode.attributes)
+                tOp.opcodeIndex = self.__opCodeIndexForOpType(opCode)
             case "Relu":
-                tOperator.builtinOptions = None
-                tOperator.opcodeIndex = self.__opCodeIndexForOpType(tflBO.BuiltinOperator.RELU)
+                tOp.builtinOptions = None
+                tOp.opcodeIndex = self.__opCodeIndexForOpType(tflBO.BuiltinOperator.RELU)
             case "LRN":
-                tOperator.builtinOptions = opConvertor.convertLRN(oNode.attributes)
-                tOperator.opcodeIndex = self.__opCodeIndexForOpType(tflBO.BuiltinOperator.LOCAL_RESPONSE_NORMALIZATION)
+                tOp.builtinOptions, opCode = opConvertor.convertLRN(oNode.attributes)
+                tOp.opcodeIndex = self.__opCodeIndexForOpType(opCode)
+            case "MaxPool":
+                tOp.builtinOptions, opCode = opConvertor.convertMaxPool(oNode.attributes)
+                tOp.opcodeIndex = self.__opCodeIndexForOpType(opCode)
             case _:
                 err.warning(f"Conversion of ONNX Operator '{oNode.opType}' is not yet supported!")
 
-        self.__getOperators().append(tOperator)
+        self.__getOperators().append(tOp)
 
 
     def buildInternalTensors(self, oTensors: list[onnxVI.ValueInfo]):
