@@ -46,6 +46,12 @@ class ModelBuilder:
             case "Conv":
                 tOperator.builtinOptions = opConvertor.convertConv(oNode.attributes)
                 tOperator.opcodeIndex = self.__opCodeIndexForOpType(tflBO.BuiltinOperator.CONV_2D)
+            case "Relu":
+                tOperator.builtinOptions = None
+                tOperator.opcodeIndex = self.__opCodeIndexForOpType(tflBO.BuiltinOperator.RELU)
+            case "LRN":
+                tOperator.builtinOptions = opConvertor.convertLRN(oNode.attributes)
+                tOperator.opcodeIndex = self.__opCodeIndexForOpType(tflBO.BuiltinOperator.LOCAL_RESPONSE_NORMALIZATION)
             case _:
                 err.warning(f"Conversion of ONNX Operator '{oNode.opType}' is not yet supported!")
 
@@ -216,7 +222,7 @@ class ModelBuilder:
             If 'name' is not yet in the 'buffers', mapping will be added and warning will be printed. """
         if name not in self.__bufferNameIndexMap.keys():
             self.__bufferNameIndexMap[name] = self.__bufferSize()
-            err.warning(f"Tensor '{name}' is not yet in the buffer. Adding it on index '{self.__bufferNameIndexMap[name]}'!") 
+            err.note(f"Tensor '{name}' is not yet in the buffer. Adding it on index '{self.__bufferNameIndexMap[name]}'!") 
 
         return self.__bufferNameIndexMap[name]
 
@@ -227,7 +233,7 @@ class ModelBuilder:
             If 'name' is not yet in the 'tensors', mapping will be added and warning will be printed. """
         if name not in self.__tensorNameIndexMap.keys():
             self.__tensorNameIndexMap[name] = self.__tensorsSize()
-            err.warning(f"Tensor '{name}' is not yet in the tensors. Adding it on index '{self.__tensorNameIndexMap[name]}'!") 
+            err.note(f"Tensor '{name}' is not yet in the tensors. Adding it on index '{self.__tensorNameIndexMap[name]}'!") 
 
         return self.__tensorNameIndexMap[name]
 

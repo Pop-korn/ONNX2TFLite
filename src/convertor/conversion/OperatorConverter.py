@@ -1,15 +1,18 @@
 from typing import Callable
+
 import src.generator.model.Operators as tflO
 
 import src.generator.builtin.Conv2D as tflConv2D
+import src.generator.builtin.LRN as tflLRN
 
 import src.parser.model.Nodes as onnxN
 
 import src.parser.builtin.Conv as onnxConv
-
-import lib.tflite.Padding as tflPad
+import src.parser.builtin.LRN as onnxLRN
 
 import src.err as err
+
+import lib.tflite.Padding as tflPad
 
 
 """ -------------------- Helper Operator Functions -------------------- """
@@ -81,3 +84,15 @@ def convertConv(oConv: onnxConv.Conv) -> tflConv2D.Conv2D:
             err.error("Conv3D NEEDS to be implemented and converted!")
         case _:
             err.error(f"Convolution with kernel shape '{oConv.kernelShape}' is not supported!")
+
+def convertLRN(oLRN: onnxLRN.LRN) -> tflLRN.LRN:
+    """ Convert ONNX 'LRN' to TFLite 'LocalResponseNormalization'. """
+
+    tLRN = tflLRN.LRN()
+
+    tLRN.radius = oLRN.size // 2 # TODO Investigate conversion
+    tLRN.bias = oLRN.bias
+    tLRN.alpha = oLRN.alpha
+    tLRN.beta = oLRN.beta
+
+    return tLRN
