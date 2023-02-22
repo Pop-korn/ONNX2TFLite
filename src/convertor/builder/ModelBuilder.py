@@ -56,7 +56,7 @@ class ModelBuilder:
                 tOp.builtinOptions, opCode = opConvertor.convertMaxPool(oNode.attributes)
                 tOp.opcodeIndex = self.__opCodeIndexForOpType(opCode)
             case _:
-                err.warning(f"Conversion of ONNX Operator '{oNode.opType}' is not yet supported!")
+                err.error(None, f"Conversion of ONNX Operator '{oNode.opType}' is not yet supported!")
 
         self.__getOperators().append(tOp)
 

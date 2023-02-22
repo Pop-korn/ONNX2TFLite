@@ -8,10 +8,12 @@ class Code(Enum):
     INVALID_TYPE = 4
     INVALID_TENSOR_SHAPE = 5
 
-def error(err_code, *args, **kwargs):
-    """ Print error message with given parameters and exit execution with given exit code. """
+def error(errCode, *args, **kwargs):
+    """ Print error message with given parameters. Alse EXIT code execution but ONLY IF
+        'errCode' is not None. """
     print("\tERROR: ", *args, file=sys.stderr, **kwargs)
-    exit(err_code)
+    if errCode is not None:
+        exit(errCode)
 
 def warning(*args, **kwargs):
     """ Print warning message with given parameters. """

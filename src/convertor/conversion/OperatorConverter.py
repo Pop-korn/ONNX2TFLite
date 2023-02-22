@@ -28,9 +28,32 @@ def __isOfSize(obj, size: int):
     return len(obj) == size
 
 
-def __convertPadding(autoPad: str, oPads: list[int]) -> tflPad.Padding:
+def __isSAMEPadding(oPads: list[int], oKernelShape: list[int]):
+    """ Determine if given 'oPads' padding can be represented exactly with the
+        'SAME' padding type for given kernel shape. """
+
+    for padding, dim in zip(oPads, oKernelShape):
+        if dim // 2 != padding:
+            return False
+
+    return True
+
+
+def __assign2DStrides(obj, strides: list[int]):
+    """ Assign the 'obj' attributes 'strideH' and 'strideW' from 'strides'.
+        'obj' MUST have these attributes. """
+    if __isOfSize(strides, 2):
+        obj.strideH = strides[0]
+        obj.strideW = strides[1]
+    else:
+        err.note(f"Expected 2D strides, got '{strides}'. Leaving default values.")
+    
+
+
+def __convertPadding(autoPad: str, oPads: list[int], oKernelShape: list[int]) -> tflPad.Padding:
     """ Convert ONNX pads to TFLite padding. 
-        'autoPad' is the ONNX attribute 'auto_pad' and 'oPads' is the ONNX attribute 'pads'. """
+        'autoPad' is the ONNX attribute 'auto_pad' and 'oPads' is the ONNX attribute 'pads'. 
+        The 'oKernelShape' is used to determine if conversion was valid"""
 
     if autoPad == "SAME_UPPER":
         return tflPad.Padding.SAME
@@ -48,7 +71,9 @@ def __convertPadding(autoPad: str, oPads: list[int]) -> tflPad.Padding:
         # No padding in any dieraction
         return tflPad.Padding.VALID
 
-    err.note(f"TFLite does NOT support '{oPads}' padding! Using 'SAME'.")
+    if not __isSAMEPadding(oPads, oKernelShape):
+        err.warning(f"TFLite does NOT support '{oPads}' padding for kernel '{oKernelShape}'! Using 'SAME'.")
+    
     return tflPad.Padding.SAME
 
 
@@ -85,15 +110,13 @@ def convertConv(oConv: onnxConv.Conv) -> tuple[tflMeta.BuiltinOptions, tflBO.Bui
 
             tConv = tflConv2D.Conv2D()
 
-            if __isOfSize(oConv.strides, 2):
-                tConv.strideH = oConv.strides[0]
-                tConv.strideW = oConv.strides[1]
+            __assign2DStrides(tConv, oConv.strides)
 
             if __isOfSize(oConv.dilations, 2):
                 tConv.dilationHFactor = oConv.dilations[0]
                 tConv.dilationHFactor = oConv.dilations[1]
 
-            tConv.padding = __convertPadding(oConv.autoPad, oConv.pads)
+            tConv.padding = __convertPadding(oConv.autoPad, oConv.pads, oConv.kernelShape)
 
             # TODO tConv.fusedActivationFunction
 
@@ -126,15 +149,13 @@ def convertMaxPool(oMP: onnxMaxPool.MaxPool) -> tuple[tflMeta.BuiltinOptions, tf
 
             tMP = tflMaxPool2D.MaxPool2D()
 
-            if __isOfSize(oMP.strides, 2):
-                tMP.strideH = oMP.strides[0]
-                tMP.strideW = oMP.strides[1]
+            __assign2DStrides(tMP, oMP.strides)
 
             if __isOfSize(oMP.kernelShape, 2):
                 tMP.filterH = oMP.kernelShape[0]
                 tMP.filterW = oMP.kernelShape[1]
 
-            tMP.padding = __convertPadding(oMP.autoPad, oMP.pads)
+            tMP.padding = __convertPadding(oMP.autoPad, oMP.pads, oMP.kernelShape)
 
             # TODO tMP.fusedActivationFunction
 
