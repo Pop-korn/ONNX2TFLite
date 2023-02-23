@@ -7,6 +7,7 @@ class Code(Enum):
     UNSUPPORTED_ONNX_TYPE = 3
     INVALID_TYPE = 4
     INVALID_TENSOR_SHAPE = 5
+    INVALID_ONNX_OPERATOR = 6
 
 def error(errCode, *args, **kwargs):
     """ Print error message with given parameters. Alse EXIT code execution but ONLY IF

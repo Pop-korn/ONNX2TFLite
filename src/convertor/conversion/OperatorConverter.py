@@ -1,17 +1,18 @@
 from typing import Callable
 
-import src.generator.model.Operators as tflO
 import src.generator.meta.meta as tflMeta
-
+import src.generator.model.Operators as tflO
+import src.generator.model.Buffers as tflB
 import src.generator.builtin.Conv2D as tflConv2D
 import src.generator.builtin.LRN as tflLRN
 import src.generator.builtin.MaxPool2D as tflMaxPool2D
+import src.generator.builtin.Reshape as tflReshape
 
 import src.parser.model.Nodes as onnxN
-
 import src.parser.builtin.Conv as onnxConv
 import src.parser.builtin.LRN as onnxLRN
 import src.parser.builtin.MaxPool as onnxMaxPool
+import src.parser.builtin.Reshape as onnxReshape
 
 import src.err as err
 
@@ -166,3 +167,16 @@ def convertMaxPool(oMP: onnxMaxPool.MaxPool) -> tuple[tflMeta.BuiltinOptions, tf
 
         case _:
             err.error(f"MaxPool with kernel shape '{oMP.kernelShape}' is not supported!")
+
+def convertReshape(oNode: onnxN.Node, 
+        tflBufferForName: Callable[[str],tflB.Buffer]) -> tuple[tflMeta.BuiltinOptions, tflBO.BuiltinOperator]:
+    """ Convert ONNX 'Reshape' to TFLite 'Reshape'. """
+
+    buffer = tflBufferForName(oNode.inputs[1])
+
+    if buffer is None:
+        err.error(err.Code.INVALID_ONNX_OPERATOR, "ONNX Reshape did NOT have a 'shape' input tensor.")
+
+    tReshape = tflReshape.Reshape(buffer.data.tolist())
+
+    return tReshape, tflBO.BuiltinOperator.RESHAPE

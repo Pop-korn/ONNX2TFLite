@@ -46,14 +46,18 @@ class ModelBuilder:
             case "Conv":
                 tOp.builtinOptions, opCode = opConvertor.convertConv(oNode.attributes)
                 tOp.opcodeIndex = self.__opCodeIndexForOpType(opCode)
-            case "Relu":
-                tOp.builtinOptions = None
-                tOp.opcodeIndex = self.__opCodeIndexForOpType(tflBO.BuiltinOperator.RELU)
             case "LRN":
                 tOp.builtinOptions, opCode = opConvertor.convertLRN(oNode.attributes)
                 tOp.opcodeIndex = self.__opCodeIndexForOpType(opCode)
             case "MaxPool":
                 tOp.builtinOptions, opCode = opConvertor.convertMaxPool(oNode.attributes)
+                tOp.opcodeIndex = self.__opCodeIndexForOpType(opCode)
+            case "Relu":
+                tOp.builtinOptions = None
+                tOp.opcodeIndex = self.__opCodeIndexForOpType(tflBO.BuiltinOperator.RELU)
+            case "Reshape":
+                tOp.inputs.vector.pop() # An extra input was generated, because ONNX Reshape uses it.
+                tOp.builtinOptions, opCode = opConvertor.convertReshape(oNode, self.__tflBufferForName)
                 tOp.opcodeIndex = self.__opCodeIndexForOpType(opCode)
             case _:
                 err.error(None, f"Conversion of ONNX Operator '{oNode.opType}' is not yet supported!")
@@ -239,6 +243,17 @@ class ModelBuilder:
             err.note(f"Tensor '{name}' is not yet in the tensors. Adding it on index '{self.__tensorNameIndexMap[name]}'!") 
 
         return self.__tensorNameIndexMap[name]
+
+    
+    def __tflBufferForName(self, name: str):
+        """ Return the existing buffer from the TFLite 'buffers' vector assigned to
+            tensor with given 'name'.
+            If tensor with 'name' doesn't exist, return 'None'. """
+        idx = self.__bufferNameIndexMap.get(name, None)
+        if idx is None:
+            return None
+
+        return self.__getBuffers().get(idx)
 
 
     def __bufferSize(self):
