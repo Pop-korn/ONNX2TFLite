@@ -15,6 +15,10 @@ class Buffer(meta.TFLiteObject):
     data: np.ndarray
     type: tt.TensorType
 
+    """ Index to the 'buffers' vector. Used to assign the 'buffer' attribute of the 
+        Tensor, this buffer belongs to."""
+    tmpIndex: int
+
     def __init__(self, data: np.ndarray=None, 
                 type: tt.TensorType=tt.TensorType.INT32) -> None:
         self.data = data

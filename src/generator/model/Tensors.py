@@ -5,6 +5,7 @@ import lib.tflite.Tensor as t
 import lib.tflite.TensorType as tt
 
 import src.generator.model.Quantization as Quantization
+import src.generator.model.Buffers as Buffers
 import src.generator.meta.meta as meta
 
 import src.err as err
@@ -31,9 +32,16 @@ class Tensor(meta.TFLiteObject):
     # TODO shapeSignature
     # TODO variantTensors
 
+    """ Reference to the 'Buffer' object holding this tensors data. 'tmpBuffer' MUST be 
+        stored a 'Buffers' object and MUST be referenced using the index 'buffer'.  """
+    tmpBuffer: Buffers.Buffer
+
+    """ Index to the 'tensors' vector for this tensor. """
+    tmpIndex: int
+
     def __init__(self, shape: Shape,
                 name: str = None, 
-                buffer: int = 0, 
+                buffer: int = None, 
                 type: tt.TensorType = tt.TensorType.FLOAT32,
                 quantization: Quantization.Quantization=None,
                 isVariable: bool = False, 
