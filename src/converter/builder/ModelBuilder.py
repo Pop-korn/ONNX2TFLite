@@ -77,7 +77,7 @@ class ModelBuilder:
         if oTensor.data is None:
             # No data was provided in the tensor
             err.warning(f"ONNX Tensor '{oTensor.name}' should contain data but doesn't! Generating empty buffer!")
-            self.appendNewBuffer(buffer, oTensor.name)
+            self.appendNewBuffer(buffer)
             return
 
 
@@ -85,7 +85,7 @@ class ModelBuilder:
         buffer.type = Translator.convertDataType(oTensor.dataType)
         buffer.data = Translator.convertTensorData(oTensor.data, oTensor.dims)
 
-        self.appendNewBuffer(buffer, oTensor.name)
+        self.appendNewBuffer(buffer)
 
         return buffer
 
@@ -150,7 +150,9 @@ class ModelBuilder:
     
 
     def tensorForName(self, name: str) -> tflT.Tensor:
-        # TODO comment
+        """ Get an existing TFLite tensor with given 'name'. If such tensor
+            does NOT exist, function will create and register a new tensor with
+            shape '[]', which will be returned."""
         if name not in self.__tensorNameMap.keys():
             err.note(f"Tensor '{name}' is not yet in the tensors. Adding it!") 
 
@@ -174,7 +176,8 @@ class ModelBuilder:
 
 
     def appendNewTensor(self, tTensor: tflT.Tensor):
-        # TODO comment
+        """ Append the TFLite tensor 'tTensor' to the 'subGraph.tensors'
+            and register it. """
 
         if tTensor.name in self.__tensorNameMap.keys():
             err.warning(f"Tensor '{tTensor.name}' is already in the tensors!")  
@@ -183,8 +186,8 @@ class ModelBuilder:
             self.getTensors().append(tTensor)
 
 
-    def appendNewBuffer(self, buffer: tflB.Buffer, name: str):
-        # TODO comment
+    def appendNewBuffer(self, buffer: tflB.Buffer):
+        """ Append the 'buffer' to the 'model.buffers'. """
         self.getBuffers().append(buffer)
 
 
