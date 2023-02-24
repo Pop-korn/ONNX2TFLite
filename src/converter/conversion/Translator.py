@@ -11,6 +11,8 @@ import src.err as err
 
 import lib.tflite.TensorType as tflTT
 
+""" This file contains functions for context-free converting from ONNX to TFLite. """
+
 
 """ -------------------- Private Helper Functions -------------------- """
 

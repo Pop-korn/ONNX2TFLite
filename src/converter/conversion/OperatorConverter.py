@@ -23,6 +23,9 @@ import lib.tflite.Padding as tflPad
 import lib.tflite.BuiltinOperator as tflBO
 
 class OperatorConverter:
+    """ This class provides methods to convert ONNX operators to TFLite and create them 
+        using the provided 'ModelBuilder'. """
+
     __builder: ModelBuilder.ModelBuilder
 
     def __init__(self, builder: ModelBuilder.ModelBuilder) -> None:

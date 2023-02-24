@@ -8,6 +8,9 @@ import src.parser.model.Tensors as onnxT
 import src.err as err
 
 class TensorConverter:
+    """ This class provides methods to convert ONNX tensors to TFLite and create them 
+        using the provided 'ModelBuilder'. """
+
     __builder: ModelBuilder.ModelBuilder
 
     def __init__(self, builder: ModelBuilder.ModelBuilder) -> None:

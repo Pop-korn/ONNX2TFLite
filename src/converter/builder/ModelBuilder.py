@@ -15,8 +15,8 @@ import src.converter.conversion.Translator as Translator
 import src.err as err
 
 class ModelBuilder:
-    """ This class provides methods to build a TFLite model by parts.
-        Uses functions defined in the 'TensorBuilder' and 'OperatorBuilder'. """
+    """ This class provides methods to build a TFLite model by parts. """
+    
     __tflModel: tflM.Model
     __tensorNameMap: dict[str : tflT.Tensor]
     __opCodeTypeIndexMap: dict[tflBO.BuiltinOperator : int]
