@@ -10,8 +10,10 @@ import src.parser.model.TensorShape as onnxTS
 import src.err as err
 
 import lib.tflite.TensorType as tflTT
+import lib.tflite.Padding as tflPad
 
-""" This file contains functions for context-free converting from ONNX to TFLite. """
+""" This file contains functions for context-free converting of various
+    things from ONNX to TFLite. """
 
 
 """ -------------------- Private Helper Functions -------------------- """
@@ -51,9 +53,50 @@ def __collectionsEqual(colA, colB):
     return True
 
 
+def __isSAMEPadding(oPads: list[int], oKernelShape: list[int]):
+    """ Determine if given 'oPads' padding can be represented exactly with the
+        'SAME' padding type for given kernel shape. """
+    
+    for padding, dim in zip(oPads, oKernelShape):
+        if dim // 2 != padding:
+            return False
+        
+    return True
+
+
 
 
 """ -------------------- Public Functions -------------------- """
+
+
+def convertPadding(autoPad: str, oPads: list[int], 
+                   oKernelShape: list[int]) -> tflPad.Padding:
+        """ Convert ONNX pads to TFLite padding. 'autoPad' is the ONNX attribute
+            'auto_pad' and 'oPads' is the ONNX attribute 'pads'. 
+            The 'oKernelShape' is used to determine if conversion was valid"""
+
+        if autoPad == "SAME_UPPER":
+            return tflPad.Padding.SAME
+
+        elif autoPad == "SAME_LOWER":
+            err.note(f"TFLite does NOT support 'SAME_LOWER' padding!",
+                     "Using 'SAME', which is equivalent to 'SAME_UPPER'.")
+            return tflPad.Padding.SAME
+
+        elif autoPad == "VALID":
+            return tflPad.Padding.VALID
+
+        # autoPad is NOTSET -> use explicit padding
+
+        if all(val == 0 for val in oPads):
+            # No padding in any dieraction
+            return tflPad.Padding.VALID
+
+        if not __isSAMEPadding(oPads, oKernelShape):
+            err.warning(f"TFLite does NOT support '{oPads}' padding for kernel",
+                        f"'{oKernelShape}'! Using 'SAME'.")
+        
+        return tflPad.Padding.SAME
 
 
 def convertTensorData(data: np.ndarray, shape: list[int]):
@@ -63,11 +106,12 @@ def convertTensorData(data: np.ndarray, shape: list[int]):
         # 'data' does not need to be converted
         return data
 
-
-    size = ft.reduce(lambda a,b : a*b, shape) # Product of all dimensions multiplied together
+    # Product of all dimensions multiplied together
+    size = ft.reduce(lambda a,b : a*b, shape) 
     if size != len(data):
         err.error(err.Code.INVALID_TENSOR_SHAPE,
-            f"Numpy array for tensor of shape '{shape}' should have '{size}' elements, but has '{len(data)}'!",
+            f"Numpy array for tensor of shape '{shape}' should have '{size}'",
+            f"elements, but has '{len(data)}'!",
             "Make sure the 'parser/Tensor.data' is flat. i.e. has no shape!")
 
     # Assign 'data' its current shape
@@ -79,20 +123,24 @@ def convertTensorData(data: np.ndarray, shape: list[int]):
     # Check it worked
     nhwcShape = __dimsToNHWC(shape)
     if not __collectionsEqual(data.shape, nhwcShape):
-        err.warning(f"Failed to convert data from shape '{shape}'! Got '{data.shape}', expected '{nhwcShape}'.")
+        err.warning(f"Failed to convert data from shape '{shape}'!",
+                    f"Got '{data.shape}', expected '{nhwcShape}'.")
 
     return data
 
 
 def convertShape(oShape: onnxTS.TensorShape) -> tflT.Shape:
     """ Convert ONNX 'TensorShape', to TFLite 'Shape'. """
+    
     dims = [dim.value for dim in oShape.dims]
 
     return convertShapeDims(dims)
 
 
 def convertShapeDims(oDims: list[int]) -> tflT.Shape:
-    """ Convert list of ints representing the shape of an ONNX Tensor to a TFLite 'Shape' object. """
+    """ Convert list of ints representing the shape of an ONNX Tensor
+        to a TFLite 'Shape' object. """
+    
     dims = [dim for dim in oDims] # Copy just in case
 
     if __isNCHW(dims):
@@ -103,9 +151,11 @@ def convertShapeDims(oDims: list[int]) -> tflT.Shape:
 
 def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
     """ Convert ONNX DataType to TFLite TensorType """
+
     match oType:
         case onnxMeta.DataType.UNDEFINED:
-            err.warning("Cannot convert ONNX DataType 'UNDEFINED' to TFLite. Using 'UINT8'.")
+            err.warning("Cannot convert ONNX DataType 'UNDEFINED' to TFLite.",
+                        "Using 'UINT8'.")
             return tflTT.TensorType.UINT8
 
         case onnxMeta.DataType.FLOAT:
@@ -154,5 +204,6 @@ def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
             return tflTT.TensorType.COMPLEX128
             
         case onnxMeta.DataType.BFLOAT16:
-            err.warning("Cannot convert ONNX DataType 'BFLOAT16' to TFLite. Using 'FLOAT16'.")
+            err.warning("Cannot convert ONNX DataType 'BFLOAT16' to TFLite.",
+                        "Using 'FLOAT16'.")
             return tflTT.TensorType.FLOAT16
