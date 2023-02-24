@@ -3,6 +3,8 @@ import src.generator.model.Model as tflM
 import src.parser.model.Model as onnxM
 
 import src.convertor.builder.ModelBuilder as ModelBuilder
+import src.convertor.conversion.OperatorConverter as OperatorConverter
+
 
 def convertModel(oM: onnxM.Model) -> tflM.Model:
     description="doc:'"+oM.docString+f"' domain:'"+oM.domain+"' producer:'"+oM.producerName+" "+oM.producerVersion+"'"
@@ -16,9 +18,11 @@ def convertModel(oM: onnxM.Model) -> tflM.Model:
 
     builder.buildInternalTensors(oM.graph.valueInfo)
 
+    opConvert = OperatorConverter.OperatorConverter(builder)
+
 
     for oNode in oM.graph.nodes:
-        builder.buildOperator(oNode)
+        opConvert.buildOperator(oNode)
 
     return builder.finish()
 
