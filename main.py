@@ -1,6 +1,6 @@
 import src.parser.model.Model as m
 
-import src.convertor.convert as convert
+import src.converter.convert as convert
 
 import flatbuffers as fb
 

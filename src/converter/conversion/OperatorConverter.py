@@ -1,6 +1,6 @@
 from typing import Callable
 
-import src.convertor.builder.ModelBuilder as ModelBuilder
+import src.converter.builder.ModelBuilder as ModelBuilder
 
 import src.generator.meta.meta as tflMeta
 import src.generator.model.Operators as tflO
@@ -29,7 +29,7 @@ class OperatorConverter:
         self.__builder = builder
 
 
-    def buildOperator(self, oNode:onnxN.Node):
+    def convertOperator(self, oNode:onnxN.Node):
         """ Convert an ONNX Node to a corresponding TFLite operator.
             This is ALWAYS a 1 to 1 conversion. """
 

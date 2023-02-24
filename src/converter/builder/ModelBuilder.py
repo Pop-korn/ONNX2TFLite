@@ -9,9 +9,8 @@ import src.generator.model.OperatorCodes as tflOC
 
 import src.parser.model.ValueInfo as onnxVI
 import src.parser.model.Tensors as onnxT
-import src.parser.model.Nodes as onnxN
 
-import src.convertor.conversion.Convertor as Convertor
+import src.converter.conversion.Translator as Translator
 
 import src.err as err
 
@@ -27,81 +26,10 @@ class ModelBuilder:
         self.__opCodeTypeIndexMap = {}
         self.__tensorNameMap = {}
 
-    
-
-
-    """ -------------------- Public Builder functions -------------------- """
-
-
-    def buildInternalTensors(self, oTensors: list[onnxVI.ValueInfo]):
-        """ Create 'tensor' tables in the 'tensors' vecotr of the subGraph for oTensors.
-            The 'oTensors' do NOT contain data. They should be the inputs and outputs of
-            operators in the graph. 
-            Designed for the 'value_info' field in ONNX 'Graph'."""
-        for oTensor in oTensors:
-            if oTensor.type.tensorType is None:
-                err.error(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for ValueInfo yet!")
-
-            if self.__tensorExists(oTensor.name):
-                # Tensor was already created using a different function
-                return 
-
-            buffer = self.__buildEmptyBuffer(oTensor.name)
-            self.__buildEmptyTensor(oTensor, buffer)
-
-
-    def buildConstantTensors(self, oTensors: onnxT.Tensors):
-        """ Create 'tensor' and 'buffer' tables for the ONNX 'oTensors'.
-            The 'oTensors' should have data in them. 
-            Designed for the 'initializer' field of the ONNX 'Graph'. """
-        for oTensor in oTensors:
-            buffer = self.__buildBuffer(oTensor)
-            self.__buildConstantTensor(oTensor, buffer)
-            
-
-    def buildOutputTensors(self, oOutputs: list[onnxVI.ValueInfo]):
-        """ Create 'tensor' tables in the 'tensors' vector of the subGraph for the 'oOutputs'.
-            Also create empty buffers in the 'buffers' vector of the model. 
-            SHOULD be called before any other tensor building function!
-            Designed for the 'output' field of the ONNX 'Graph'. """
-
-        if self.__bufferSize() != 0:
-            err.internal("'Builder.buildOutputTensors()' should be called before any other Tensor building function!")
-
-        outputs = tflSG.Outputs()
-
-        for oOutput in oOutputs:
-            if oOutput.type.tensorType is None:
-                err.error(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for Outputs yet!")
-
-            buffer = self.__buildEmptyBuffer(oOutput.name)
-            self.__buildEmptyTensor(oOutput, buffer)
-
-            outputs.tmpOutputs.append(self.tensorForName(oOutput.name))        
-
-        self.getSubgraph().outputs = outputs
-
-
-    def buildInputTensors(self, oInputs: list[onnxVI.ValueInfo]):
-        """ Create 'tensor' tables in the 'tensors' vector of the subGraph for the 'oInputs'.
-            Also create empty buffers in the 'buffers' vector of the model. """
-
-        inputs = tflSG.Inputs()
-
-        for oInput in oInputs:
-            if oInput.type.tensorType is None:
-                err.error(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported for Inputs yet!")
-
-            buffer = self.__buildEmptyBuffer(oInput.name)
-            self.__buildEmptyTensor(oInput, buffer)
-
-            inputs.tmpInputs.append(self.tensorForName(oInput.name))        
-
-
-        self.getSubgraph().inputs = inputs
 
 
     def finish(self) -> tflM.Model:
+        """ Finalize the TFLite model and return it. """
 
         # Assign each buffer its index
         for i, buffer in enumerate(self.getBuffers().vector):
@@ -134,8 +62,6 @@ class ModelBuilder:
 
 
 
-    """ -------------------- Private generic build functions. -------------------- """
-
 
     def __buildOperatorCode(self, opType: tflBO.BuiltinOperator):
         """ Add a new OperatorCode for given 'opType' to the 'operator_codes' vector. """
@@ -144,54 +70,57 @@ class ModelBuilder:
         self.getOperatorCodes().append(opCode)
 
 
-    def __buildBuffer(self, oTensor: onnxT.Tensor) -> tflB.Buffer:
+    def buildBuffer(self, oTensor: onnxT.Tensor) -> tflB.Buffer:
+        """ Create a new 'buffer' object. Register it and add to the 'model.Buffers'. """
         buffer = tflB.Buffer()
 
         if oTensor.data is None:
             # No data was provided in the tensor
             err.warning(f"ONNX Tensor '{oTensor.name}' should contain data but doesn't! Generating empty buffer!")
-            self.__appendNewBuffer(buffer, oTensor.name)
+            self.appendNewBuffer(buffer, oTensor.name)
             return
 
 
         # Convert the data
-        buffer.type = Convertor.convertDataType(oTensor.dataType)
-        buffer.data = Convertor.convertTensorData(oTensor.data, oTensor.dims)
+        buffer.type = Translator.convertDataType(oTensor.dataType)
+        buffer.data = Translator.convertTensorData(oTensor.data, oTensor.dims)
 
-        self.__appendNewBuffer(buffer, oTensor.name)
+        self.appendNewBuffer(buffer, oTensor.name)
 
         return buffer
 
 
-    def __buildConstantTensor(self, oTensor: onnxT.Tensor, buffer: tflB.Buffer):
-            shape = Convertor.convertShapeDims(oTensor.dims)
-            name = oTensor.name
-            type = Convertor.convertDataType(oTensor.dataType)
+    def buildConstantTensor(self, oTensor: onnxT.Tensor, buffer: tflB.Buffer):
+        """ Create a 'Tensor' object from the ONNX 'oTensor'. Register it and add to the 
+            'subGraph.Tensors'. """
+        shape = Translator.convertShapeDims(oTensor.dims)
+        name = oTensor.name
+        type = Translator.convertDataType(oTensor.dataType)
 
-            tTensor = tflT.Tensor(shape,name,None,type)
-            tTensor.tmpBuffer = buffer
+        tTensor = tflT.Tensor(shape,name,None,type)
+        tTensor.tmpBuffer = buffer
 
-            self.__appendNewTensor(tTensor)
+        self.appendNewTensor(tTensor)
 
 
-    def __buildEmptyTensor(self, oVI :onnxVI.ValueInfo, buffer: tflB.Buffer):
-        """ Build a 'Tensor' object from am ONNX ValueInfo object. So the resulting tensor has
+    def buildEmptyTensor(self, oVI :onnxVI.ValueInfo, buffer: tflB.Buffer):
+        """ Create a 'Tensor' object from am ONNX ValueInfo object. So the resulting tensor has
             no data, just properties. """
         oTensor = oVI.type.tensorType
         if oTensor is None:
             err.error(err.Code.UNSUPPORTED_ONNX_TYPE,"ONNX: Only type 'tensor_type' is supported yet!")
 
-        shape = Convertor.convertShape(oTensor.shape)
+        shape = Translator.convertShape(oTensor.shape)
         name = oVI.name
-        type = Convertor.convertDataType(oTensor.elemType)
+        type = Translator.convertDataType(oTensor.elemType)
 
         tensor = tflT.Tensor(shape, name, None, type)
         tensor.tmpBuffer = buffer
-        self.__appendNewTensor(tensor)
+        self.appendNewTensor(tensor)
 
 
-    def __buildEmptyBuffer(self, name: str) -> tflB.Buffer:
-        # TODO comment
+    def buildEmptyBuffer(self) -> tflB.Buffer:
+        """ Create, register and return a new empty 'Buffer' object. """
         buffer = tflB.Buffer([])
 
         self.getBuffers().append(buffer)
@@ -200,7 +129,7 @@ class ModelBuilder:
 
 
 
-    """ -------------------- Private 'quality of life' functions. -------------------- """
+    """ -------------------- 'quality of life' functions. -------------------- """
 
 
     def opCodeIndexForOpType(self, opType: tflBO.BuiltinOperator):
@@ -208,14 +137,14 @@ class ModelBuilder:
             the operator with given 'opType'.
             If corresponding opCode doesn't exist, create new mapping and a new OperatorCode. """
         if opType not in self.__opCodeTypeIndexMap.keys():
-            self.__opCodeTypeIndexMap[opType] = self.__operatorCodesSize()
+            self.__opCodeTypeIndexMap[opType] = self.operatorCodesSize()
             self.__buildOperatorCode(opType)
         
         return self.__opCodeTypeIndexMap[opType]
 
 
 
-    def __tensorExists(self, name: str):
+    def tensorExists(self, name: str):
         """ Determine if a tensor with 'name' already exists or not. """
         return name in self.__tensorNameMap.keys()
     
@@ -224,25 +153,27 @@ class ModelBuilder:
         # TODO comment
         if name not in self.__tensorNameMap.keys():
             err.note(f"Tensor '{name}' is not yet in the tensors. Adding it!") 
+
             newTensor = tflT.Tensor(tflT.Shape([]),name) # TODO Should be OK (only useless output tensor)
-            newTensor.tmpBuffer = self.__buildEmptyBuffer("")
-            self.__appendNewTensor(newTensor)
+            newTensor.tmpBuffer = self.buildEmptyBuffer()
+
+            self.appendNewTensor(newTensor)
 
         return self.__tensorNameMap[name]
 
 
-    def __bufferSize(self):
+    def bufferSize(self):
         """ Return the number of buffers that are currently in the model. """
         return self.getBuffers().len()
 
 
 
-    def __operatorCodesSize(self):
+    def operatorCodesSize(self):
         """ Return the number of buffers that are currently in the model. """
         return len(self.__opCodeTypeIndexMap.keys())
 
 
-    def __appendNewTensor(self, tTensor: tflT.Tensor):
+    def appendNewTensor(self, tTensor: tflT.Tensor):
         # TODO comment
 
         if tTensor.name in self.__tensorNameMap.keys():
@@ -252,7 +183,7 @@ class ModelBuilder:
             self.getTensors().append(tTensor)
 
 
-    def __appendNewBuffer(self, buffer: tflB.Buffer, name: str):
+    def appendNewBuffer(self, buffer: tflB.Buffer, name: str):
         # TODO comment
         self.getBuffers().append(buffer)
 

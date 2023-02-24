@@ -3,7 +3,6 @@ import functools as ft
 
 import src.generator.model.Tensors as tflT
 
-
 import src.parser.meta.meta as onnxMeta
 import src.parser.model.TensorShape as onnxTS
 
