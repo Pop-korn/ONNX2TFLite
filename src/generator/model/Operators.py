@@ -5,6 +5,7 @@ import lib.tflite.Operator as op
 import lib.tflite.CustomOptionsFormat as cof
 
 import src.generator.meta.meta as meta
+import src.generator.model.Tensors as Tensors
 
 class Inputs(meta.IntVector):
     def __init__(self, inputs: list[int]):
@@ -29,6 +30,11 @@ class Operator(meta.TFLiteObject):
     # TODO customOptions
     # TODO intermediates
 
+    """ Lists of references to 'Tensor' objects. Simpler to use when converting
+        than 'inputs' and 'outputs'. """
+    tmpInputs: list[Tensors.Tensor]
+    tmpOutputs: list[Tensors.Tensor]
+
     def __init__(self, inputs: Inputs=None, outputs: Outputs=None,
                 builtinOptions: meta.BuiltinOptions=None,
                 opcodeIndex: int = 0, 
@@ -40,6 +46,9 @@ class Operator(meta.TFLiteObject):
         self.inputs = inputs
         self.outputs = outputs
         self.builtinOptions = builtinOptions
+
+        self.tmpInputs = []
+        self.tmpOutputs = []
 
     def genTFLite(self, builder: fb.Builder):
         if self.mutatingVariableInputs is not None:

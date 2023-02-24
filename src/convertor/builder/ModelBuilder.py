@@ -20,15 +20,13 @@ class ModelBuilder:
     """ This class provides methods to build a TFLite model by parts.
         Uses functions defined in the 'TensorBuilder' and 'OperatorBuilder'. """
     __tflModel: tflM.Model
-    __bufferNameIndexMap: dict[str : int]
-    __tensorNameIndexMap: dict[str : int]
+    __tensorNameMap: dict[str : tflT.Tensor]
     __opCodeTypeIndexMap: dict[tflBO.BuiltinOperator : int]
 
     def __init__(self, modelVersion: int, modelDescription: str) -> None:
         self.__tflModel = tflM.Model(modelVersion,modelDescription)
-        self.__bufferNameIndexMap = {}
-        self.__tensorNameIndexMap = {}
         self.__opCodeTypeIndexMap = {}
+        self.__tensorNameMap = {}
 
     
 
@@ -40,7 +38,7 @@ class ModelBuilder:
         """ Convert an ONNX Node to a corresponding TFLite operator.
             This is ALWAYS a 1 to 1 conversion. """
 
-        tOp = opConvertor.convertNode(oNode, self.__tensorIndexForName)
+        tOp = opConvertor.convertNode(oNode, self.__tensorForName)
 
         match(oNode.opType):
             case "Conv":
@@ -109,8 +107,7 @@ class ModelBuilder:
             buffer = self.__buildEmptyBuffer(oOutput.name)
             self.__buildEmptyTensor(oOutput, buffer)
 
-            # Add the tensor index to the 'outputs' field of the subGraph
-            outputs.append(self.__tensorIndexForName(oOutput.name))
+            outputs.tmpOutputs.append(self.__tensorForName(oOutput.name))        
 
         self.__getSubgraph().outputs = outputs
 
@@ -128,8 +125,8 @@ class ModelBuilder:
             buffer = self.__buildEmptyBuffer(oInput.name)
             self.__buildEmptyTensor(oInput, buffer)
 
-            # Add the tensor index to the 'input' field of the subGraph
-            inputs.append(self.__tensorIndexForName(oInput.name))
+            inputs.tmpInputs.append(self.__tensorForName(oInput.name))        
+
 
         self.__getSubgraph().inputs = inputs
 
@@ -144,6 +141,23 @@ class ModelBuilder:
         for i, tensor in enumerate(self.__getTensors().vector):
             tensor.tmpIndex = i
             tensor.buffer = tensor.tmpBuffer.tmpIndex
+
+        # Assign 'Outputs' and 'Inputs' their tensor inidces
+        outputs = self.__getSubgraph().outputs
+        for tensor in outputs.tmpOutputs:
+            outputs.append(tensor.tmpIndex)
+
+        inputs = self.__getSubgraph().inputs
+        for tensor in inputs.tmpInputs:
+            inputs.append(tensor.tmpIndex)
+
+        # Assign each operator its inputs and outputs indices
+        for operator in self.__getSubgraph().operators.vector:
+            for inputTensor in operator.tmpInputs:
+                operator.inputs.append( inputTensor.tmpIndex )
+
+            for outputTensor in operator.tmpOutputs:
+                operator.outputs.append( outputTensor.tmpIndex )
 
         return self.__tflModel
 
@@ -233,39 +247,24 @@ class ModelBuilder:
 
     def __tensorExists(self, name: str):
         """ Determine if a tensor with 'name' already exists or not. """
-        return name in self.__tensorNameIndexMap.keys()
-
-
-    def __tensorIndexForName(self, name: str):
-        """ Return the index to the 'tensors' vector in the TFLite subGraph for the tensor with
-            given name 
-            If 'name' is not yet in the 'tensors', mapping will be added and warning will be printed. """
-        if name not in self.__tensorNameIndexMap.keys():
-            self.__tensorNameIndexMap[name] = self.__tensorsSize()
-            err.note(f"Tensor '{name}' is not yet in the tensors. Adding it on index '{self.__tensorNameIndexMap[name]}'!") 
-
-        return self.__tensorNameIndexMap[name]
-
+        return name in self.__tensorNameMap.keys()
     
-    def __tflBufferForName(self, name: str):
-        """ Return the existing buffer from the TFLite 'buffers' vector assigned to
-            tensor with given 'name'.
-            If tensor with 'name' doesn't exist, return 'None'. """
-        idx = self.__bufferNameIndexMap.get(name, None)
-        if idx is None:
-            return None
 
-        return self.__getBuffers().get(idx)
+    def __tensorForName(self, name: str) -> tflT.Tensor:
+        # TODO comment
+        if name not in self.__tensorNameMap.keys():
+            err.note(f"Tensor '{name}' is not yet in the tensors. Adding it!") 
+            newTensor = tflT.Tensor(tflT.Shape([]),name) # TODO Should be OK (only useless output tensor)
+            newTensor.tmpBuffer = self.__buildEmptyBuffer("")
+            self.__appendNewTensor(newTensor)
+
+        return self.__tensorNameMap[name]
 
 
     def __bufferSize(self):
         """ Return the number of buffers that are currently in the model. """
-        return len(self.__bufferNameIndexMap.keys())
+        return self.__getBuffers().len()
 
-
-    def __tensorsSize(self):
-        """ Return the number of tensors that are currently in the subGraph. """
-        return len(self.__tensorNameIndexMap.keys())
 
 
     def __operatorCodesSize(self):
@@ -273,24 +272,14 @@ class ModelBuilder:
         return len(self.__opCodeTypeIndexMap.keys())
 
 
-    def __newTensorIndexForName(self, name: str):
-        """ Return the index to the 'tensors' vector in the TFLite subGraph for the tensor with
-            given name. Just like in '__tensorIndexForName'.
-            Howerver if 'name' is already in, warning message will be printed."""
-        if name in self.__tensorNameIndexMap.keys():
-            err.warning(f"Tensor '{name}' is already in the tensors on index '{self.__tensorNameIndexMap[name]}'!")   
-        else:
-            # Add the new tensor
-            self.__tensorNameIndexMap[name] =self.__tensorsSize()
-
-        return self.__tensorNameIndexMap[name]
-
-
     def __appendNewTensor(self, tTensor: tflT.Tensor):
-        """ Add 'tTensor' to the end of the 'Tensors' vector.
-            Function also assigns new index to the 'Tensors' vector for 'tTensor'. """
-        self.__newTensorIndexForName(tTensor.name) # Register the new tensor 
-        self.__getTensors().append(tTensor)
+        # TODO comment
+
+        if tTensor.name in self.__tensorNameMap.keys():
+            err.warning(f"Tensor '{tTensor.name}' is already in the tensors!")  
+        else:
+            self.__tensorNameMap[tTensor.name] = tTensor
+            self.__getTensors().append(tTensor)
 
 
     def __appendNewBuffer(self, buffer: tflB.Buffer, name: str):

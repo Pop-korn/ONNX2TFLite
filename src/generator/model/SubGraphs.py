@@ -12,14 +12,25 @@ import src.err as err
 """ Classes representing the 'SubGraph' st  ructure and its parameters """
 
 class Inputs(meta.IntVector):
+
+    """ List of 'Tensor' objects. Easier to use while converting. """
+    tmpInputs: list[Tensors.Tensor]
+
     def __init__(self, inputs: list[int] = None):
         """ 'inputs' is a list of indices into the 'tensors' vector. """
         super().__init__(inputs,sg.StartInputsVector)
+        self.tmpInputs = []
+
 
 class Outputs(meta.IntVector):
+
+    """ List of 'Tensor' objects. Easier to use while converting. """
+    tmpOutputs: list[Tensors.Tensor]
+
     def __init__(self, outputs: list[int] = None):
         """ 'outputs' is a list of indices into the 'tensors' vector. """
         super().__init__(outputs,sg.StartOutputsVector)
+        self.tmpOutputs = []
 
 
 class SubGraph(meta.TFLiteObject):

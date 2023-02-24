@@ -2,6 +2,7 @@ from typing import Callable
 
 import src.generator.meta.meta as tflMeta
 import src.generator.model.Operators as tflO
+import src.generator.model.Tensors as tflT
 import src.generator.model.Buffers as tflB
 import src.generator.builtin.Conv2D as tflConv2D
 import src.generator.builtin.LRN as tflLRN
@@ -81,16 +82,22 @@ def __convertPadding(autoPad: str, oPads: list[int], oKernelShape: list[int]) ->
 
 
 
-def convertNode(oNode: onnxN.Node, tensorIndexForName: Callable[[str],int]) -> tflO.Operator:
+def convertNode(oNode: onnxN.Node, tensorForName: Callable[[str],tflT.Tensor]) -> tflO.Operator:
     """ Create a TFLite 'Operator' from the ONNX 'Node' with corresponding 'inputs' and 'outputs'.
-        'tensorIndexForName' is a function that maps the name of a tensor to its index in the
-        TFLite 'tensors' vector. """
-    tOp = tflO.Operator()
+        'tensorForName' is a function that maps the name of a tensor to the Tensor. """
+    tOperator = tflO.Operator()
 
-    tOp.inputs = tflO.Inputs([ tensorIndexForName(name) for name in oNode.inputs ])
-    tOp.outputs = tflO.Outputs([ tensorIndexForName(name) for name in oNode.outputs ])
+    # Initialize operator inputs
+    tOperator.inputs = tflO.Inputs([])
+    for name in oNode.inputs:
+        tOperator.tmpInputs.append(tensorForName(name))
 
-    return tOp
+    # Initialize operator outputs
+    tOperator.outputs = tflO.Outputs([])
+    for name in oNode.outputs:
+        tOperator.tmpOutputs.append(tensorForName(name))
+
+    return tOperator
 
 
 
