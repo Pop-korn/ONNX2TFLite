@@ -1,7 +1,8 @@
 import flatbuffers as fb
 
 import lib.tflite.Pool2DOptions as pool
-import lib.tflite.BuiltinOptions as bo
+import lib.tflite.BuiltinOptions as bOpt
+import lib.tflite.BuiltinOperator as bOp
 import lib.tflite.Padding as p
 import lib.tflite.ActivationFunctionType as aft
 
@@ -19,7 +20,8 @@ class MaxPool2D(meta.BuiltinOptions):
                 strideW: int = 0, strideH: int = 0,
                 filterW: int = 1, filterH: int = 1,
                 fusedActivationFunction: aft.ActivationFunctionType = aft.ActivationFunctionType.NONE) -> None:
-        super().__init__(bo.BuiltinOptions.Pool2DOptions)
+        super().__init__(bOpt.BuiltinOptions.Pool2DOptions,
+                         bOp.BuiltinOperator.MAX_POOL_2D)
         self.padding = padding
         self.strideW = strideW
         self.strideH = strideH

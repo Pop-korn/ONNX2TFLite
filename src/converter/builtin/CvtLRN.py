@@ -1,17 +1,11 @@
 import src.err as err
 
-import lib.tflite.BuiltinOperator as tflBO
-
 import src.parser.builtin.LRN as onnxLRN
 
 import src.generator.builtin.LRN as tflLRN
 import src.generator.meta.meta as tflMeta
 
-
-
-
-def convert(oLRN: onnxLRN.LRN) -> tuple[tflMeta.BuiltinOptions,
-                                         tflBO.BuiltinOperator]:
+def convert(oLRN: onnxLRN.LRN) -> tflMeta.BuiltinOptions:
     """ Convert ONNX 'LRN' to TFLite 'LocalResponseNormalization'. """
 
     tLRN = tflLRN.LRN()
@@ -25,4 +19,4 @@ def convert(oLRN: onnxLRN.LRN) -> tuple[tflMeta.BuiltinOptions,
     tLRN.alpha = oLRN.alpha
     tLRN.beta = oLRN.beta
 
-    return tLRN, tflBO.BuiltinOperator.LOCAL_RESPONSE_NORMALIZATION
+    return tLRN

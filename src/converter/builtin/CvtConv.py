@@ -8,10 +8,7 @@ import src.parser.builtin.Conv as onnxConv
 import src.generator.builtin.Conv2D as tflConv2D
 import src.generator.meta.meta as tflMeta
 
-import lib.tflite.BuiltinOperator as tflBO
-
-def convert(oConv: onnxConv.Conv) -> tuple[tflMeta.BuiltinOptions, 
-                                           tflBO.BuiltinOperator]:
+def convert(oConv: onnxConv.Conv) -> tflMeta.BuiltinOptions:
     """ Convert the ONNX 'Conv' operator to TFLite. """
 
     match len(oConv.kernelShape):
@@ -30,7 +27,7 @@ def convert(oConv: onnxConv.Conv) -> tuple[tflMeta.BuiltinOptions,
             
             # TODO tConv.fusedActivationFunction
             
-            return tConv, tflBO.BuiltinOperator.CONV_2D
+            return tConv
         
         case 3:
             err.error("Conv3D NEEDS to be implemented and converted!")

@@ -2,7 +2,8 @@ from typing_extensions import override
 import flatbuffers as fb
 from typing import Callable
 
-import lib.tflite.BuiltinOptions as bo
+import lib.tflite.BuiltinOptions as bOpt
+import lib.tflite.BuiltinOperator as bOp
 
 import src.err as err
 
@@ -134,11 +135,25 @@ class BuiltinOptions(TFLiteObject):
         'builtinOptionsType' is merely stored here for convenience and an 'Operator' object
         generates its TFLite representation (as it is the child of the 'operator' table in 'operators'). 
         """
-    builtinOptionsType: bo.BuiltinOptions
 
-    def __init__(self, builtinOptionsType: bo.BuiltinOptions) -> None:
+    """ The type of parameters of this operator. """
+    builtinOptionsType: bOpt.BuiltinOptions
+
+    """ The type of this operator. """
+    operatorType: bOp.BuiltinOperator
+
+    def __init__(self, builtinOptionsType: bOpt.BuiltinOptions, 
+                 operatorType: bOp.BuiltinOperator) -> None:
+        if builtinOptionsType is None:
+            err.internal("TFLITE: Operator inheritting from 'BuiltinOptions'",
+                         "MUST specify the 'builtinOptionsType'!")
+        if operatorType is None:
+            err.internal("TFLITE: Operator inheritting from 'BuiltinOptions'",
+                         "MUST specify the 'operatorType'!")
         self.builtinOptionsType = builtinOptionsType
+        self.operatorType = operatorType
 
     """ Function has to be overwritten """
     def genTFLite(self, builder: fb.Builder):
-        err.warning(f"BuiltinOperator '{self.builtinOptionsType}': genTFLite() is not defined!")
+        err.warning(f"BuiltinOperator '{self.builtinOptionsType}':",
+                    "genTFLite() is not defined!")

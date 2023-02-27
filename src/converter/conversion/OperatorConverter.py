@@ -48,25 +48,30 @@ class OperatorConverter:
 
         tOp = self.convertNode(oNode)
 
+        # Indicator if after conversion, 'tOp.builtinOptions' was set
+        implicitOperatorType = True
+
         match(oNode.opType):
             case "Conv":
-                tOp.builtinOptions, opCode = CvtConv.convert(oNode.attributes)
-                tOp.opcodeIndex = self.__builder.opCodeIndexForOpType(opCode)
+                tOp.builtinOptions = CvtConv.convert(oNode.attributes)
             case "LRN":
-                tOp.builtinOptions, opCode = CvtLRN.convert(oNode.attributes)
-                tOp.opcodeIndex = self.__builder.opCodeIndexForOpType(opCode)
+                tOp.builtinOptions = CvtLRN.convert(oNode.attributes)
             case "MaxPool":
-                tOp.builtinOptions, opCode = CvtMaxPool.convert(oNode.attributes)
-                tOp.opcodeIndex = self.__builder.opCodeIndexForOpType(opCode)
+                tOp.builtinOptions = CvtMaxPool.convert(oNode.attributes)
             case "Relu":
                 tOp.builtinOptions = None
-                tOp.opcodeIndex = self.__builder.opCodeIndexForOpType(
-                                                    tflBO.BuiltinOperator.RELU)
+                tOp.opcodeIndex = self.__builder.opCodeIndexForOpType(tflBO.BuiltinOperator.RELU)
+                implicitOperatorType = False
             case "Reshape":
-                tOp.builtinOptions, opCode = CvtReshape.convert(tOp)
-                tOp.opcodeIndex = self.__builder.opCodeIndexForOpType(opCode)
+                tOp.builtinOptions = CvtReshape.convert(tOp)
             case _:
+                implicitOperatorType = False
                 err.error(None, f"Conversion of ONNX Operator '{oNode.opType}'",
                           "is not yet supported!")
+                
+        # Assign 'tOp' its operator type. If possible
+        if implicitOperatorType:
+            tOp.opcodeIndex = self.__builder.opCodeIndexForOpType(tOp.builtinOptions.operatorType)
+        
 
         self.__builder.getOperators().append(tOp)

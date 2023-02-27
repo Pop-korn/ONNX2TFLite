@@ -6,8 +6,7 @@ import src.generator.builtin.Reshape as tflReshape
 import src.generator.meta.meta as tflMeta
 import src.generator.model.Operators as tflOperators
 
-def convert(tflOperator: tflOperators.Operator) -> tuple[tflMeta.BuiltinOptions, 
-                                                         tflBO.BuiltinOperator]:
+def convert(tflOperator: tflOperators.Operator) -> tflMeta.BuiltinOptions:
     """ Convert ONNX 'Reshape' to TFLite 'Reshape'. """
 
     try:    
@@ -19,7 +18,7 @@ def convert(tflOperator: tflOperators.Operator) -> tuple[tflMeta.BuiltinOptions,
         # TFLite does NOT use it -> remove it
         tflOperator.tmpInputs.pop()
 
-        return tReshape, tflBO.BuiltinOperator.RESHAPE
+        return tReshape
     
     except:
         err.error(err.Code.INVALID_ONNX_OPERATOR, 

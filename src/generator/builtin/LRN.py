@@ -2,7 +2,8 @@ import flatbuffers as fb
 
 import src.generator.meta.meta as meta
 
-import lib.tflite.BuiltinOptions as bo
+import lib.tflite.BuiltinOptions as bOpt
+import lib.tflite.BuiltinOperator as bOp
 import lib.tflite.LocalResponseNormalizationOptions as lrn
 
 class LRN(meta.BuiltinOptions):
@@ -15,7 +16,8 @@ class LRN(meta.BuiltinOptions):
                 bias: float = 0.0,
                 alpha: float = 0.0,
                 beta: float = 0.0) -> None:
-        super().__init__(bo.BuiltinOptions.LocalResponseNormalizationOptions)
+        super().__init__(bOpt.BuiltinOptions.LocalResponseNormalizationOptions,
+                         bOp.BuiltinOperator.LOCAL_RESPONSE_NORMALIZATION)
         self.radius = radius
         self.bias = bias
         self.alpha = alpha
