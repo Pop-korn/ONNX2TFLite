@@ -51,6 +51,7 @@ class OperatorConverter:
         # Indicator if after conversion, 'tOp.builtinOptions' was set
         implicitOperatorType = True
 
+        # Identify ONNX operator and convert it
         match(oNode.opType):
             case "Conv":
                 tOp.builtinOptions = CvtConv.convert(oNode.attributes)
