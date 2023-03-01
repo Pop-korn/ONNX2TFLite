@@ -10,6 +10,8 @@ Currently supported:
 
 Project should be in a usable state by June 2023. For now, you can download the *bvlcalexnet-12.onnx* model from https://github.com/onnx/models/blob/main/vision/classification/alexnet/model/bvlcalexnet-12.onnx, save it in the *data/onnx* directory and run *make* from the root directory to try and convert the model.
 
+Project comes with *ONNX* and *TFLite* schemas pre-installed and libraries pre-compiled. You can delete the *data/schemas* and *lib* directories and run *make install*  in the root directory to get the schemas and complie them yourself.
+
 ---
 ## Structure
 The entry point of the program is the *main.py* file in the root directory. To run the program use Makefile in the root directory. A *.tflite* model will be generated in the **/test** directory.
