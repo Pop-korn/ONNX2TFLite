@@ -1,11 +1,11 @@
 import numpy as np
 import functools as ft
+from typing import List
 
 import src.generator.model.Tensors as tflT
 
 import src.parser.meta.meta as onnxMeta
 import src.parser.model.TensorShape as onnxTS
-
 
 import src.err as err
 
@@ -19,17 +19,17 @@ import lib.tflite.Padding as tflPad
 """ -------------------- Private Helper Functions -------------------- """
 
 
-def __isNCHW(list: list[int]) -> bool:
-    """ Figure out if given 'list' is in the 'nchw' format. """
+def __isNCHW(dims: List[int]) -> bool:
+    """ Figure out if given 'dims' is in the 'nchw' format. """
 
     # TODO Improve
-    if len(list) >= 4:
+    if len(dims) >= 4:
         return True
 
     return False
 
 
-def __dimsToNHWC(nchwList: list[int]) -> list[int]:
+def __dimsToNHWC(nchwList: List[int]) -> List[int]:
     """ Convert a list of ints which represent dimensions from NCHW to NHWC. """
 
     res = [nchwList[0]] # First element is 'n'
@@ -53,7 +53,7 @@ def __collectionsEqual(colA, colB):
     return True
 
 
-def __isSAMEPadding(oPads: list[int], oKernelShape: list[int]):
+def __isSAMEPadding(oPads: List[int], oKernelShape: List[int]):
     """ Determine if given 'oPads' padding can be represented exactly with the
         'SAME' padding type for given kernel shape. """
     
@@ -69,8 +69,8 @@ def __isSAMEPadding(oPads: list[int], oKernelShape: list[int]):
 """ -------------------- Public Functions -------------------- """
 
 
-def convertPadding(autoPad: str, oPads: list[int], 
-                   oKernelShape: list[int]) -> tflPad.Padding:
+def convertPadding(autoPad: str, oPads: List[int], 
+                   oKernelShape: List[int]) -> tflPad.Padding:
         """ Convert ONNX pads to TFLite padding. 'autoPad' is the ONNX attribute
             'auto_pad' and 'oPads' is the ONNX attribute 'pads'. 
             The 'oKernelShape' is used to determine if conversion was valid"""
@@ -99,7 +99,7 @@ def convertPadding(autoPad: str, oPads: list[int],
         return tflPad.Padding.SAME
 
 
-def convertTensorData(data: np.ndarray, shape: list[int]):
+def convertTensorData(data: np.ndarray, shape: List[int]):
     """ Convert the data of a tensor from the 'NCHW' to 'NHWC' format. """
 
     if not __isNCHW(shape):
@@ -137,7 +137,7 @@ def convertShape(oShape: onnxTS.TensorShape) -> tflT.Shape:
     return convertShapeDims(dims)
 
 
-def convertShapeDims(oDims: list[int]) -> tflT.Shape:
+def convertShapeDims(oDims: List[int]) -> tflT.Shape:
     """ Convert list of ints representing the shape of an ONNX Tensor
         to a TFLite 'Shape' object. """
     

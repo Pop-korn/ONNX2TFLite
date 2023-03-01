@@ -1,3 +1,4 @@
+from typing import List
 import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
 import src.parser.meta.meta as meta
@@ -20,7 +21,7 @@ class Dimention(meta.ONNXObject):
             err.warning("ONNX TensorShape.Dimension has no valid value!")
 
 class TensorShape(meta.ONNXObject):
-    dims: list[Dimention]
+    dims: List[Dimention]
 
     def __init__(self, descriptor: onnx.TensorShapeProto) -> None:
         super().__init__(descriptor)

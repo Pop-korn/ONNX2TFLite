@@ -1,3 +1,4 @@
+from typing import List
 import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
 import src.parser.meta.meta as meta
@@ -14,7 +15,7 @@ class MaxPool(meta.ONNXOperatorAttributes):
     storageOrder: int
     strides: meta.ONNXIntListAttribute
 
-    def __init__(self, descriptor: list[onnx.AttributeProto]) -> None:
+    def __init__(self, descriptor: List[onnx.AttributeProto]) -> None:
         super().__init__(descriptor)
         self.__defaultValues()
         self.__initAttributes()

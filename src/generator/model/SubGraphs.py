@@ -1,5 +1,7 @@
 import flatbuffers as fb
 
+from typing import List
+
 import lib.tflite.SubGraph as sg
 import lib.tflite.Model as Model
 
@@ -14,9 +16,9 @@ import src.err as err
 class Inputs(meta.IntVector):
 
     """ List of 'Tensor' objects. Easier to use while converting. """
-    tmpInputs: list[Tensors.Tensor]
+    tmpInputs: List[Tensors.Tensor]
 
-    def __init__(self, inputs: list[int] = None):
+    def __init__(self, inputs: List[int] = None):
         """ 'inputs' is a list of indices into the 'tensors' vector. """
         super().__init__(inputs,sg.StartInputsVector)
         self.tmpInputs = []
@@ -25,9 +27,9 @@ class Inputs(meta.IntVector):
 class Outputs(meta.IntVector):
 
     """ List of 'Tensor' objects. Easier to use while converting. """
-    tmpOutputs: list[Tensors.Tensor]
+    tmpOutputs: List[Tensors.Tensor]
 
-    def __init__(self, outputs: list[int] = None):
+    def __init__(self, outputs: List[int] = None):
         """ 'outputs' is a list of indices into the 'tensors' vector. """
         super().__init__(outputs,sg.StartOutputsVector)
         self.tmpOutputs = []
@@ -78,5 +80,5 @@ class SubGraph(meta.TFLiteObject):
         return sg.End(builder)
 
 class SubGraphs(meta.TFLiteVector):
-    def __init__(self, subGraphs: list[SubGraph] = []) -> None:
+    def __init__(self, subGraphs: List[SubGraph] = []) -> None:
         super().__init__(subGraphs,Model.StartSubgraphsVector)

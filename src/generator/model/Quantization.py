@@ -1,3 +1,4 @@
+from typing import List
 import flatbuffers as fb
 
 import lib.tflite.QuantizationParameters as qp
@@ -10,19 +11,19 @@ import src.generator.meta.meta as meta
 """
 
 class Min (meta.FloatVector):
-    def __init__(self, min: list[float]=[]) -> None:
+    def __init__(self, min: List[float]=[]) -> None:
         super().__init__(min, qp.StartMinVector, genEmpty = False)
 
 class Max (meta.FloatVector):
-    def __init__(self, max: list[float]=[]) -> None:
+    def __init__(self, max: List[float]=[]) -> None:
         super().__init__(max,qp.StartMaxVector, genEmpty = False)
 
 class Scale(meta.FloatVector):
-    def __init__(self, scale: list[float]=[]) -> None:
+    def __init__(self, scale: List[float]=[]) -> None:
         super().__init__(scale,qp.StartScaleVector)
 
 class ZeroPoint(meta.IntVector):
-    def __init__(self, zeroPoint: list[int]=[]) -> None:
+    def __init__(self, zeroPoint: List[int]=[]) -> None:
         super().__init__(zeroPoint,qp.StartZeroPointVector,
                         lambda builder : builder.PrependInt64)
 

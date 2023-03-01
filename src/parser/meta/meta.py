@@ -1,5 +1,7 @@
 import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
+from typing import List
+
 """ Various ENUM references. Originals are 'difficult' to acces because of no intellisense. """
 AttributeType = onnx.AttributeProto.AttributeType
 DataType = onnx.TensorProto.DataType
@@ -18,7 +20,7 @@ class ONNXOperatorAttributes:
     """ Protobuf descriptor. Holds barely structured data, that represents the individual
         attributes of the operator. The data will be assigned to the subclasses attributes 
         for easier access. """
-    _descriptor: list[onnx.AttributeProto]
+    _descriptor: List[onnx.AttributeProto]
 
     def __init__(self, descriptor: onnx.AttributeProto) -> None:
         self._descriptor = descriptor
@@ -34,7 +36,7 @@ class ONNXOperatorAttributes:
         """ Child class should initialize its attributes with values from the '_descriptor'. """
         pass
 
-class ONNXIntListAttribute(list [int]):
+class ONNXIntListAttribute(List [int]):
     """ Represents an ONNX operator attribute, that is a list of integers
         and has 'name' and 'type'.  """
     _descriptor: onnx.AttributeProto

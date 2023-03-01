@@ -1,3 +1,4 @@
+from typing import List
 import flatbuffers as fb
 
 import src.generator.meta.meta as meta
@@ -34,6 +35,6 @@ class OperatorCode(meta.TFLiteObject):
         return oc.End(builder)
 
 class OperatorCodes(meta.TFLiteVector):
-    def __init__(self, operatorCodes: list[OperatorCode] = []) -> None:
+    def __init__(self, operatorCodes: List[OperatorCode] = []) -> None:
         super().__init__(operatorCodes,Model.StartOperatorCodesVector)
     

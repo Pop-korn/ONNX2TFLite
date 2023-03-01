@@ -1,3 +1,4 @@
+from typing import List
 import flatbuffers as fb
 
 import lib.tflite.SubGraph as sg
@@ -17,7 +18,7 @@ import src.err as err
 # TODO If 'hasRank' is false, "shape" must be [].
 
 class Shape(meta.IntVector):
-    def __init__(self, shape: list[int]) -> None:
+    def __init__(self, shape: List[int]) -> None:
         super().__init__(shape,t.StartShapeVector)
 
 class Tensor(meta.TFLiteObject):
@@ -80,5 +81,5 @@ class Tensor(meta.TFLiteObject):
         return t.End(builder)
 
 class Tensors(meta.TFLiteVector):
-    def __init__(self, tensors: list[Tensor] = []) -> None:
+    def __init__(self, tensors: List[Tensor] = []) -> None:
         super().__init__(tensors,sg.StartTensorsVector)

@@ -1,3 +1,5 @@
+from typing import Dict
+
 import lib.tflite.BuiltinOperator as tflBO
 
 import src.generator.model.Model as tflM
@@ -18,8 +20,8 @@ class ModelBuilder:
     """ This class provides methods to build a TFLite model by parts. """
     
     __tflModel: tflM.Model
-    __tensorNameMap: dict[str : tflT.Tensor]
-    __opCodeTypeIndexMap: dict[tflBO.BuiltinOperator : int]
+    __tensorNameMap: Dict # Mapping 'str' to 'tflT.Tensor'
+    __opCodeTypeIndexMap: Dict # Mapping 'tflBO.BuiltinOperator' to 'int'
 
     def __init__(self, modelVersion: int, modelDescription: str) -> None:
         self.__tflModel = tflM.Model(modelVersion,modelDescription)

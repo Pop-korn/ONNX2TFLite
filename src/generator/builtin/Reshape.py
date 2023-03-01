@@ -1,3 +1,4 @@
+from typing import List
 import flatbuffers as fb
 
 import src.generator.meta.meta as meta
@@ -7,13 +8,13 @@ import lib.tflite.BuiltinOptions as bOpt
 import lib.tflite.BuiltinOperator as bOp
 
 class NewShape(meta.IntVector):
-    def __init__(self, newShape: list[int]) -> None:
+    def __init__(self, newShape: List[int]) -> None:
         super().__init__(newShape, reshape.StartNewShapeVector)
 
 class Reshape(meta.BuiltinOptions):
     newShape: NewShape
 
-    def __init__(self, newShape: list[int]) -> None:
+    def __init__(self, newShape: List[int]) -> None:
         super().__init__(bOpt.BuiltinOptions.ReshapeOptions,
                          bOp.BuiltinOperator.RESHAPE)
         self.newShape = NewShape(newShape)

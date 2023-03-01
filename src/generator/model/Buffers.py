@@ -1,3 +1,4 @@
+from typing import List
 import flatbuffers as fb
 import numpy as np
 
@@ -65,5 +66,5 @@ class Buffer(meta.TFLiteObject):
 
 
 class Buffers(meta.TFLiteVector):
-    def __init__(self, vector: list[Buffer]=[]) -> None:
+    def __init__(self, vector: List[Buffer]=[]) -> None:
         super().__init__(vector, m.StartBuffersVector)

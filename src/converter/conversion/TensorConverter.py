@@ -1,3 +1,5 @@
+from typing import List
+
 import src.converter.builder.ModelBuilder as ModelBuilder
 
 import src.generator.model.SubGraphs as tflSG
@@ -16,7 +18,7 @@ class TensorConverter:
     def __init__(self, builder: ModelBuilder.ModelBuilder) -> None:
         self.__builder = builder
 
-    def convertInternalTensors(self, oTensors: list[onnxVI.ValueInfo]):
+    def convertInternalTensors(self, oTensors: List[onnxVI.ValueInfo]):
         """ Create 'tensor' tables in the 'tensors' vecotr of the subGraph for oTensors.
             The 'oTensors' do NOT contain data. They should be the inputs and outputs of
             operators in the graph. 
@@ -42,7 +44,7 @@ class TensorConverter:
             self.__builder.buildConstantTensor(oTensor, buffer)
             
 
-    def convertOutputTensors(self, oOutputs: list[onnxVI.ValueInfo]):
+    def convertOutputTensors(self, oOutputs: List[onnxVI.ValueInfo]):
         """ Create 'tensor' tables in the 'tensors' vector of the subGraph for the 'oOutputs'.
             Also create empty buffers in the 'buffers' vector of the model. 
             SHOULD be called before any other tensor building function!
@@ -65,7 +67,7 @@ class TensorConverter:
         self.__builder.getSubgraph().outputs = outputs
 
 
-    def convertInputTensors(self, oInputs: list[onnxVI.ValueInfo]):
+    def convertInputTensors(self, oInputs: List[onnxVI.ValueInfo]):
         """ Create 'tensor' tables in the 'tensors' vector of the subGraph for the 'oInputs'.
             Also create empty buffers in the 'buffers' vector of the model. """
 

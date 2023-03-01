@@ -1,6 +1,6 @@
 from typing_extensions import override
 import flatbuffers as fb
-from typing import Callable
+from typing import Callable, List
 
 import lib.tflite.BuiltinOptions as bOpt
 import lib.tflite.BuiltinOperator as bOp
@@ -20,7 +20,7 @@ class TFLiteVector(TFLiteObject):
     """ Represents a TFLite vector of TFLiteObjects. Provides interface for storing data
         and generating output TFLite code. """
 
-    vector: list[TFLiteObject]
+    vector: List[TFLiteObject]
 
     """ Indicates if an empty vector should be generated if 'vector' attribute is
     empty, or to not generate anything in that case. """
@@ -34,7 +34,7 @@ class TFLiteVector(TFLiteObject):
     as argument """
     PrependFunction: Callable[[fb.Builder],None]
 
-    def __init__(self, vector: list[TFLiteObject], 
+    def __init__(self, vector: List[TFLiteObject], 
                 StartFunction: Callable[[fb.Builder, int],None],
                 PrependFunction: Callable[[fb.Builder],Callable[[int],None]] = lambda builder: builder.PrependUOffsetTRelative,
                 genEmpty: bool=True) -> None:
@@ -73,7 +73,7 @@ class TFLiteVector(TFLiteObject):
         return builder.EndVector()
 
 class TFLiteAtomicVector(TFLiteVector):
-    def __init__(self, vector: list[int, float, bool],
+    def __init__(self, vector: List[int | float | bool],
                 StartFunction: Callable[[fb.Builder, int],None],
                 PrependFunction: Callable[[fb.Builder],Callable[[int],None]],
                 genEmpty: bool=True) -> None:
@@ -100,7 +100,7 @@ class FloatVector(TFLiteAtomicVector):
     """ Class represents a TFLite vector of float values. Provides interface for storing data
         and generating output TFLite code. """
 
-    def __init__(self, floatList: list[float], 
+    def __init__(self, floatList: List[float], 
                 StartFunction: Callable[[fb.Builder, int],None],
                 PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependFloat32,
                 genEmpty: bool=True) -> None:
@@ -110,7 +110,7 @@ class IntVector(TFLiteAtomicVector):
     """ Class represents a TFLite vector of integer values. Provides interface for storing data
         and generating output TFLite code. """
 
-    def __init__(self, intList: list[int], 
+    def __init__(self, intList: List[int], 
                 StartFunction: Callable[[fb.Builder, int],None],
                 PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependInt32,
                 genEmpty: bool=True) -> None:
@@ -119,7 +119,7 @@ class IntVector(TFLiteAtomicVector):
 class BoolVector(TFLiteAtomicVector):
     """ Class represents a TFLite vector of boolean values. Provides interface for storing data
         and generating output TFLite code. """
-    def __init__(self, boolList: list[bool],
+    def __init__(self, boolList: List[bool],
                 StartFunction: Callable[[fb.Builder, int],None],
                 PrependFunction: Callable[[fb.Builder],None] = lambda builder: builder.PrependBool,
                 genEmpty: bool=True) -> None:

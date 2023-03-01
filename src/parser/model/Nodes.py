@@ -1,5 +1,6 @@
 import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
+from typing import List
 import src.err as err
 
 import src.parser.meta.meta as meta
@@ -14,8 +15,8 @@ import src.parser.builtin.Reshape as Reshape
 import src.parser.builtin.Softmax as Softmax
 
 class Node(meta.ONNXObject):
-    inputs: list[str]
-    outputs: list[str]
+    inputs: List[str]
+    outputs: List[str]
     name: str
     opType: str
     domain: str
@@ -57,7 +58,7 @@ class Node(meta.ONNXObject):
                 err.warning(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
             
 
-class Nodes(list[Node]):
-    def __init__(self, descriptor: list[onnx.NodeProto]):
+class Nodes(List[Node]):
+    def __init__(self, descriptor: List[onnx.NodeProto]):
         for item in descriptor:
             self.append(Node(item))

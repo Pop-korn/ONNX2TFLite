@@ -1,3 +1,4 @@
+from typing import List
 import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
 class OperatorSetId:
@@ -8,7 +9,7 @@ class OperatorSetId:
         self.domain = descriptor.domain
         self.version = descriptor.version
 
-class OperatorSetIds(list[OperatorSetId]):
-    def __init__(self, vectorDesc: list[onnx.OperatorSetIdProto]) -> None:
+class OperatorSetIds(List[OperatorSetId]):
+    def __init__(self, vectorDesc: List[onnx.OperatorSetIdProto]) -> None:
         for item in vectorDesc:
             self.append(OperatorSetId(item))

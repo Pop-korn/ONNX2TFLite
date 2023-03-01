@@ -1,3 +1,4 @@
+from typing import List
 import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
 import src.parser.model.Nodes as n
@@ -12,9 +13,9 @@ class Graph(meta.ONNXObject):
     initializers: t.Tensors
     # TODO sparseInitializers
     docString: str
-    inputs: list[vi.ValueInfo]
-    outputs: list[vi.ValueInfo]
-    valueInfo: list[vi.ValueInfo]
+    inputs: List[vi.ValueInfo]
+    outputs: List[vi.ValueInfo]
+    valueInfo: List[vi.ValueInfo]
     # TODO quantizationAnnotation
 
     def __init__(self, descriptor: onnx.GraphProto) -> None:
@@ -30,6 +31,6 @@ class Graph(meta.ONNXObject):
         self.valueInfo = []
         self.__initList(self.valueInfo, descriptor.value_info, vi.ValueInfo)
 
-    def __initList(self,list,descriptor,object):
+    def __initList(self, lst: List, descriptor, object):
         for item in descriptor:
-            list.append(object(item))
+            lst.append(object(item))

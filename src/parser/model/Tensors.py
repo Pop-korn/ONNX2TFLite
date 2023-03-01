@@ -1,3 +1,4 @@
+from typing import List
 import numpy as np
 
 import lib.onnx.onnx.onnx_ml_pb2 as onnx
@@ -16,7 +17,7 @@ class Segment:
         self.end = descriptor.end
 
 class Tensor(meta.ONNXObject):
-    dims: list[int]
+    dims: List[int]
     dataType: meta.DataType
     segment: Segment
     """ Data of the tensor. Shape is given in 'dims' and the ndarray itself MUST BE FLAT.
@@ -95,21 +96,25 @@ class Tensor(meta.ONNXObject):
             self.__assertTypeAllowed([meta.DataType.UINT32, meta.DataType.UINT64],"uint64_data") # 'onnx-ml.proto' line '617'
 
 
-    def __assertTypeAllowed(self, allowedTypes: list[meta.DataType], forField: str):
-        """ Check that 'self.dataType' is in 'allowedTypes'. If it isn't, print warning message. """
+    def __assertTypeAllowed(self, allowedTypes: List, forField: str):
+        """ Check that 'self.dataType' is in 'allowedTypes'. If it isn't, print warning message. 
+            'allowedTypes' is a list of 'meta.DataType' values. """
+        
         if self.dataType not in allowedTypes:
             err.warning(f"""ONNX Tensor '{forField}' is used and 'data_type' is '{self.dataType}'!
                 MUST be one of '{allowedTypes}'""")
 
-    def __assertTypeNotBanned(self, bannedTypes: list[meta.DataType], forField: str):
-        """ Check that 'self.dataType' is NOT in 'bannedTypes'. If it IS, print warning message. """
+    def __assertTypeNotBanned(self, bannedTypes: List, forField: str):
+        """ Check that 'self.dataType' is NOT in 'bannedTypes'. If it IS, print warning message. 
+            'bannedTypes' is a list of 'meta.DataType' values. """
+        
         if self.dataType in bannedTypes:
             err.warning(f"""ONNX Tensor '{forField}' is used and 'data_type' is '{self.dataType}'!
                 must NOT be one of '{bannedTypes}'""")
 
 
 
-class Tensors(list [Tensor]):
-    def __init__(self, descriptor: list[onnx.TensorProto]):
+class Tensors(List [Tensor]):
+    def __init__(self, descriptor: List[onnx.TensorProto]):
         for item in descriptor:
             self.append(Tensor(item))

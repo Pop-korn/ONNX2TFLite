@@ -1,3 +1,4 @@
+from typing import List
 import flatbuffers as fb
 
 import lib.tflite.SubGraph as sg
@@ -8,15 +9,15 @@ import src.generator.meta.meta as meta
 import src.generator.model.Tensors as Tensors
 
 class Inputs(meta.IntVector):
-    def __init__(self, inputs: list[int]):
+    def __init__(self, inputs: List[int]):
         super().__init__(inputs,op.StartInputsVector)
 
 class Outputs(meta.IntVector):
-    def __init__(self, outputs: list[int]):
+    def __init__(self, outputs: List[int]):
         super().__init__(outputs,op.StartOutputsVector)
 
 class MutatingVariableInputs(meta.BoolVector):
-        def __init__(self, mutatingVariableInputs: list[bool]=[]) -> None:
+        def __init__(self, mutatingVariableInputs: List[bool]=[]) -> None:
              super().__init__(mutatingVariableInputs,op.StartMutatingVariableInputsVector)
 
 
@@ -32,8 +33,8 @@ class Operator(meta.TFLiteObject):
 
     """ Lists of references to 'Tensor' objects. Simpler to use when converting
         than 'inputs' and 'outputs'. """
-    tmpInputs: list[Tensors.Tensor]
-    tmpOutputs: list[Tensors.Tensor]
+    tmpInputs: List[Tensors.Tensor]
+    tmpOutputs: List[Tensors.Tensor]
 
     def __init__(self, inputs: Inputs=None, outputs: Outputs=None,
                 builtinOptions: meta.BuiltinOptions=None,
@@ -77,6 +78,6 @@ class Operator(meta.TFLiteObject):
 
 
 class Operators(meta.TFLiteVector):
-    def __init__(self, operators: list[Operator] = []) -> None:
+    def __init__(self, operators: List[Operator] = []) -> None:
         super().__init__(operators,sg.StartOperatorsVector)
         

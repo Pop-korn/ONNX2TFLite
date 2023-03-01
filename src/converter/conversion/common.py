@@ -3,7 +3,7 @@
 
 import src.err as err
 
-
+from typing import List
 
 def isOfSize(obj, size: int):
     """ Determine if given object with '__len__()' method if not None
@@ -15,7 +15,7 @@ def isOfSize(obj, size: int):
     return len(obj) == size
 
 
-def assign2DStrides(obj, strides: list[int]):
+def assign2DStrides(obj, strides: List[int]):
     """ Assign the 'obj' attributes 'strideH' and 'strideW' from 'strides'.
         'obj' MUST have these attributes. """
     
