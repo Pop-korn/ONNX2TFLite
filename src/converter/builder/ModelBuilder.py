@@ -22,18 +22,32 @@ class ModelBuilder:
     __tflModel: tflM.Model
     __tensorNameMap: Dict # Mapping 'str' to 'tflT.Tensor'
     __opCodeTypeIndexMap: Dict # Mapping 'tflBO.BuiltinOperator' to 'int'
+    __skippedOutputMap: Dict # Mapping 'tflT.Tensor' objects that were
+    # outputs of skipped operators, to 'tflT.Tensor' ouputs of previous operators
 
-    __operatorSkipped: bool
 
     def __init__(self, modelVersion: int, modelDescription: str) -> None:
         self.__tflModel = tflM.Model(modelVersion,modelDescription)
         self.__opCodeTypeIndexMap = {}
         self.__tensorNameMap = {}
-        self.__operatorSkipped = False
+        self.__skippedOutputMap = {}
 
 
-    def skipOperator(self):
-        self.__operatorSkipped = True
+    def skipOperator(self, tOp: tflO.Operator):
+        """ Map the outputs of 'tOp' to the outputs of the previous operator,
+            or the graph input. """
+        
+        lastOperator = self.__getLastOperator()
+        if lastOperator is None:
+            # The very first operator is being skipped
+            lastOutputs = self.getSubgraph().inputs.tmpInputs
+            err.unchecked("ModelBuilder.skipOperator(): first operator.")
+        else:
+            lastOutputs = lastOperator.tmpOutputs
+
+        for skipped, replacement in zip(tOp.tmpOutputs, lastOutputs):
+            self.__skippedOutputMap[skipped] = replacement
+
 
 
     def checkAndAppendOperator(self, tOp: tflO.Operator):
@@ -42,21 +56,16 @@ class ModelBuilder:
             For example if conversion of the last operator was skipped, this 
             operator will be correctly connetced with the one before that. """
         
-        if self.__operatorSkipped:
-            # The previous operator was not converted. So the input tensor of
-            # 'tOp' is not the same as the outpu of the last operator.
-            self.__operatorSkipped = False
-
-            # Compare the tensors
-            prevOutput = self.getLastOperator().tmpOutputs[0]
+        # Find out if operators inputs were skipped
+        for i, inpt in enumerate(tOp.tmpInputs):
+            if inpt in self.__skippedOutputMap.keys():
+                tOp.tmpInputs[i] = self.__skippedTensorReplacement(inpt)
             
-            if not self.tensorsSimilar(tOp.tmpInputs[0], prevOutput):
-                err.error(None,f"Could not connect graph after operator was",
-                          f"skipped! Output '{prevOutput.name}' cannot match",
-                          f"input '{tOp.tmpInputs[0].name}'!")
-            else:
-                # Connect the operators
-                tOp.tmpInputs[0] = prevOutput    
+                if not self.tensorsSimilar(tOp.tmpInputs[i], inpt):
+                    # Tensors can not be replaced
+                    err.error(None,f"Could not connect graph after operator was",
+                            f"skipped! Tensor '{tOp.tmpInputs[i].name}'"
+                            f"cannot match input '{inpt.name}'!")
 
         self.getOperators().append(tOp)
 
@@ -218,7 +227,13 @@ class ModelBuilder:
             self.__buildOperatorCode(opType)
         
         return self.__opCodeTypeIndexMap[opType]
+    
 
+    def __skippedTensorReplacement(self, tTensor: tflT.Tensor):
+        if tTensor not in self.__skippedOutputMap.keys():
+            err.internal(f"Tensor '{tTensor.name}' was not skipped! But is trying",
+                         "to be replaced!")
+        return self.__skippedOutputMap[tTensor]
 
 
     def tensorExists(self, name: str):
@@ -327,5 +342,7 @@ class ModelBuilder:
 
         return self.__tflModel.operatorCodes
     
-    def getLastOperator(self) -> tflO.Operator:
+    def __getLastOperator(self) -> tflO.Operator:
+        """ Get the last operator in the subGraphs 'operators' list. 
+            Or None if the list is empty. """
         return self.getOperators().getLast()

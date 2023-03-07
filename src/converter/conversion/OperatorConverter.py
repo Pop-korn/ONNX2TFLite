@@ -72,7 +72,7 @@ class OperatorConverter:
             case "Dropout":
                 tOp.builtinOptions = CvtDropout.convert(oNode.attributes)
                 if tOp.builtinOptions is None:
-                    self.__builder.skipOperator()
+                    self.__builder.skipOperator(tOp)
                 return
 
 
