@@ -31,6 +31,10 @@ class Operator(meta.TFLiteObject):
     # TODO customOptions
     # TODO intermediates
 
+
+    """ IMPORTANT! The following attributes are used only by 'ModelBuilder' 
+        in order to make model creation more eficient. """
+
     """ Lists of references to 'Tensor' objects. Simpler to use when converting
         than 'inputs' and 'outputs'. """
     tmpInputs: List[Tensors.Tensor]

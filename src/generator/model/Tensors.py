@@ -33,12 +33,20 @@ class Tensor(meta.TFLiteObject):
     # TODO shapeSignature
     # TODO variantTensors
 
+
+    """ IMPORTANT! The following attributes are used only by 'ModelBuilder' 
+        in order to make model creation more eficient. """
+
     """ Reference to the 'Buffer' object holding this tensors data. 'tmpBuffer' MUST be 
         stored a 'Buffers' object and MUST be referenced using the index 'buffer'.  """
     tmpBuffer: Buffers.Buffer
 
     """ Index to the 'tensors' vector for this tensor. """
     tmpIndex: int
+
+    """ Indicator if the tensor is used in the final model. """
+    tmpUsed: bool
+
 
     def __init__(self, shape: Shape,
                 name: str = None, 

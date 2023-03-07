@@ -16,9 +16,17 @@ class Buffer(meta.TFLiteObject):
     data: np.ndarray
     type: tt.TensorType
 
+
+    """ IMPORTANT! The following attributes are used only by 'ModelBuilder' 
+        in order to make model creation more eficient. """
+
     """ Index to the 'buffers' vector. Used to assign the 'buffer' attribute of the 
         Tensor, this buffer belongs to."""
     tmpIndex: int
+
+    """ Indicator if the buffer is used in the final model. """
+    tmpUsed: bool
+
 
     def __init__(self, data: np.ndarray=None, 
                 type: tt.TensorType=tt.TensorType.INT32) -> None:

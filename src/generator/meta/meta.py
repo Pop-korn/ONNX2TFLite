@@ -48,6 +48,9 @@ class TFLiteVector(TFLiteObject):
     def append(self, item):
         self.vector.append(item)
 
+    def remove(self, item):
+        self.vector.remove(item)
+
     def get(self, index: int):
         return self.vector[index]
     

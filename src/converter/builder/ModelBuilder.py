@@ -65,6 +65,10 @@ class ModelBuilder:
     def finish(self) -> tflM.Model:
         """ Finalize the TFLite model and return it. """
 
+        # Remove unused tensors and bufers
+        self.__markUnusedTensorsAndBuffers()
+        self.__removeUnusedTensorsAndBuffers()
+
         # Assign each buffer its index
         for i, buffer in enumerate(self.getBuffers().vector):
             buffer.tmpIndex = i
@@ -72,6 +76,7 @@ class ModelBuilder:
         # Assign each tensor its index and its buffer index
         for i, tensor in enumerate(self.getTensors().vector):
             tensor.tmpIndex = i
+            print(tensor.name)
             tensor.buffer = tensor.tmpBuffer.tmpIndex
 
         # Assign 'Outputs' and 'Inputs' their tensor inidces
@@ -92,9 +97,48 @@ class ModelBuilder:
                 operator.outputs.append( outputTensor.tmpIndex )
 
         return self.__tflModel
+    
 
+    def __removeUnusedTensorsAndBuffers(self):
+        """ Remove all tensors and buffers from the model, that are not
+            marked as used. """
+        
+        toRemove = []
+        for tensor in self.getTensors().vector:
+            if not tensor.tmpUsed:
+                toRemove.append(tensor)
+        for tensor in toRemove:
+            self.getTensors().remove(tensor)
 
+        toRemove = []
+        for buffer in self.getBuffers().vector:
+            if buffer.tmpUsed:
+                toRemove.append(buffer)
+        for buffer in toRemove:
+            self.getTensors().remove(buffer)
 
+    def __markUnusedTensorsAndBuffers(self):
+        """ Find out which tensors and buffer in the model are actually used.
+            Those that are not, will be marked by setting their 'tmpUsed'
+            attribute to False. """
+        
+        # Mark all unused
+        for tensor in self.getTensors().vector:
+            tensor.tmpUsed = False
+        for buffer in self.getBuffers().vector:
+            buffer.tmpUsed = False
+
+        # Find out which are used
+        for operator in self.getOperators().vector:
+            for tensor in operator.tmpInputs:
+                tensor.tmpUsed = True
+                if tensor.tmpBuffer is not None:
+                    tensor.tmpBuffer.used = True
+
+            for tensor in operator.tmpOutputs:
+                tensor.tmpUsed = True
+                if tensor.tmpBuffer is not None:
+                    tensor.tmpBuffer.used = True
 
 
     def __buildOperatorCode(self, opType: tflBO.BuiltinOperator):
