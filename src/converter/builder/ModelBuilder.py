@@ -23,10 +23,42 @@ class ModelBuilder:
     __tensorNameMap: Dict # Mapping 'str' to 'tflT.Tensor'
     __opCodeTypeIndexMap: Dict # Mapping 'tflBO.BuiltinOperator' to 'int'
 
+    __operatorSkipped: bool
+
     def __init__(self, modelVersion: int, modelDescription: str) -> None:
         self.__tflModel = tflM.Model(modelVersion,modelDescription)
         self.__opCodeTypeIndexMap = {}
         self.__tensorNameMap = {}
+        self.__operatorSkipped = False
+
+
+    def skipOperator(self):
+        self.__operatorSkipped = True
+
+
+    def checkAndAppendOperator(self, tOp: tflO.Operator):
+        """ Append the new TFLite operator the the model. Check that it's input
+            tensors are valid.
+            For example if conversion of the last operator was skipped, this 
+            operator will be correctly connetced with the one before that. """
+        
+        if self.__operatorSkipped:
+            # The previous operator was not converted. So the input tensor of
+            # 'tOp' is not the same as the outpu of the last operator.
+            self.__operatorSkipped = False
+
+            # Compare the tensors
+            prevOutput = self.getLastOperator().tmpOutputs[0]
+            
+            if not self.tensorsSimilar(tOp.tmpInputs[0], prevOutput):
+                err.error(None,f"Could not connect graph after operator was",
+                          f"skipped! Output '{prevOutput.name}' cannot match",
+                          f"input '{tOp.tmpInputs[0].name}'!")
+            else:
+                # Connect the operators
+                tOp.tmpInputs[0] = prevOutput    
+
+        self.getOperators().append(tOp)
 
 
 
@@ -171,7 +203,6 @@ class ModelBuilder:
         return self.getBuffers().len()
 
 
-
     def operatorCodesSize(self):
         """ Return the number of buffers that are currently in the model. """
         return len(self.__opCodeTypeIndexMap.keys())
@@ -191,6 +222,17 @@ class ModelBuilder:
     def appendNewBuffer(self, buffer: tflB.Buffer):
         """ Append the 'buffer' to the 'model.buffers'. """
         self.getBuffers().append(buffer)
+
+
+    def tensorsSimilar(self, tTensor1: tflT.Tensor, tTensor2: tflT.Tensor) -> bool:
+        """ Determine if the given TFLite tensors have the same shape and 
+            datatype. """
+        
+        if tTensor1.type != tTensor2.type:
+            return False
+        
+        return Translator.collectionsEqual(tTensor1.shape.vector, 
+                                           tTensor2.shape.vector)
 
 
 
@@ -241,3 +283,6 @@ class ModelBuilder:
             self.__tflModel.operatorCodes = tflOC.OperatorCodes()
 
         return self.__tflModel.operatorCodes
+    
+    def getLastOperator(self) -> tflO.Operator:
+        return self.getOperators().getLast()

@@ -1,8 +1,6 @@
-from typing import Callable
-
 import src.converter.builder.ModelBuilder as ModelBuilder
 
-from src.converter.builtin import CvtConv, CvtLRN, CvtMaxPool, CvtReshape
+from src.converter.builtin import CvtConv, CvtLRN, CvtMaxPool, CvtReshape, CvtDropout
 
 import src.generator.model.Operators as tflO
 
@@ -65,6 +63,16 @@ class OperatorConverter:
                 implicitOperatorType = False
             case "Reshape":
                 tOp.builtinOptions = CvtReshape.convert(tOp)
+
+
+                """ Operators that might not get converted! """
+            case "Dropout":
+                tOp.builtinOptions = CvtDropout.convert(oNode.attributes)
+                if tOp.builtinOptions is None:
+                    self.__builder.skipOperator()
+                return
+
+
             case _:
                 implicitOperatorType = False
                 err.error(None, f"Conversion of ONNX Operator '{oNode.opType}'",
@@ -75,4 +83,4 @@ class OperatorConverter:
             tOp.opcodeIndex = self.__builder.opCodeIndexForOpType(tOp.builtinOptions.operatorType)
         
 
-        self.__builder.getOperators().append(tOp)
+        self.__builder.checkAndAppendOperator(tOp)

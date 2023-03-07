@@ -43,10 +43,13 @@ def __dimsToNHWC(nchwList: List[int]) -> List[int]:
     return res
 
 
-def __collectionsEqual(colA, colB):
+def collectionsEqual(colA, colB):
     """ Compare each inidividual element of both collections. 
         They can be any combination of lists, tuples or numpy arrays. 
         Return True if they are equal."""
+    if len(colA) != len(colB):
+        return False
+    
     for (a,b) in zip(colA,colB):
         if a != b:
             return False
@@ -122,7 +125,7 @@ def convertTensorData(data: np.ndarray, shape: List[int]):
     
     # Check it worked
     nhwcShape = __dimsToNHWC(shape)
-    if not __collectionsEqual(data.shape, nhwcShape):
+    if not collectionsEqual(data.shape, nhwcShape):
         err.warning(f"Failed to convert data from shape '{shape}'!",
                     f"Got '{data.shape}', expected '{nhwcShape}'.")
 

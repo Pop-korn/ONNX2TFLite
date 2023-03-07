@@ -50,6 +50,11 @@ class TFLiteVector(TFLiteObject):
 
     def get(self, index: int):
         return self.vector[index]
+    
+    def getLast(self):
+        if len(self.vector) > 0:
+            return self.vector[-1]
+        return None
 
     def len(self):
         return self.vector.__len__()
