@@ -1,6 +1,17 @@
 import sys
 from enum import Enum
 
+""" Minumum message importance level to print. """
+class MessageImportance(Enum):
+    UNCHECKED = 0
+    INTERNAL = 1
+    NOTE = 2
+    WARNING = 3
+    ERROR = 4
+
+MIN_OUTPUT_IMPORTANCE = MessageImportance.UNCHECKED
+
+
 class Code(Enum):
     INPUT_FILE_ERR = 1
     UNSUPPORTED_OPERATOR = 2
@@ -10,28 +21,47 @@ class Code(Enum):
     INVALID_ONNX_OPERATOR = 6
     CONVERSION_IMPOSSIBLE = 7
 
-def error(errCode, *args, **kwargs):
+def error(errCode: Code, *args, **kwargs):
     """ Print error message with given parameters. Alse EXIT code execution but ONLY IF
         'errCode' is not None. """
+    if MIN_OUTPUT_IMPORTANCE.value > MessageImportance.ERROR.value:
+        return
+    
     print("\tERROR: ", *args, file=sys.stderr, **kwargs)
     if errCode is not None:
-        exit(errCode)
+        exit(errCode.value)
 
 def warning(*args, **kwargs):
     """ Print warning message with given parameters. """
+
+    if MIN_OUTPUT_IMPORTANCE.value > MessageImportance.WARNING.value:
+        return
+    
     print("\tWARNING: ", *args, file=sys.stderr, **kwargs)
 
 def note(*args, **kwargs):
     """ Print note message with given parameters. """
+    
+    if MIN_OUTPUT_IMPORTANCE.value > MessageImportance.NOTE.value:
+        return
+
     print("\tNOTE: ", *args, file=sys.stderr, **kwargs)
 
 def internal(*args, **kwargs):
     """ Print internal debug/warning message with given parameters. """
+
+    if MIN_OUTPUT_IMPORTANCE.value > MessageImportance.INTERNAL.value:
+        return
+
     print("\tINTERNAL: ", *args, file=sys.stderr, **kwargs)
 
 def unchecked(name: str, *args, **kwargs):
     """ Print internal message informing the user, that a part of code was just run, which
         had not yet been tested. """
+    
+    if MIN_OUTPUT_IMPORTANCE.value > MessageImportance.UNCHECKED.value:
+        return
+
     internal(f"This code has not yet been tested:'{name}'. If everything is working fine, please remove this message.")
     
 def expectType(obj, expectedType, msg: str=""):
