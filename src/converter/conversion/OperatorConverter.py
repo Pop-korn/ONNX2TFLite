@@ -1,6 +1,7 @@
 import src.converter.builder.ModelBuilder as ModelBuilder
 
 from src.converter.builtin import CvtConv, CvtLRN, CvtMaxPool, CvtReshape, CvtDropout
+from src.converter.builtin import CvtSoftmax
 
 import src.generator.model.Operators as tflO
 
@@ -63,6 +64,8 @@ class OperatorConverter:
                 implicitOperatorType = False
             case "Reshape":
                 tOp.builtinOptions = CvtReshape.convert(tOp)
+            case "Softmax":
+                tOp.builtinOptions = CvtSoftmax.convert(oNode.attributes)
 
 
                 """ Operators that might not get converted! """

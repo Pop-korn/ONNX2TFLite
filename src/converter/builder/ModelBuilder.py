@@ -76,7 +76,6 @@ class ModelBuilder:
         # Assign each tensor its index and its buffer index
         for i, tensor in enumerate(self.getTensors().vector):
             tensor.tmpIndex = i
-            print(tensor.name)
             tensor.buffer = tensor.tmpBuffer.tmpIndex
 
         # Assign 'Outputs' and 'Inputs' their tensor inidces
