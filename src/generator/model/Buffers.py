@@ -35,7 +35,10 @@ class Buffer(meta.TFLiteObject):
 
     def __dataIsEmpty(self):
         """ Determine if the buffer data is empty. """
-        return (self.data is None) or (len(self.data) == 0)
+        try:
+            return (self.data is None) or (len(self.data) == 0)
+        except:
+            return True
 
     # -------------------- OLD IMPLEMENTATION (SLOW) --------------------
     # def getPrependFunction(self, builder: fb.Builder):

@@ -1,5 +1,7 @@
 from typing import Dict
 
+import numpy as np
+
 import lib.tflite.BuiltinOperator as tflBO
 
 import src.generator.model.Model as tflM
@@ -73,8 +75,12 @@ class ModelBuilder:
         """ Create a new tensor and buffer, which is exactly the same as 
             'tTensor' except its data is transposed and name is changed. 
             Return the transposed tensor. """
+        
         newTensor = self.duplicateTensor(tTensor, tTensor.name + "_transposed")
-        newTensor.tmpBuffer.data.transpose() # TODO needs testing
+
+        # TODO needs testing
+        newTensor.tmpBuffer.data = np.transpose(newTensor.tmpBuffer.data)
+        newTensor.shape = tflT.Shape(list(newTensor.tmpBuffer.data.shape))
 
         return newTensor
 
@@ -90,15 +96,15 @@ class ModelBuilder:
         newName = self.__validateNewTensorName(newName)
 
         buffer = tflB.Buffer()
-        self.appendNewBuffer(buffer)
-
         if self.tensorHasData(tTensor):
             buffer.data = tTensor.tmpBuffer.data.copy()
-        
-        shape = tflT.Shape(tTensor.shape.vector.copy())
 
+        self.appendNewBuffer(buffer)
+
+        shape = tflT.Shape(tTensor.shape.vector.copy())
         tensor = tflT.Tensor(shape, newName, None, tTensor.type)
         tensor.tmpBuffer = buffer
+
         self.appendNewTensor(tensor)
 
         return tensor
@@ -153,10 +159,10 @@ class ModelBuilder:
 
         toRemove = []
         for buffer in self.getBuffers().vector:
-            if buffer.tmpUsed:
+            if not buffer.tmpUsed:
                 toRemove.append(buffer)
         for buffer in toRemove:
-            self.getTensors().remove(buffer)
+            self.getBuffers().remove(buffer)
 
     def __markUnusedTensorsAndBuffers(self):
         """ Find out which tensors and buffer in the model are actually used.
@@ -166,6 +172,7 @@ class ModelBuilder:
         # Mark all unused
         for tensor in self.getTensors().vector:
             tensor.tmpUsed = False
+
         for buffer in self.getBuffers().vector:
             buffer.tmpUsed = False
 
@@ -174,12 +181,12 @@ class ModelBuilder:
             for tensor in operator.tmpInputs:
                 tensor.tmpUsed = True
                 if tensor.tmpBuffer is not None:
-                    tensor.tmpBuffer.used = True
+                    tensor.tmpBuffer.tmpUsed = True
 
             for tensor in operator.tmpOutputs:
                 tensor.tmpUsed = True
                 if tensor.tmpBuffer is not None:
-                    tensor.tmpBuffer.used = True
+                    tensor.tmpBuffer.tmpUsed = True
 
 
     def __buildOperatorCode(self, opType: tflBO.BuiltinOperator):

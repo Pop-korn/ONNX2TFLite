@@ -105,17 +105,18 @@ def convertPadding(autoPad: str, oPads: List[int],
 def convertTensorData(data: np.ndarray, shape: List[int]):
     """ Convert the data of a tensor from the 'NCHW' to 'NHWC' format. """
 
+    err.expectEqualLists(shape, list(data.shape))
+
     if not __isNCHW(shape):
         # 'data' does not need to be converted
         return data
 
     # Product of all dimensions multiplied together
     size = ft.reduce(lambda a,b : a*b, shape) 
-    if size != len(data):
+    if size != len(data.flatten()):
         err.error(err.Code.INVALID_TENSOR_SHAPE,
             f"Numpy array for tensor of shape '{shape}' should have '{size}'",
-            f"elements, but has '{len(data)}'!",
-            "Make sure the 'parser/Tensor.data' is flat. i.e. has no shape!")
+            f"elements, but has '{len(data)}'!")
 
     # Assign 'data' its current shape
     data.shape = shape

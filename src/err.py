@@ -75,3 +75,33 @@ def expectType(obj, expectedType, msg: str=""):
 def requireType(obj, requiredType, msg: str=""):
     if type(obj) != requiredType:
         error(Code.INVALID_TYPE, f"Object '{obj}' is of type '{type(obj)}' where '{requiredType}' was required!",msg) 
+
+def expectEqual(val1, val2, msg: str=""):
+    """ Compare two values. If they are different, print warning message. """
+
+    try:
+        if val1 != val2:
+            warning(msg,":",f"'{val1}' does not equal '{val2}'!")
+    except:
+        warning(msg,":",f"Values '{val1}' and '{val2}' could not be compared!")
+
+def expectEqualLists(list1, list2, msg: str=""):
+    """ Compare two lists. If they are different, print warning message. """
+    
+    try:
+
+        equal = True
+
+        if len(list1) != len(list2):
+            equal = False
+
+        for el1, el2 in zip(list1,list2):
+            if el1 != el2:
+                equal = False
+                break
+
+        if not equal:
+            warning(msg,":",f"'{list1}' does not equal '{list2}'!")
+
+    except:
+        warning(msg,":",f"Lists '{list1}' and '{list2}' could not be compared!")

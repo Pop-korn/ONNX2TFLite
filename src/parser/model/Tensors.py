@@ -36,7 +36,9 @@ class Tensor(meta.ONNXObject):
         self.name = descriptor.name
         self.docString = descriptor.doc_string
         self.dataLocation = descriptor.data_location
+
         self.__assignData()
+        self.data =np.reshape(self.data, self.dims)
 
     
     def __hasRawData(self):
