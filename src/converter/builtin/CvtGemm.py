@@ -49,7 +49,8 @@ def convert(oGemm: onnxGemm.Gemm,
                 __notYetSupported(oGemm)
 
         """ Inputs have been transposed. Now convert the operator. """
-        print("ahoj")
+        tFC = tflFullyConnected.FullyConnected()
+        return tFC
                 
 
     else:

@@ -94,11 +94,10 @@ class ModelBuilder:
 
         if self.tensorHasData(tTensor):
             buffer.data = tTensor.tmpBuffer.data.copy()
-            
-        tensor = tflT.Tensor(tTensor.shape.vector.copy(),
-                             newName,
-                             None,
-                             tTensor.type)
+        
+        shape = tflT.Shape(tTensor.shape.vector.copy())
+
+        tensor = tflT.Tensor(shape, newName, None, tTensor.type)
         tensor.tmpBuffer = buffer
         self.appendNewTensor(tensor)
 
@@ -260,7 +259,6 @@ class ModelBuilder:
         suffix = 0
         newName = name
         while self.tensorExists(newName):
-            err.unchecked("'ModelBuilder.__validateNewTensorName()'")
             newName = name + str(suffix)
             suffix += 1
 
