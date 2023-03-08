@@ -49,7 +49,6 @@ class ModelBuilder:
             self.__skippedOutputMap[skipped] = replacement
 
 
-
     def checkAndAppendOperator(self, tOp: tflO.Operator):
         """ Append the new TFLite operator the the model. Check that it's input
             tensors are valid.
@@ -69,7 +68,42 @@ class ModelBuilder:
 
         self.getOperators().append(tOp)
 
+    
+    def createTransposedTensor(self, tTensor: tflT.Tensor) -> tflT.Tensor:
+        """ Create a new tensor and buffer, which is exactly the same as 
+            'tTensor' except its data is transposed and name is changed. 
+            Return the transposed tensor. """
+        newTensor = self.duplicateTensor(tTensor, tTensor.name + "_transposed")
+        newTensor.tmpBuffer.data.transpose() # TODO needs testing
 
+        return newTensor
+
+
+    def duplicateTensor(self, tTensor: tflT.Tensor, 
+                        newName: str) -> tflT.Tensor:
+        """ Properly create and register a new TFLite tensor, add it to the 
+            model and return it. 
+            The new tensors 'newName' will be used, unless a tensor with that
+            name already exists. In which case the name will be slightelly 
+            altered. """
+        
+        newName = self.__validateNewTensorName(newName)
+
+        buffer = tflB.Buffer()
+        self.appendNewBuffer(buffer)
+
+        if self.tensorHasData(tTensor):
+            buffer.data = tTensor.tmpBuffer.data.copy()
+            
+        tensor = tflT.Tensor(tTensor.shape.vector.copy(),
+                             newName,
+                             None,
+                             tTensor.type)
+        tensor.tmpBuffer = buffer
+        self.appendNewTensor(tensor)
+
+        return tensor
+        
 
     def finish(self) -> tflM.Model:
         """ Finalize the TFLite model and return it. """
@@ -207,7 +241,7 @@ class ModelBuilder:
 
     def buildEmptyBuffer(self) -> tflB.Buffer:
         """ Create, register and return a new empty 'Buffer' object. """
-        buffer = tflB.Buffer([])
+        buffer = tflB.Buffer()
 
         self.getBuffers().append(buffer)
 
@@ -217,6 +251,22 @@ class ModelBuilder:
 
     """ -------------------- 'quality of life' functions. -------------------- """
 
+
+    def __validateNewTensorName(self, name: str) -> str:
+        """ Take tensor name 'name' and make it unique in the model.
+            Returns a unique tensor name. """
+        
+        # Try adding numbers to the 'name' until it is unique
+        suffix = 0
+        newName = name
+        while self.tensorExists(newName):
+            err.unchecked("'ModelBuilder.__validateNewTensorName()'")
+            newName = name + str(suffix)
+            suffix += 1
+
+        return newName
+            
+                
 
     def opCodeIndexForOpType(self, opType: tflBO.BuiltinOperator):
         """ Return the index to the 'operator_codes' vector in the TFLite model for
@@ -291,6 +341,23 @@ class ModelBuilder:
         
         return Translator.collectionsEqual(tTensor1.shape.vector, 
                                            tTensor2.shape.vector)
+    
+
+    def tensorHasData(slef, tTensor: tflT.Tensor) -> bool:
+        """ Determine if given TFLite tensor has any data. """
+        try:
+            size = tTensor.tmpBuffer.data.size
+
+            # Make sure this function is valid
+            if size < 10:
+                err.unchecked("'ModelBuilder.tensorHasData()' Tensor",
+                              f"'{tTensor.name}' has data.size = '{size}'.")
+                
+            return size != 0
+        except:
+            err.internal("'ModelBuilder.tensorHasData()' called with",
+                         "uninitialized tensor!")
+            return False
 
 
 

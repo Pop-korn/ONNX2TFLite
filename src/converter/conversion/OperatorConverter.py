@@ -1,7 +1,7 @@
 import src.converter.builder.ModelBuilder as ModelBuilder
 
 from src.converter.builtin import CvtConv, CvtLRN, CvtMaxPool, CvtReshape, CvtDropout
-from src.converter.builtin import CvtSoftmax
+from src.converter.builtin import CvtSoftmax, CvtGemm
 
 import src.generator.model.Operators as tflO
 
@@ -54,6 +54,10 @@ class OperatorConverter:
         match(oNode.opType):
             case "Conv":
                 tOp.builtinOptions = CvtConv.convert(oNode.attributes)
+            case "Gemm":
+                tOp.builtinOptions = CvtGemm.convert(oNode.attributes,
+                                                     tOp,
+                                                     self.__builder)
             case "LRN":
                 tOp.builtinOptions = CvtLRN.convert(oNode.attributes)
             case "MaxPool":

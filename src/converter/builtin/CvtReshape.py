@@ -1,7 +1,5 @@
 import src.err as err
 
-import lib.tflite.BuiltinOperator as tflBO
-
 import src.generator.builtin.Reshape as tflReshape
 import src.generator.meta.meta as tflMeta
 import src.generator.model.Operators as tflOperators
