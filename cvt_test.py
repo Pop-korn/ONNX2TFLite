@@ -6,39 +6,48 @@ import onnx
 
 import numpy as np
 
-image = Image.open("data/224x224/cat2.jpg")
-image = [np.asarray(image).tolist()]
-image = np.asarray(image, np.float32)
-nchwImage = np.moveaxis(image,3,1)
+def printStats(formatName, output):
+    print(formatName)
+    print(f"\tMax: output[{output.argmax()}] = {output.max()}")
+    print(f"\tSum = {output.sum()}")
+    print(f"\tMean = {output.mean()}")
+    print(f"\tStd = {output.std()}")
 
-onnxModel = onnx.load("data/onnx/bvlcalexnet-12.onnx")
-onnx.checker.check_model(onnxModel)
+def nchw(image):
+    return np.moveaxis(image,3,1)
 
-ortSession = ort.InferenceSession("data/onnx/bvlcalexnet-12.onnx")
-onnxOutput = ortSession.run(None, {ortSession.get_inputs()[0].name : nchwImage})
-onnxOutput = np.asarray(onnxOutput).squeeze()
-print("ONNX:")
-print(f"\tMax: output[{onnxOutput.argmax()}] = {onnxOutput.max()}")
-print(f"\tSum = {onnxOutput.sum()}")
-print(f"\tMean = {onnxOutput.mean()}")
-print(f"\tStd = {onnxOutput.std()}")
+def loadImage(file):
+    img = Image.open(file)
+    img = [np.asarray(img).tolist()]
+    return np.asarray(img, np.float32)
 
+def runOnnxModel(modelFile, image):
+    model = onnx.load(modelFile)
+    onnx.checker.check_model(model)
 
-tflModel = tf.lite.Interpreter(model_path="test/alexnet.tflite")
-tflModel.allocate_tensors()
+    sess = ort.InferenceSession(modelFile)
+    
+    res = sess.run(None, {sess.get_inputs()[0].name : nchw(image)})
+    return np.asarray(res).squeeze()
 
+def runTFLiteModel(modelFile, image):
+    tflModel = tf.lite.Interpreter(model_path=modelFile)
+    tflModel.allocate_tensors()
 
+    inDet = tflModel.get_input_details()
+    outDet = tflModel.get_output_details()
 
-inpt = tflModel.get_input_details()
-outpt = tflModel.get_output_details()
+    tflModel.set_tensor(inDet[0]['index'], image)
 
-tflModel.set_tensor(inpt[0]['index'], image)
+    tflModel.invoke()
 
-tflModel.invoke()
+    return tflModel.get_tensor(outDet[0]['index'])
 
-tflOutput:np.ndarray = tflModel.get_tensor(outpt[0]['index'])
-print("TFLite:")
-print(f"\tMax: output[{tflOutput.argmax()}] = {tflOutput.max()}")
-print(f"\tSum = {tflOutput.sum()}")
-print(f"\tMean = {tflOutput.mean()}")
-print(f"\tStd = {tflOutput.std()}")
+image = loadImage("data/224x224/cat2.jpg")
+
+onnxOut = runOnnxModel("data/onnx/bvlcalexnet-12.onnx", image)
+
+tflOut = runTFLiteModel("test/alexnet.tflite", image)
+
+printStats("ONNX", onnxOut)
+printStats("TFLite", tflOut)
