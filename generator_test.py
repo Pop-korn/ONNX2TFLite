@@ -24,6 +24,8 @@ import src.generator.builtin.FullyConnected as FullyConnected
 import src.generator.builtin.Softmax as Softmax
 
 
+
+
 """ Generate a basic .tflite model. 
 Should behave identically to the '/data/cifar10/cifar10_model.tflite'.
 """

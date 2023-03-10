@@ -31,8 +31,13 @@ def convert(oGemm: onnxGemm.Gemm,
         if oGemm.transA:
             __notYetSupported(oGemm)
 
-        if oGemm.transB:
-            """ Input tensorB needs to be transposed. """
+        if not oGemm.transB:
+            """ Input tensorB needs to be transposed. ONNX needs its tensors
+                to bo correctly transposed for multiplication. TFLite instead
+                needs the second dimension of both tensors to be the same size.
+                So if ONNX doesn't need to transpose, TFLite does. """
+
+            err.unchecked("CvtGemm.convert()")
             
             if modelBuilder.tensorHasData(tensorB):
                 """ A stored tensor needs to be transposed. This can be done
@@ -49,7 +54,7 @@ def convert(oGemm: onnxGemm.Gemm,
                 __notYetSupported(oGemm)
 
         """ Inputs have been transposed. Now convert the operator. """
-        tFC = tflFullyConnected.FullyConnected()
+        tFC = tflFullyConnected.FullyConnected(keepNumDims=True)
         return tFC
                 
 

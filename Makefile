@@ -3,7 +3,10 @@
 all:
 	python3 ./main.py
 
-test: all
+test:
+	python3 cvt_test.py
+
+to-json: all
 	flatc -t --strict-json --defaults-json -o test data/schemas/tflite/schema.fbs -- test/alexnet.tflite --raw-binary 
 
 generator-test:

@@ -10,7 +10,7 @@ import src.converter.conversion.TensorConverter as TensorConverter
 def convertModel(oM: onnxM.Model) -> tflM.Model:
     description="doc:'"+oM.docString+f"' domain:'"+oM.domain+"' producer:'"+oM.producerName+" "+oM.producerVersion+"'"
 
-    builder = ModelBuilder.ModelBuilder(oM.modelVersion, description)
+    builder = ModelBuilder.ModelBuilder(3, description)
     operatorCvt = OperatorConverter.OperatorConverter(builder)
     tensorCvt = TensorConverter.TensorConverter(builder)
     
