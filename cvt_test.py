@@ -63,6 +63,24 @@ def createReducedOnnxModelFrom(fromModel, newModel, lastNode):
     while len(model.graph.node) > lastNode + 1:
         model.graph.node.pop()
 
+    usedTensors = []
+    for node in model.graph.node:
+        for inpt in node.input:
+            usedTensors.append(inpt)
+        for outpt in node.output:
+            usedTensors.append(outpt)
+
+    tensorsToKeep = []
+    for tensor in model.graph.initializer:
+        if tensor.name in usedTensors:
+            tensorsToKeep.append(tensor)
+
+    while len(model.graph.initializer) != 0:
+        model.graph.initializer.pop()
+
+    for tensor in tensorsToKeep:
+        model.graph.initializer.append(tensor)
+
     onnx.save(model,newModel)
 
 
