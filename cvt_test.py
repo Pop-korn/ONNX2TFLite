@@ -96,29 +96,32 @@ def createReducedOnnxModelFrom(fromModel, newModel, lastNode):
     onnx.save(model,newModel)
 
 
+def reduceConvertAndTestModel(originalOnnxFile, outOnnxFile, 
+                             outTfliteFile, numOpsToPreserve,
+                             imageFile):
+    
+    image = loadImage(imageFile)
+
+    createReducedOnnxModelFrom(originalOnnxFile, outOnnxFile, numOpsToPreserve-1)
+
+    convert.convertModel(outOnnxFile, outTfliteFile)
+
+    onnxOut = runOnnxModel(outOnnxFile, image)
+
+    tflOut = runTFLiteModel(outTfliteFile, image)
+
+    printStats("ONNX", onnxOut)
+    printStats("TFLite", tflOut)
+
+
+
 
 """ -------------------- Start of execution -------------------- """
 
+
 imageFile = "data/224x224/cat1.jpg"
-originalOnnxFile = "data/onnx/bvlcalexnet-12.onnx"
+onnxFile = "data/onnx/bvlcalexnet-12.onnx"
 
-# Reduced files
-onnxFile = "test/alexnet_reduced.onnx"
-tfliteFile = "test/alexnet_reduced.tflite"
-
-# Chose how many operators from the original model should be kept
-numOpsToPreserve = 3
-# ---------------------------------------------------------------
-
-image = loadImage(imageFile)
-
-createReducedOnnxModelFrom(originalOnnxFile, onnxFile, numOpsToPreserve-1)
-
-convert.convertModel(onnxFile, tfliteFile)
-
-onnxOut = runOnnxModel(onnxFile, image)
-
-tflOut = runTFLiteModel(tfliteFile, image)
-
-printStats("ONNX", onnxOut)
-printStats("TFLite", tflOut)
+reduceConvertAndTestModel(onnxFile, "test/alexnet_reduced.onnx",
+                          "test/alexnet_reduced.tflite", 16, 
+                          imageFile)

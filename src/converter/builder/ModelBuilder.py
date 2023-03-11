@@ -164,6 +164,7 @@ class ModelBuilder:
         for buffer in toRemove:
             self.getBuffers().remove(buffer)
 
+
     def __markUnusedTensorsAndBuffers(self):
         """ Find out which tensors and buffer in the model are actually used.
             Those that are not, will be marked by setting their 'tmpUsed'
@@ -255,6 +256,7 @@ class ModelBuilder:
 
 
 
+
     """ -------------------- 'quality of life' functions. -------------------- """
 
 
@@ -271,7 +273,6 @@ class ModelBuilder:
 
         return newName
             
-                
 
     def opCodeIndexForOpType(self, opType: tflBO.BuiltinOperator):
         """ Return the index to the 'operator_codes' vector in the TFLite model for
@@ -408,11 +409,13 @@ class ModelBuilder:
 
         return subGraph.operators
 
+
     def getOperatorCodes(self) -> tflOC.OperatorCodes:
         if self.__tflModel.operatorCodes is None:
             self.__tflModel.operatorCodes = tflOC.OperatorCodes()
 
         return self.__tflModel.operatorCodes
+    
     
     def __getLastOperator(self) -> tflO.Operator:
         """ Get the last operator in the subGraphs 'operators' list. 

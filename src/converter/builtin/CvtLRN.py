@@ -14,16 +14,16 @@ def convert(oLRN: onnxLRN.LRN) -> tflMeta.BuiltinOptions:
 
     if oLRN.size % 2 == 0:
         err.warning(f"ONNX: LRN Operator has even size ({oLRN.size}).",
-                    "Therefore the generated TFLite model might NOT be identical!")
+                    "So the generated TFLite model might NOT be identical!")
         # ONNX inference uses 'ciel(size/2)' and 'floor(size/2)'
         # TFLite inference only uses radius, so 'floor(size/2)'
 
-    tLRN.radius = oLRN.size//2
+    tLRN.radius = oLRN.size // 2
     tLRN.bias = oLRN.bias
     
-    # Probably due to float accuracy, TFLite operator will give slightelly
-    # different output. Difference appears to be on the scale of 10^(-4)
-    tLRN.alpha = oLRN.alpha/oLRN.size 
+    # Probably due to float accuracy, TFLite operator will give slightly
+    # different output. Difference appears to be on the scale of 10^(-4).
+    tLRN.alpha = oLRN.alpha / oLRN.size 
     
     tLRN.beta = oLRN.beta
 
