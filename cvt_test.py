@@ -6,6 +6,8 @@ import onnx
 
 import numpy as np
 
+import main
+
 def printStats(formatName, output):
     print(formatName)
     print(f"\tMax: output[{output.argmax()}] = {output.max()}")
@@ -43,11 +45,47 @@ def runTFLiteModel(modelFile, image):
 
     return tflModel.get_tensor(outDet[0]['index'])
 
-image = loadImage("data/224x224/cat2.jpg")
+def createReducedOnnxModelFrom(fromModel, newModel, lastNode):
+    model = onnx.load(fromModel)
 
-onnxOut = runOnnxModel("data/onnx/bvlcalexnet-12.onnx", image)
+    for vi in model.graph.value_info:
+        if vi.name == model.graph.node[lastNode].output[0]:
+            model.graph.output[0].name = vi.name
+            model.graph.output[0].doc_string = vi.doc_string
+            model.graph.output[0].type.tensor_type.elem_type = vi.type.tensor_type.elem_type
+            for i in range(len(model.graph.output[0].type.tensor_type.shape.dim)):
+                model.graph.output[0].type.tensor_type.shape.dim.pop()
+            for i in range(len(vi.type.tensor_type.shape.dim)):
+                model.graph.output[0].type.tensor_type.shape.dim.append(vi.type.tensor_type.shape.dim[i])
 
-tflOut = runTFLiteModel("test/alexnet.tflite", image)
+    while len(model.graph.node) > lastNode + 1:
+        model.graph.node.pop()
+
+    onnx.save(model,newModel)
+
+
+
+""" -------------------- Start of execution -------------------- """
+
+imageFile = "data/224x224/cat1.jpg"
+originalOnnxFile = "data/onnx/bvlcalexnet-12.onnx"
+
+# Reduced files
+onnxFile = "test/alexnet_reduced.onnx"
+tfliteFile = "test/alexnet_reduced.tflite"
+
+image = loadImage(imageFile)
+
+createReducedOnnxModelFrom(originalOnnxFile, onnxFile, 0)
+
+print("AA")
+
+# main.convertModel("test/alexnet_reduced.onnx", "test/alexnet_reduced.tflite")
+main.convertModel(onnxFile, tfliteFile)
+
+onnxOut = runOnnxModel(onnxFile, image)
 
 printStats("ONNX", onnxOut)
+tflOut = runTFLiteModel(tfliteFile, image)
+
 printStats("TFLite", tflOut)

@@ -2,6 +2,8 @@ bvlcalexnet-12.onnx
 alexnet.tflite
 alexnet.json
 classes.txt
+.vscode/
+alexnet_reduced.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

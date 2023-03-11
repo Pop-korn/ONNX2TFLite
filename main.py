@@ -4,15 +4,18 @@ import src.converter.convert as convert
 
 import flatbuffers as fb
 
-onnxModel = m.Model("data/onnx/bvlcalexnet-12.onnx")
+def convertModel(onnxFile, tfliteFile):
+    onnxModel = m.Model(onnxFile)
 
-tflModel = convert.convertModel(onnxModel)
+    tflModel = convert.convertModel(onnxModel)
 
-fbB = fb.Builder(2000000000)
+    fbB = fb.Builder(2000000000)
 
-tflModel.genTFLite(fbB)
+    tflModel.genTFLite(fbB)
 
-buffer = fbB.Output()
+    buffer = fbB.Output()
 
-with open("test/alexnet.tflite","wb") as f:
-    f.write(buffer)
+    with open(tfliteFile, "wb") as f:
+        f.write(buffer)
+
+# convertModel("data/onnx/bvlcalexnet-12.onnx", "test/alexnet.tflite")
