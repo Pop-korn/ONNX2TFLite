@@ -10,7 +10,9 @@ Currently supported:
 
 Project should be in a usable state by June 2023. For now, you can download the *bvlcalexnet-12.onnx* model from https://github.com/onnx/models/blob/main/vision/classification/alexnet/model/bvlcalexnet-12.onnx, save it in the *data/onnx* directory and run *make* from the root directory to try and convert the model.
 
-Project comes with *ONNX* and *TFLite* schemas pre-installed and libraries pre-compiled. You can delete the *data/schemas* and *lib* directories and run *make install*  in the root directory to get the schemas and complie them yourself.
+The only python packages required for model conversion are *numpy* and *flatbuffers*. Others are used just for testing. To install all used python packages, run *make install* in the root directory. There is a requirement confilct between tensorflow and onnx over protobuf version. This program doesn't require that part of tensorflow functionality, so if there is a problem during instalation, run **pip install onnx==1.13.0**. Conversion testing should now work.
+
+Project comes with *ONNX* and *TFLite* schemas pre-installed and libraries pre-compiled. If you want, you can delete the *data/schemas* and *lib* directories and run *make regenerate-lib*  in the root directory to get the schemas and complie them yourself. THIS MAT CAUSE *make test* TO NOT WORK!
 
 ---
 ## Structure

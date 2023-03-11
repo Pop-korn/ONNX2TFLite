@@ -3,6 +3,9 @@
 all:
 	python3 ./main.py
 
+install:
+	pip install -r requirements.txt
+
 test:
 	python3 cvt_test.py
 
@@ -18,15 +21,15 @@ get-schemas:
 	wget -P ./data/schemas/onnx/onnx/ https://raw.githubusercontent.com/onnx/onnx/main/onnx/onnx-ml.proto
 	wget -P ./data/schemas/onnx/ https://raw.githubusercontent.com/onnx/onnx/main/onnx/onnx-data.proto
 	wget -P ./data/schemas/onnx/ https://raw.githubusercontent.com/onnx/onnx/main/onnx/onnx-operators-ml.proto
-create-lib-dir:
-	mkdir -p lib
-	mkdir -p lib/onnx
 compile-tflite-schema:
 	flatc -p -o ./lib/ data/schemas/tflite/schema.fbs
 compile-onnx-schema:
+	mkdir -p lib
+	mkdir -p lib/onnx
 	cd data/schemas/onnx ; protoc --python_out=../../../lib/onnx onnx/onnx-ml.proto onnx-operators-ml.proto onnx-data.proto
+regenrate-lib: get-schemas compile-tflite-schema compile-onnx-schema
 
-install: create-lib-dir get-schemas compile-tflite-schema compile-onnx-schema
+
 
 
 LB := (
