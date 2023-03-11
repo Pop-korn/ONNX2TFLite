@@ -6,7 +6,9 @@ import onnx
 
 import numpy as np
 
-import main
+import src.converter.convert as convert
+
+""" This file provides functions to  """
 
 def printStats(formatName, output):
     print(formatName)
@@ -74,18 +76,19 @@ originalOnnxFile = "data/onnx/bvlcalexnet-12.onnx"
 onnxFile = "test/alexnet_reduced.onnx"
 tfliteFile = "test/alexnet_reduced.tflite"
 
+# Chose how many operators from the original model should be kept
+numOpsToPreserve = 3
+# ---------------------------------------------------------------
+
 image = loadImage(imageFile)
 
-createReducedOnnxModelFrom(originalOnnxFile, onnxFile, 0)
+createReducedOnnxModelFrom(originalOnnxFile, onnxFile, numOpsToPreserve-1)
 
-print("AA")
-
-# main.convertModel("test/alexnet_reduced.onnx", "test/alexnet_reduced.tflite")
-main.convertModel(onnxFile, tfliteFile)
+convert.convertModel(onnxFile, tfliteFile)
 
 onnxOut = runOnnxModel(onnxFile, image)
 
-printStats("ONNX", onnxOut)
 tflOut = runTFLiteModel(tfliteFile, image)
 
+printStats("ONNX", onnxOut)
 printStats("TFLite", tflOut)
