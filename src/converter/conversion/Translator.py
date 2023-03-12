@@ -19,7 +19,7 @@ import lib.tflite.Padding as tflPad
 """ -------------------- Private Helper Functions -------------------- """
 
 
-def __isNCHW(dims: List[int]) -> bool:
+def isNCHW(dims: List[int]) -> bool:
     """ Figure out if given 'dims' is in the 'nchw' format. """
 
     # TODO Improve
@@ -107,7 +107,7 @@ def convertTensorData(data: np.ndarray, shape: List[int]):
 
     err.expectEqualLists(shape, list(data.shape))
 
-    if not __isNCHW(shape):
+    if not isNCHW(shape):
         # 'data' does not need to be converted
         return data
 
@@ -147,7 +147,7 @@ def convertShapeDims(oDims: List[int]) -> tflT.Shape:
     
     dims = [dim for dim in oDims] # Copy just in case
 
-    if __isNCHW(dims):
+    if isNCHW(dims):
         dims = __dimsToNHWC(dims)
 
     return tflT.Shape(dims)

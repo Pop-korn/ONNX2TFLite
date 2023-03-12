@@ -67,7 +67,7 @@ class OperatorConverter:
                 tOp.opcodeIndex = self.__builder.opCodeIndexForOpType(tflBO.BuiltinOperator.RELU)
                 implicitOperatorType = False
             case "Reshape":
-                tOp.builtinOptions = CvtReshape.convert(tOp)
+                tOp.builtinOptions = CvtReshape.convert(tOp, self.__builder)
             case "Softmax":
                 tOp.builtinOptions = CvtSoftmax.convert(oNode.attributes)
 
