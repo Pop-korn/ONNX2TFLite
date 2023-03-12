@@ -29,7 +29,7 @@ class TensorConverter:
 
             if self.__builder.tensorExists(oTensor.name):
                 # Tensor was already created using a different function
-                return 
+                continue 
 
             buffer = self.__builder.buildEmptyBuffer()
             self.__builder.buildEmptyTensor(oTensor, buffer)
