@@ -83,18 +83,14 @@ class ModelBuilder:
 
 
     def skipOperator(self, tOp: tflO.Operator):
-        """ Map the outputs of 'tOp' to the outputs of the previous operator,
-            or the graph input. """
-        
-        lastOperator = self.__getLastOperator()
-        if lastOperator is None:
-            # The very first operator is being skipped
-            lastOutputs = self.getSubgraph().inputs.tmpInputs
-            err.unchecked("ModelBuilder.skipOperator(): first operator.")
-        else:
-            lastOutputs = lastOperator.tmpOutputs
+        """ Map the outputs of 'tOp' to the inputs of 'tOp'. Future references 
+            to the outputs of 'tOp' will be substituted for its inputs. This is
+            done in the 'checkAndAppendOperator()' method. """
 
-        for skipped, replacement in zip(tOp.tmpOutputs, lastOutputs):
+        for skipped, replacement in zip(tOp.tmpOutputs, tOp.tmpInputs):
+            if skipped in self.__skippedOutputMap.keys():
+                err.internal(f"skipOperator: tensor '{skipped.name}' is already"
+                             , "mapped to something!")
             self.__skippedOutputMap[skipped] = replacement
 
             # If the ouput of the skipped operator was the output of the whole
