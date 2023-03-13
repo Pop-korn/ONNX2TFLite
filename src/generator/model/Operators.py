@@ -48,9 +48,13 @@ class Operator(meta.TFLiteObject):
         self.opcodeIndex = opcodeIndex
         self.customOptionsFormat = customOptionsFormat
         self.mutatingVariableInputs = mutatingVariableInputs
-        self.inputs = inputs
-        self.outputs = outputs
         self.builtinOptions = builtinOptions
+        if inputs is None:
+            inputs = Inputs([])
+        self.inputs = inputs
+        if outputs is None:
+            outputs = Outputs([])
+        self.outputs = outputs
 
         self.tmpInputs = []
         self.tmpOutputs = []

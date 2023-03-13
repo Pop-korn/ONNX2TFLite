@@ -12,6 +12,10 @@ def convert(tflOperator: tflOperators.Operator,
     """ Convert ONNX 'Reshape' to TFLite 'Reshape'. """
 
     try:    
+        if len(tflOperator.tmpInputs) != 2:
+            err.warning("ONNX: Reshape operator doesn't have 2 inputs!",
+                        "Conversion behaviour is undefined!")
+
         buffer = tflOperator.tmpInputs[1].tmpBuffer
 
         newShape = buffer.data.tolist()
@@ -29,12 +33,12 @@ def convert(tflOperator: tflOperators.Operator,
                     If equivalent NCHW and NHWC tensors are flattened,
                     the result will be different! So input first needs to be
                     converted to NCHW. """
-                # TODO Prepend operator, to transform input
-                pass
+                tflOperator.tmpInputs[0] = modelBuilder.nchwVersionOf(tflOperator.tmpInputs[0])
 
         return tReshape
     
-    except:
+    except Exception as e:
+        print(e)
         err.error(err.Code.INVALID_ONNX_OPERATOR, 
-                  "ONNX Reshape did NOT have a 'shape' input tensor.")
+                  "ONNX Reshape conversion failed!")
         

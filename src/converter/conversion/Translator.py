@@ -29,6 +29,17 @@ def isNCHW(dims: List[int]) -> bool:
     return False
 
 
+def __dimsToNCHW(nhwcList: List[int]) -> List[int]:
+    """ Convert a list of ints which represent dimensions from NHWC to NCHW. """
+
+    res = [nhwcList[0]] # First element is 'n'
+
+    res.append(nhwcList[-1]) # Channels
+
+    res[2:] = nhwcList[1:-1] # Move h,w,... one to the right
+
+    return res
+
 def __dimsToNHWC(nchwList: List[int]) -> List[int]:
     """ Convert a list of ints which represent dimensions from NCHW to NHWC. """
 
@@ -70,6 +81,13 @@ def __isSAMEPadding(oPads: List[int], oKernelShape: List[int]):
 
 
 """ -------------------- Public Functions -------------------- """
+
+
+def shapeFromNumpy(numpyArray):
+    """ Return a 'Shape' object representing the shape of given 'numpyArray'. 
+    """
+    dims = list(numpyArray.shape)
+    return tflT.Shape(dims)
 
 
 def convertPadding(autoPad: str, oPads: List[int], 
@@ -141,6 +159,15 @@ def convertShape(oShape: onnxTS.TensorShape) -> tflT.Shape:
     return convertShapeDims(dims)
 
 
+def NHWCShapeToNCHW(nhwcShape: tflT.Shape) -> tflT.Shape:
+    """ Create an NCHW version of an NHWC 'generator/shape' object. """
+
+    dims = nhwcShape.vector.copy()
+    dims = __dimsToNCHW(dims)
+
+    return tflT.Shape(dims)
+
+
 def convertShapeDims(oDims: List[int]) -> tflT.Shape:
     """ Convert list of ints representing the shape of an ONNX Tensor
         to a TFLite 'Shape' object. """
@@ -151,6 +178,15 @@ def convertShapeDims(oDims: List[int]) -> tflT.Shape:
         dims = __dimsToNHWC(dims)
 
     return tflT.Shape(dims)
+
+
+def createToNCHWPerm(dims: List[int]) -> np.ndarray:
+    """ Take 'dims' in NHWC and return a numpy array, holding data that 
+        describes the permutation which would change 'dims' to NCHW. """
+    
+    perm = __dimsToNCHW( list(range(len(dims))) )
+
+    return np.asarray(perm, np.int32)
 
 
 def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
@@ -211,3 +247,61 @@ def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
             err.warning("Cannot convert ONNX DataType 'BFLOAT16' to TFLite.",
                         "Using 'FLOAT16'.")
             return tflTT.TensorType.FLOAT16
+
+
+
+def numpyTypeToTFLite(numpyType) -> tflTT.TensorType:
+    """ Convert numpy dtype to TFLite TensorType """
+
+    match numpyType:
+        case np.float32:
+            return tflTT.TensorType.FLOAT32
+
+        case np.uint8:
+            return tflTT.TensorType.UINT8
+
+        case np.int8:
+            return tflTT.TensorType.INT8
+
+        case np.uint16:
+            return tflTT.TensorType.UINT16
+
+        case np.int16:
+            return tflTT.TensorType.INT16
+
+        case np.int32:
+            return tflTT.TensorType.INT32
+
+        case np.int64:
+            return tflTT.TensorType.INT64
+
+        case np.string_:
+            return tflTT.TensorType.STRING
+
+        case np.bool_:
+            return tflTT.TensorType.BOOL
+
+        case np.float16:
+            return tflTT.TensorType.FLOAT16
+
+        case np.float64:
+            return tflTT.TensorType.FLOAT64
+        case np.double:
+            return tflTT.TensorType.FLOAT64
+
+        case np.uint32:
+            return tflTT.TensorType.UINT32
+
+        case np.uint64:
+            return tflTT.TensorType.UINT64
+
+        case np.complex64:
+            return tflTT.TensorType.COMPLEX64
+
+        case np.complex128:
+            return tflTT.TensorType.COMPLEX128
+            
+        case _:
+            err.warning(f"Cannot convert numpy data type '{numpyType}'",
+                        "to TFLite.")
+            return tflTT.TensorType.FLOAT32

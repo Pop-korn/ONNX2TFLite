@@ -1,18 +1,29 @@
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 
-import lib.tflite.BuiltinOperator as tflBO
+from lib.tflite import (
+    BuiltinOperator as tflBO,
+    TensorType as tflTT
+)
 
-import src.generator.model.Model as tflM
-import src.generator.model.SubGraphs as tflSG
-import src.generator.model.Buffers as tflB
-import src.generator.model.Tensors as tflT
-import src.generator.model.Operators as tflO
-import src.generator.model.OperatorCodes as tflOC
+from src.generator.model import (
+    Model as tflM,
+    SubGraphs as tflSG,
+    Buffers as tflB,
+    Tensors as tflT,
+    Operators as tflO,
+    OperatorCodes as tflOC
+)
 
-import src.parser.model.ValueInfo as onnxVI
-import src.parser.model.Tensors as onnxT
+from src.parser.model import (
+    ValueInfo as onnxVI,
+    Tensors as onnxT
+)
+
+from src.generator.builtin import (
+    Transpose as tflTranspose
+)
 
 import src.converter.conversion.Translator as Translator
 
@@ -22,17 +33,53 @@ class ModelBuilder:
     """ This class provides methods to build a TFLite model by parts. """
     
     __tflModel: tflM.Model
+
     __tensorNameMap: Dict # Mapping 'str' to 'tflT.Tensor'
+
     __opCodeTypeIndexMap: Dict # Mapping 'tflBO.BuiltinOperator' to 'int'
-    __skippedOutputMap: Dict # Mapping 'tflT.Tensor' objects that were
-    # outputs of skipped operators, to 'tflT.Tensor' ouputs of previous operators
+
+    __nchwTensorVersion: Dict # Mapping 'tflT.Tensor' to 'tflT.Tensor' which is
+                              # equal, but in NCHW format
+
+    __skippedOutputMap: Dict # Mapping 'tflT.Tensor' objects that were outputs
+                             # of skipped operators, to 'tflT.Tensor' ouputs of 
+                             # previous operators
 
 
     def __init__(self, modelVersion: int, modelDescription: str) -> None:
         self.__tflModel = tflM.Model(modelVersion,modelDescription)
         self.__opCodeTypeIndexMap = {}
         self.__tensorNameMap = {}
+        self.__nchwTensorVersion = {}
         self.__skippedOutputMap = {}
+
+
+    def nchwVersionOf(self,tTensor: tflT.Tensor):
+        """ Get the NCHW version of non-static 'tTensor'. If one is not 
+            available in the graph yet, add transpose operator to create it. """
+        if tTensor in self.__nchwTensorVersion.keys():
+            return self.__nchwTensorVersion[tTensor]
+        
+        # Need to add Transpose operator to transform 'tTensor' to NCHW.
+
+        nchwTensor = self.duplicateTensor(tTensor, tTensor.name + "_nchw")
+        nchwTensor.shape = Translator.NHWCShapeToNCHW(tTensor.shape)
+
+        perm = Translator.createToNCHWPerm(tTensor.shape.vector)
+
+        shapeTensor = self.__createTensorForData(perm,
+                                                 "transpose_to_nchw_perm")
+
+        transpose = tflO.Operator(builtinOptions=tflTranspose.Transpose())
+        transpose.opcodeIndex = self.opCodeIndexForOpType(transpose.builtinOptions.operatorType)
+        transpose.tmpInputs = [tTensor, shapeTensor]
+        transpose.tmpOutputs = [nchwTensor]
+
+        self.checkAndAppendOperator(transpose)
+
+        self.__nchwTensorVersion[tTensor] = nchwTensor
+
+        return nchwTensor
 
 
     def skipOperator(self, tOp: tflO.Operator):
@@ -102,7 +149,9 @@ class ModelBuilder:
         self.appendNewBuffer(buffer)
 
         shape = tflT.Shape(tTensor.shape.vector.copy())
-        tensor = tflT.Tensor(shape, newName, None, tTensor.type)
+        tensor = tflT.Tensor(shape, newName, None, tTensor.type,
+                             tTensor.quantization, tTensor.isVariable,
+                             tTensor.hasRank)
         tensor.tmpBuffer = buffer
 
         self.appendNewTensor(tensor)
@@ -260,6 +309,25 @@ class ModelBuilder:
     """ -------------------- 'quality of life' functions. -------------------- """
 
 
+    def __createTensorForData(self, data: np.ndarray, 
+                              name: str):
+        type = Translator.numpyTypeToTFLite(data.dtype)
+
+        buffer = tflB.Buffer(data, type)
+        self.appendNewBuffer(buffer)
+
+        shape = Translator.shapeFromNumpy(data)
+        name = self.__validateNewTensorName(name)
+
+        tensor = tflT.Tensor(shape, name, type=type)
+
+        tensor.tmpBuffer = buffer
+
+        self.appendNewTensor(tensor)
+
+        return tensor
+
+
     def __validateNewTensorName(self, name: str) -> str:
         """ Take tensor name 'name' and make it unique in the model.
             Returns a unique tensor name. """
@@ -351,7 +419,11 @@ class ModelBuilder:
 
     def tensorHasData(slef, tTensor: tflT.Tensor) -> bool:
         """ Determine if given TFLite tensor has any data. """
+        
         try:
+            if tTensor.tmpBuffer.data is None:
+                return False
+        
             size = tTensor.tmpBuffer.data.size
 
             # Make sure this function is valid
@@ -360,9 +432,10 @@ class ModelBuilder:
                               f"'{tTensor.name}' has data.size = '{size}'.")
                 
             return size != 0
+        
         except:
-            err.internal("'ModelBuilder.tensorHasData()' called with",
-                         "uninitialized tensor!")
+            err.internal("'ModelBuilder.tensorHasData()' failed!")
+
             return False
 
 
