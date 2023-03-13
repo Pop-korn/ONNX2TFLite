@@ -24,8 +24,8 @@ class Buffer(meta.TFLiteObject):
         Tensor, this buffer belongs to."""
     tmpIndex: int
 
-    """ Indicator if the buffer is used in the final model. """
-    tmpUsed: bool
+    """ Counter of how many tensors use this buffer. """
+    tmpReferenceCount: int
 
 
     def __init__(self, data: np.ndarray=None, 

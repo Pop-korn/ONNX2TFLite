@@ -102,7 +102,6 @@ class ModelBuilder:
                 graphOutputs[idx] = replacement
 
 
-
     def checkAndAppendOperator(self, tOp: tflO.Operator):
         """ Append the new TFLite operator the the model. Check that it's input
             tensors are valid.
@@ -208,14 +207,14 @@ class ModelBuilder:
         
         toRemove = []
         for tensor in self.getTensors().vector:
-            if not tensor.tmpUsed:
+            if tensor.tmpReferenceCount == 0:
                 toRemove.append(tensor)
         for tensor in toRemove:
             self.getTensors().remove(tensor)
 
         toRemove = []
         for buffer in self.getBuffers().vector:
-            if not buffer.tmpUsed:
+            if buffer.tmpReferenceCount == 0:
                 toRemove.append(buffer)
         for buffer in toRemove:
             self.getBuffers().remove(buffer)
@@ -228,22 +227,22 @@ class ModelBuilder:
         
         # Mark all unused
         for tensor in self.getTensors().vector:
-            tensor.tmpUsed = False
+            tensor.tmpReferenceCount = 0
 
         for buffer in self.getBuffers().vector:
-            buffer.tmpUsed = False
+            buffer.tmpReferenceCount = 0
 
         # Find out which are used
         for operator in self.getOperators().vector:
             for tensor in operator.tmpInputs:
-                tensor.tmpUsed = True
+                tensor.tmpReferenceCount += 1
                 if tensor.tmpBuffer is not None:
-                    tensor.tmpBuffer.tmpUsed = True
+                    tensor.tmpBuffer.tmpReferenceCount += 1
 
             for tensor in operator.tmpOutputs:
-                tensor.tmpUsed = True
+                tensor.tmpReferenceCount += 1
                 if tensor.tmpBuffer is not None:
-                    tensor.tmpBuffer.tmpUsed = True
+                    tensor.tmpBuffer.tmpReferenceCount += 1
 
 
     def __buildOperatorCode(self, opType: tflBO.BuiltinOperator):

@@ -44,8 +44,8 @@ class Tensor(meta.TFLiteObject):
     """ Index to the 'tensors' vector for this tensor. """
     tmpIndex: int
 
-    """ Indicator if the tensor is used in the final model. """
-    tmpUsed: bool
+    """ Counter of how many operators use this tensor. """
+    tmpReferenceCount: int
 
 
     def __init__(self, shape: Shape,
