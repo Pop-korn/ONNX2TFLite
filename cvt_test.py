@@ -196,10 +196,10 @@ def runAndTestOperators(originalOnnxFile, outOnnxFile,
 """ -------------------- Start of execution -------------------- """
 
 
-imageFile = "data/224x224/cat1.jpg"
+imageFile = "data/224x224/cat2.jpg"
 onnxFile = "data/onnx/bvlcalexnet-12.onnx"
 onnxReducedFile = "test/alexnet_reduced.onnx"
 tflReducedFile = "test/alexnet_reduced.tflite"
 
-runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,0,23)
-# runAndTestFirstNOperators(onnxFile,onnxReducedFile,tflReducedFile,16,imageFile)
+# runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,0,23)
+runAndTestFirstNOperators(onnxFile,onnxReducedFile,tflReducedFile,24,imageFile)

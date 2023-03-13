@@ -47,7 +47,7 @@ class ModelBuilder:
 
 
     def __init__(self, modelVersion: int, modelDescription: str) -> None:
-        self.__tflModel = tflM.Model(modelVersion,modelDescription)
+        self.__tflModel = tflM.Model(modelVersion, modelDescription)
         self.__opCodeTypeIndexMap = {}
         self.__tensorNameMap = {}
         self.__nchwTensorVersion = {}
@@ -168,6 +168,9 @@ class ModelBuilder:
     def finish(self) -> tflM.Model:
         """ Finalize the TFLite model and return it. """
 
+        # Keep only 1 empty buffer
+        self.__redirectEmptyTensorsToOneBuffer()
+
         # Remove unused tensors and bufers
         self.__markUnusedTensorsAndBuffers()
         self.__removeUnusedTensorsAndBuffers()
@@ -200,6 +203,14 @@ class ModelBuilder:
 
         return self.__tflModel
     
+
+    def __redirectEmptyTensorsToOneBuffer(self):
+        emptyBuffer = self.__getFirstEmptyBuffer()
+
+        for t in self.getTensors().vector:
+            if not self.tensorHasData(t):
+                t.tmpBuffer = emptyBuffer
+
 
     def __removeUnusedTensorsAndBuffers(self):
         """ Remove all tensors and buffers from the model, that are not
@@ -423,26 +434,34 @@ class ModelBuilder:
                                            tTensor2.shape.vector)
     
 
-    def tensorHasData(slef, tTensor: tflT.Tensor) -> bool:
+    def tensorHasData(self, tTensor: tflT.Tensor) -> bool:
         """ Determine if given TFLite tensor has any data. """
-        
-        try:
-            if tTensor.tmpBuffer.data is None:
-                return False
-        
-            size = tTensor.tmpBuffer.data.size
 
-            # Make sure this function is valid
-            if size < 10:
-                err.unchecked("'ModelBuilder.tensorHasData()' Tensor",
-                              f"'{tTensor.name}' has data.size = '{size}'.")
-                
+        if tTensor.tmpBuffer is None:
+            return False
+        
+        res = self.bufferHasData(tTensor.tmpBuffer)
+        if res is None:
+            res = False
+            print(tTensor.name)
+
+        return res
+        
+    
+    def bufferHasData(self, tBuffer: tflB.Buffer) -> bool:
+        """ Determine if given buffer has any data in it. """
+
+        try:
+            if tBuffer.data is None:
+                return False
+            
+            size = tBuffer.data.size                
             return size != 0
         
-        except:
-            err.internal("'ModelBuilder.tensorHasData()' failed!")
-
-            return False
+        except Exception as e:
+            err.internal("'ModelBuilder.bufferHasData()' failed!")
+            print(e)
+            return None
 
 
 
@@ -500,3 +519,15 @@ class ModelBuilder:
         """ Get the last operator in the subGraphs 'operators' list. 
             Or None if the list is empty. """
         return self.getOperators().getLast()
+
+
+    def __getFirstEmptyBuffer(self) -> tflB.Buffer:
+        """ Return the first empty buffer in the model.
+            It should be the one on index 0. """
+        for b in self.getBuffers().vector:
+            if not self.bufferHasData(b):
+                return b
+            
+        # Execution should not reach this
+        err.internal("ModeLBuilder.__getFirstEmptyBuffer()")
+
