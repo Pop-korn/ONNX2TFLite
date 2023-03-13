@@ -4,7 +4,9 @@ import numpy as np
 
 from lib.tflite import (
     BuiltinOperator as tflBO,
-    TensorType as tflTT
+    BuiltinOptions as tflBOpt,
+    TensorType as tflTT,
+    ActivationFunctionType as tflAFT
 )
 
 from src.generator.model import (
@@ -171,10 +173,74 @@ class ModelBuilder:
         # Keep only 1 empty buffer
         self.__redirectEmptyTensorsToOneBuffer()
 
+        # Combine activation function operators where possible
+        self.__fuseActivationFunctions()
+
         # Remove unused tensors and bufers
-        self.__markUnusedTensorsAndBuffers()
         self.__removeUnusedTensorsAndBuffers()
 
+        # Swich from using 'tmp' references to 'index' references in tensors
+        # and buffers.
+        self.__assignTensorAndBufferIndices()
+
+        return self.__tflModel
+    
+
+    def __fuseActivationFunctions(self):
+        if tflBO.BuiltinOperator.RELU not in self.__opCodeTypeIndexMap.keys():
+            # There is no RELU operator in the model
+            return
+        
+        reluOpCodeIndex = self.opCodeIndexForOpType(tflBO.BuiltinOperator.RELU)
+
+        self.__countReferencesToTensorsAndBuffers()
+
+        # Find Relu operators and remove them if possible
+        for op in self.getOperators().vector:
+            
+            try:
+
+                if op.opcodeIndex != reluOpCodeIndex:
+                    # Operator is not Relu
+                    continue
+                
+                inTensor = op.tmpInputs[0]
+                
+                if inTensor.tmpReferenceCount != 2:
+                    # The output of the previous tensor is used by something 
+                    # other that the Relu.
+                    continue
+
+                prevOp = self.__getOperatorWithOutput(inTensor)
+
+                if not self.__canHaveFusedActivationFunction(prevOp):
+                    # The operator before Relu does not support fused act. fun.
+                    continue
+
+                if prevOp.tmpOutputs[0] != inTensor:
+                    # The Relu is being applied to a different output
+                    # than the main one. Keep things as they are
+                    continue
+
+                if not self.tensorsSimilar(inTensor, op.tmpOutputs[0]):
+                    # Should never happen
+                    err.internal("ModelBuilder.__fuseActivationFunctions()",
+                                 "Relu input differs from its output!")
+                    continue
+
+                # Finally fuse the activation function with 'prevOp'
+                prevOp.tmpOutputs[0] = op.tmpOutputs[0]
+                prevOp.builtinOptions.fusedActivationFunction = tflAFT.ActivationFunctionType.RELU
+                self.getOperators().remove(op)
+
+            except:
+                err.note("Something failed during activation function fusing.")
+
+
+    def __assignTensorAndBufferIndices(self):
+        """ Correctly initialize all references via indices in all tensors
+            and buffers. """
+        
         # Assign each buffer its index
         for i, buffer in enumerate(self.getBuffers().vector):
             buffer.tmpIndex = i
@@ -201,8 +267,6 @@ class ModelBuilder:
             for outputTensor in operator.tmpOutputs:
                 operator.outputs.append( outputTensor.tmpIndex )
 
-        return self.__tflModel
-    
 
     def __redirectEmptyTensorsToOneBuffer(self):
         emptyBuffer = self.__getFirstEmptyBuffer()
@@ -216,6 +280,8 @@ class ModelBuilder:
         """ Remove all tensors and buffers from the model, that are not
             marked as used. """
         
+        self.__countReferencesToTensorsAndBuffers()
+
         toRemove = []
         for tensor in self.getTensors().vector:
             if tensor.tmpReferenceCount == 0:
@@ -231,10 +297,9 @@ class ModelBuilder:
             self.getBuffers().remove(buffer)
 
 
-    def __markUnusedTensorsAndBuffers(self):
-        """ Find out which tensors and buffer in the model are actually used.
-            Those that are not, will be marked by setting their 'tmpUsed'
-            attribute to False. """
+    def __countReferencesToTensorsAndBuffers(self):
+        """ Count how many times each tensor and buffer are used. Store
+            the counts in their '.tmpReferenceCount' attributes. """
         
         # Mark all unused
         for tensor in self.getTensors().vector:
@@ -324,6 +389,31 @@ class ModelBuilder:
 
 
     """ -------------------- 'quality of life' functions. -------------------- """
+
+
+    def __canHaveFusedActivationFunction(self, tOp: tflO.Operator) -> bool:
+        """ Determine if given operator can have a fused activation function
+            as one of its parameters. """
+        
+        supportedOptions = [tflBOpt.BuiltinOptions.Conv2DOptions,
+                            tflBOpt.BuiltinOptions.Conv3DOptions,
+                            tflBOpt.BuiltinOptions.Pool2DOptions,
+                            tflBOpt.BuiltinOptions.DepthwiseConv2DOptions,
+                            tflBOpt.BuiltinOptions.SVDFOptions,
+                            tflBOpt.BuiltinOptions.RNNOptions,
+                            tflBOpt.BuiltinOptions.SequenceRNNOptions,
+                            tflBOpt.BuiltinOptions.BidirectionalSequenceRNNOptions,
+                            tflBOpt.BuiltinOptions.FullyConnectedOptions,
+                            tflBOpt.BuiltinOptions.ConcatenationOptions,
+                            tflBOpt.BuiltinOptions.MulOptions,
+                            tflBOpt.BuiltinOptions.L2NormOptions,
+                            tflBOpt.BuiltinOptions.LSTMOptions,
+                            tflBOpt.BuiltinOptions.UnidirectionalSequenceLSTMOptions,
+                            tflBOpt.BuiltinOptions.SubOptions,
+                            tflBOpt.BuiltinOptions.DivOptions,
+                            tflBOpt.BuiltinOptions.TransposeOptions]
+        
+        return tOp.builtinOptions.builtinOptionsType in supportedOptions
 
 
     def __createTensorForData(self, data: np.ndarray, 
@@ -464,6 +554,45 @@ class ModelBuilder:
             return None
 
 
+    def __getLastOperator(self) -> tflO.Operator:
+        """ Get the last operator in the subGraphs 'operators' list. 
+            Or None if the list is empty. """
+        return self.getOperators().getLast()
+
+
+    def __getFirstEmptyBuffer(self) -> tflB.Buffer:
+        """ Return the first empty buffer in the model.
+            It should be the one on index 0. """
+        for b in self.getBuffers().vector:
+            if not self.bufferHasData(b):
+                return b
+            
+        # Execution should not reach this
+        err.internal("ModeLBuilder.__getFirstEmptyBuffer()")
+
+
+    def __getOperatorWithOutput(self, tTensor: tflT.Tensor) -> tflO.Operator:
+        """ Get the first operator from the graph, that has 'tTensor' in its
+            'tmpOutputs' list. 
+            If such operator doesn't exist, return None. """
+        
+        for op in self.getOperators().vector:
+            if tTensor in op.tmpOutputs:
+                return op
+            
+        return None
+    
+
+    def __getOperatorWithInput(self, tTensor: tflT.Tensor) -> tflO.Operator:
+        """ Get the first operator from the graph, that has 'tTensor' in its
+            'tmpInputs' list. 
+            If such operator doesn't exist, return None. """
+        
+        for op in self.getOperators().vector:
+            if tTensor in op.tmpInputs:
+                return op
+            
+        return None
 
 
     """ ---------------- Functions to get an element of the TFLite model. ----------------
@@ -514,20 +643,3 @@ class ModelBuilder:
 
         return self.__tflModel.operatorCodes
     
-    
-    def __getLastOperator(self) -> tflO.Operator:
-        """ Get the last operator in the subGraphs 'operators' list. 
-            Or None if the list is empty. """
-        return self.getOperators().getLast()
-
-
-    def __getFirstEmptyBuffer(self) -> tflB.Buffer:
-        """ Return the first empty buffer in the model.
-            It should be the one on index 0. """
-        for b in self.getBuffers().vector:
-            if not self.bufferHasData(b):
-                return b
-            
-        # Execution should not reach this
-        err.internal("ModeLBuilder.__getFirstEmptyBuffer()")
-
