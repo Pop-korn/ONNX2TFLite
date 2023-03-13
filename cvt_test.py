@@ -201,5 +201,5 @@ onnxFile = "data/onnx/bvlcalexnet-12.onnx"
 onnxReducedFile = "test/alexnet_reduced.onnx"
 tflReducedFile = "test/alexnet_reduced.tflite"
 
-runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,14,15)
+runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,0,18)
 # runAndTestFirstNOperators(onnxFile,onnxReducedFile,tflReducedFile,16,imageFile)

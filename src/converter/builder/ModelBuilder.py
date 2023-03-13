@@ -97,6 +97,15 @@ class ModelBuilder:
         for skipped, replacement in zip(tOp.tmpOutputs, lastOutputs):
             self.__skippedOutputMap[skipped] = replacement
 
+            # If the ouput of the skipped operator was the output of the whole
+            # graph, replace it.
+
+            graphOutputs = self.getSubgraph().outputs.tmpOutputs 
+            if skipped in graphOutputs:
+                idx = graphOutputs.index(skipped)
+                graphOutputs[idx] = replacement
+
+
 
     def checkAndAppendOperator(self, tOp: tflO.Operator):
         """ Append the new TFLite operator the the model. Check that it's input
@@ -123,6 +132,8 @@ class ModelBuilder:
             'tTensor' except its data is transposed and name is changed. 
             Return the transposed tensor. """
         
+        err.note(f"Creating a transposed tensor for '{tTensor.name}'.")
+
         newTensor = self.duplicateTensor(tTensor, tTensor.name + "_transposed")
 
         # TODO needs testing
