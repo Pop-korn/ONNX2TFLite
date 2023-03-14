@@ -228,6 +228,10 @@ class ModelBuilder:
                                  "Relu input differs from its output!")
                     continue
 
+                if prevOp.builtinOptions.fusedActivationFunction != tflAFT.ActivationFunctionType.NONE:
+                    # Previous operator already has an activation function
+                    continue
+
                 # Finally fuse the activation function with 'prevOp'
                 prevOp.tmpOutputs[0] = op.tmpOutputs[0]
                 prevOp.builtinOptions.fusedActivationFunction = tflAFT.ActivationFunctionType.RELU
