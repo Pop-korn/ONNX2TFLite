@@ -121,7 +121,6 @@ def pickOutOperators(onnxFile, startIdx, endIdx):
     outputsVI = []
 
     tensorsToKeep = []
-    tensorsToKeepVI = []
 
     nodesToRemove = []
 
