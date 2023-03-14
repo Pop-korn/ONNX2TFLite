@@ -12,9 +12,18 @@ def convert(tflOperator: tflOperators.Operator,
     """ Convert ONNX 'Reshape' to TFLite 'Reshape'. """
 
     try:    
+
         if len(tflOperator.tmpInputs) != 2:
             err.warning("ONNX: Reshape operator doesn't have 2 inputs!",
                         "Conversion behaviour is undefined!")
+            
+        if not modelBuilder.tensorHasData(tflOperator.tmpInputs[1]):
+            # The new shape is dynamically calculated during inference.
+            # Currently this is not supported. Just return an empty 'Reshape'.
+            return tflReshape.Reshape([])
+
+
+        """ The new shape is stacically given. """
 
         buffer = tflOperator.tmpInputs[1].tmpBuffer
 
@@ -22,8 +31,8 @@ def convert(tflOperator: tflOperators.Operator,
 
         tReshape = tflReshape.Reshape(newShape)
 
-        # The input tensor was retained from the ONNX model. 
-        # TFLite does NOT use it -> remove it
+        # The new shape can be represented using operators parameters. No need
+        # for the input tensor. Remove it
         tflOperator.tmpInputs.pop()
 
         originalShape = tflOperator.tmpInputs[0].shape.vector

@@ -21,6 +21,26 @@ class Shape(meta.IntVector):
     def __init__(self, shape: List[int]) -> None:
         super().__init__(shape,t.StartShapeVector)
 
+    def genTFLite(self, builder: fb.Builder):
+        """ Generates TFLite code for the Shape """
+
+        if (not self.genEmpty) and (len(self.vector) == 0):
+            # Nothing to generate
+            return
+
+        self.StartFunction(builder, len(self.vector))
+
+        # values need to be generated in reverse order. Thats how flatbuffers work
+        for val in reversed(self.vector):
+            # If a dimension is not and integer, it is not specified. TFLite
+            # uses '-1' to indicate unspecified dimensions.
+            if type(val) != type(1):
+                val = -1
+            self.PrependFunction(builder)(val)
+
+        return builder.EndVector()
+
+
 class Tensor(meta.TFLiteObject):
     isVariable: bool
     hasRank: bool

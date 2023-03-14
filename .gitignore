@@ -1,6 +1,7 @@
 bvlcalexnet-12.onnx
-alexnet.tflite
-alexnet.json
+*.tflite
+*.json
+*.onnx
 classes.txt
 .vscode/
 alexnet_reduced.*
