@@ -108,6 +108,9 @@ def convertPadding(autoPad: str, oPads: List[int],
             return tflPad.Padding.VALID
 
         # autoPad is NOTSET -> use explicit padding
+        if oPads is None:
+            err.internal("convertPadding(): oPads is None, when it should not!")
+            return tflPad.Padding.VALID
 
         if all(val == 0 for val in oPads):
             # No padding in any dieraction

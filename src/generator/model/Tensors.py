@@ -18,27 +18,52 @@ import src.err as err
 # TODO If 'hasRank' is false, "shape" must be [].
 
 class Shape(meta.IntVector):
+    __shapeOffset: int
+    
+    __alsoSignature: bool
+    __shapeSignatureVector: List[int]
+    __shapeSignatureOffset: int
+
     def __init__(self, shape: List[int]) -> None:
         super().__init__(shape,t.StartShapeVector)
+        self.__alsoSignature = False
 
-    def genTFLite(self, builder: fb.Builder):
-        """ Generates TFLite code for the Shape """
+    def __checkDims(self):
+        """ Check if all dimensions are integers. If not, transform this
+            to 'shape_signature'. """
+        
+        self.__shapeSignatureVector = []
 
-        if (not self.genEmpty) and (len(self.vector) == 0):
-            # Nothing to generate
-            return
-
-        self.StartFunction(builder, len(self.vector))
-
-        # values need to be generated in reverse order. Thats how flatbuffers work
-        for val in reversed(self.vector):
-            # If a dimension is not and integer, it is not specified. TFLite
-            # uses '-1' to indicate unspecified dimensions.
+        for val in self.vector:
             if type(val) != type(1):
                 val = -1
-            self.PrependFunction(builder)(val)
+                self.__alsoSignature = True
+            
+            self.__shapeSignatureVector.append(val)
 
-        return builder.EndVector()
+        if self.__alsoSignature:
+            self.vector = [ abs(val) for val in self.__shapeSignatureVector]
+
+
+    def genTFLite(self, builder: fb.Builder, tensor):
+        """ Generates TFLite code for the Shape """
+        self.__checkDims()
+
+        if self.__alsoSignature:
+            tensor.hasRank = True
+
+
+        self.__shapeOffset = super().genTFLite(builder)
+        if self.__alsoSignature:
+            self.vector = self.__shapeSignatureVector
+            self.__shapeSignatureOffset = super().genTFLite(builder)
+
+    
+    def addTFLite(self, builder):
+        t.AddShape(builder, self.__shapeOffset)
+
+        if self.__alsoSignature:
+            t.AddShapeSignature(builder, self.__shapeSignatureOffset)
 
 
 class Tensor(meta.TFLiteObject):
@@ -85,7 +110,7 @@ class Tensor(meta.TFLiteObject):
 
     def genTFLite(self, builder: fb.Builder):
         name = builder.CreateString(self.name)
-        tflShape = self.shape.genTFLite(builder)
+        self.shape.genTFLite(builder, self)
 
         if(self.quantization is not None):
             err.requireType(self.quantization, Quantization.Quantization, "Tensor.quantization")
@@ -101,7 +126,7 @@ class Tensor(meta.TFLiteObject):
         if name is not None:
             t.AddName(builder, name)
 
-        t.AddShape(builder,tflShape)
+        self.shape.addTFLite(builder)
 
         if(self.quantization is not None):
             t.AddQuantization(builder,tflQuantization)

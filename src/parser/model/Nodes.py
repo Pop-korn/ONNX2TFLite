@@ -48,6 +48,8 @@ class Node(meta.ONNXObject):
                 self.attributes = LRN.LRN(self._descriptor.attribute)
             case "MaxPool":
                 self.attributes = MaxPool.MaxPool(self._descriptor.attribute)
+            case "Mul":
+                self.attributes = None
             case "Relu":
                 self.attributes = Relu.Relu(self._descriptor.attribute)
             case "Reshape":

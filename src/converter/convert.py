@@ -15,15 +15,12 @@ def __convert(oM: onnxM.Model) -> tflM.Model:
     operatorCvt = OperatorConverter.OperatorConverter(builder)
     tensorCvt = TensorConverter.TensorConverter(builder)
     
-
     tensorCvt.convertOutputTensors(oM.graph.outputs)
     tensorCvt.convertInputTensors(oM.graph.inputs)
 
     tensorCvt.convertConstantTensors(oM.graph.initializers)
 
     tensorCvt.convertInternalTensors(oM.graph.valueInfo)
-
-
 
     for oNode in oM.graph.nodes:
         operatorCvt.convertOperator(oNode)

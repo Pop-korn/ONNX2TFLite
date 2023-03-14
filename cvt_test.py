@@ -140,6 +140,7 @@ def pickOutOperators(onnxFile, startIdx, endIdx):
     for node in nodesToRemove:
         model.graph.node.remove(node)
 
+
     keepOnlyTensors(model.graph.initializer, tensorsToKeep)
     keepOnlyTensors(model.graph.value_info, tensorsToKeep)
 
@@ -149,24 +150,32 @@ def pickOutOperators(onnxFile, startIdx, endIdx):
         elif vi.name in outputs:
             outputsVI.append(vi)
 
-
     for vi in model.graph.input:
         if vi.name in inputs:
             inputsVI.append(vi)
     for vi in model.graph.output:
         if vi.name in outputs:
             outputsVI.append(vi)
-    
+
+    if len(outputsVI) == 0:
+        for o in model.graph.output:
+            outputsVI.append(o)
+            o.type.tensor_type.shape.Clear()
+            o.name = outputs[0]
+
     while len(model.graph.input) > 0:
         model.graph.input.pop()
     while len(model.graph.output) > 0:
         model.graph.output.pop()
 
 
+
     for i in inputsVI:
         model.graph.input.append(i)
     for o in outputsVI:
         model.graph.output.append(o)
+
+   
 
     return model
 
@@ -179,7 +188,8 @@ def runAndTestOperators(originalOnnxFile, outOnnxFile,
     onnx.save(onnxModel, outOnnxFile)
     convert.convertModel(outOnnxFile, outTfliteFile)
 
-    shape = [dim.dim_value for dim in onnxModel.graph.input[0].type.tensor_type.shape.dim]
+    shape = [dim.dim_value if dim.dim_value != 0 else 1 for dim in onnxModel.graph.input[0].type.tensor_type.shape.dim]
+    
     shape = shapeToNHWC(shape)
 
     inpt: np.ndarray = np.random.rand(*shape).astype(np.float32)
@@ -196,9 +206,9 @@ def runAndTestOperators(originalOnnxFile, outOnnxFile,
 
 
 imageFile = "data/224x224/cat2.jpg"
-onnxFile = "data/onnx/bvlcalexnet-12.onnx"
-onnxReducedFile = "test/alexnet_reduced.onnx"
-tflReducedFile = "test/alexnet_reduced.tflite"
+onnxFile = "data/onnx/tinyyolov2-8.onnx"
+onnxReducedFile = "test/tinyyolo.onnx"
+tflReducedFile = "test/tinyyolo.tflite"
 
 runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,0,0)
 # runAndTestFirstNOperators(onnxFile,onnxReducedFile,tflReducedFile,24,imageFile)

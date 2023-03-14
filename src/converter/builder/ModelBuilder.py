@@ -362,7 +362,10 @@ class ModelBuilder:
         tTensor = tflT.Tensor(shape,name,None,type)
         tTensor.tmpBuffer = buffer
 
-        self.appendNewTensor(tTensor)
+        # Append the tensor. Override=True, because sometimes the tensor might
+        # have been mentioned as 'value_info', in which case it was added 
+        # without data.
+        self.appendNewTensor(tTensor, overwrite=True)
 
 
     def buildEmptyTensor(self, oVI :onnxVI.ValueInfo, buffer: tflB.Buffer):
@@ -501,12 +504,63 @@ class ModelBuilder:
         return len(self.__opCodeTypeIndexMap.keys())
 
 
-    def appendNewTensor(self, tTensor: tflT.Tensor):
+    def __removeTensorWithNameFromCollection(self, name, collection):
+        """ Find and remove a tensor with given 'name' from given 'collection'.
+        """
+        toRemove = None
+
+        for t in collection:
+            if t.name == name:
+                toRemove = t
+                break
+
+        if toRemove is not None:
+            collection.remove(toRemove)
+
+
+    def __removeInputWithName(self, name):
+        """ Find and remove a tensor in the subgraph 'inputs' with given 'name'. 
+        """
+        self.__removeTensorWithNameFromCollection(name, 
+                                                  self.getSubgraph().inputs.tmpInputs)
+    
+    
+    def __removeOutputWithName(self, name):
+        """ Find and remove a tensor in the subgraph 'outputs' with given 'name'. 
+        """
+        self.__removeTensorWithNameFromCollection(name, 
+                                                  self.getSubgraph().outputs.tmpOutputs)
+    
+    
+    def __removeTensorWithName(self, name):
+        """ Find and remove a tensor in the graph with given 'name'. """
+        self.__removeTensorWithNameFromCollection(name, 
+                                                  self.getTensors().vector)
+
+
+    def appendNewTensor(self, tTensor: tflT.Tensor, overwrite: bool = False):
         """ Append the TFLite tensor 'tTensor' to the 'subGraph.tensors'
             and register it. """
 
         if tTensor.name in self.__tensorNameMap.keys():
-            err.warning(f"Tensor '{tTensor.name}' is already in the tensors!")  
+            """ Tensor has already been added. Sometimes however, ONNX models 
+                will have tensors in their 'inputs' or 'outpus', which don't
+                belong there and are in fact static. I this case we need to 
+                overwrite the existing tensors. """
+            
+            if overwrite:
+                self.__removeTensorWithName(tTensor.name)
+
+                # If the tenor previously appeared in ONNX 'inputs' or 'outputs',
+                # the old version MUST be removed from there.
+                self.__removeInputWithName(tTensor.name)
+                self.__removeOutputWithName(tTensor.name)
+
+                self.getTensors().append(tTensor)
+                self.__tensorNameMap[tTensor.name] = tTensor
+            else:
+                err.warning(f"Tensor '{tTensor.name}' is already in the tensors!")  
+
         else:
             self.__tensorNameMap[tTensor.name] = tTensor
             self.getTensors().append(tTensor)
