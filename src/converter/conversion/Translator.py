@@ -96,15 +96,15 @@ def convertPadding(autoPad: str, oPads: List[int],
             'auto_pad' and 'oPads' is the ONNX attribute 'pads'. 
             The 'oKernelShape' is used to determine if conversion was valid"""
 
-        if autoPad == "SAME_UPPER":
+        if autoPad == b"SAME_UPPER":
             return tflPad.Padding.SAME
 
-        elif autoPad == "SAME_LOWER":
+        elif autoPad == b"SAME_LOWER":
             err.note(f"TFLite does NOT support 'SAME_LOWER' padding!",
                      "Using 'SAME', which is equivalent to 'SAME_UPPER'.")
             return tflPad.Padding.SAME
 
-        elif autoPad == "VALID":
+        elif autoPad == b"VALID":
             return tflPad.Padding.VALID
 
         # autoPad is NOTSET -> use explicit padding

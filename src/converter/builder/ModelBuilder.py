@@ -56,6 +56,15 @@ class ModelBuilder:
         self.__skippedOutputMap = {}
 
 
+    def createEmptyTensor(self, dims: List[int], 
+                          name: str, 
+                          dtype: np.dtype) -> tflT.Tensor:
+        
+        data = np.zeros(dims, dtype)
+
+        return self.__createTensorForData(data, name)
+
+
     def nchwVersionOf(self,tTensor: tflT.Tensor):
         """ Get the NCHW version of non-static 'tTensor'. If one is not 
             available in the graph yet, add transpose operator to create it. """

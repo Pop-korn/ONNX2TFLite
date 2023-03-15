@@ -53,7 +53,9 @@ class OperatorConverter:
         # Identify ONNX operator and convert it
         match(oNode.opType):
             case "Conv":
-                tOp.builtinOptions = CvtConv.convert(oNode.attributes)
+                tOp.builtinOptions = CvtConv.convert(oNode.attributes, 
+                                                     tOp,
+                                                     self.__builder)
             case "Gemm":
                 tOp.builtinOptions = CvtGemm.convert(oNode.attributes,
                                                      tOp,

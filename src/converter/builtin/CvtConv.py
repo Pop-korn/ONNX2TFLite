@@ -1,5 +1,6 @@
 import src.converter.conversion.Translator as Translator
 import src.converter.conversion.common as common
+import src.converter.builder.ModelBuilder as ModelBuilder
 
 import src.err as err
 
@@ -7,8 +8,10 @@ import src.parser.builtin.Conv as onnxConv
 
 import src.generator.builtin.Conv2D as tflConv2D
 import src.generator.meta.meta as tflMeta
+import src.generator.model.Operators as tflO
 
-def convert(oConv: onnxConv.Conv) -> tflMeta.BuiltinOptions:
+def convert(oConv: onnxConv.Conv, tOp: tflO.Operator,
+            modelBuilder: ModelBuilder.ModelBuilder) -> tflMeta.BuiltinOptions:
     """ Convert the ONNX 'Conv' operator to TFLite. """
 
     match len(oConv.kernelShape):
@@ -25,8 +28,14 @@ def convert(oConv: onnxConv.Conv) -> tflMeta.BuiltinOptions:
             tConv.padding = Translator.convertPadding(oConv.autoPad, oConv.pads, 
                                                       oConv.kernelShape)
             
-            # TODO tConv.fusedActivationFunction
-            
+            if len(tOp.tmpInputs) == 2:
+                # Operator is has no bias. ONNX model can ommit it. TFLite can't.
+                kernelShape = tOp.tmpInputs[1].shape.vector
+                bias = modelBuilder.createEmptyTensor([kernelShape[0]], 
+                                                      "zero_conv_bias",
+                                                      tOp.tmpInputs[1].tmpBuffer.data.dtype)
+                tOp.tmpInputs.append(bias)
+
             return tConv
         
         case 3:
