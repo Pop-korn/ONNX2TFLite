@@ -89,19 +89,30 @@ class ModelBuilder:
             to the outputs of 'tOp' will be substituted for its inputs. This is
             done in the 'checkAndAppendOperator()' method. """
 
-        for skipped, replacement in zip(tOp.tmpOutputs, tOp.tmpInputs):
+        # Try to find suitable replacements
+        for skipped in tOp.tmpOutputs:
             if skipped in self.__skippedOutputMap.keys():
                 err.internal(f"skipOperator: tensor '{skipped.name}' is already"
                              , "mapped to something!")
-            self.__skippedOutputMap[skipped] = replacement
+                continue
 
-            # If the ouput of the skipped operator was the output of the whole
-            # graph, replace it.
+            for replacement in tOp.tmpInputs:
+                if self.tensorHasData(replacement):
+                    # Not a dynamic tensor
+                    continue
 
-            graphOutputs = self.getSubgraph().outputs.tmpOutputs 
-            if skipped in graphOutputs:
-                idx = graphOutputs.index(skipped)
-                graphOutputs[idx] = replacement
+                # Found suitable replacement
+                self.__skippedOutputMap[skipped] = replacement
+                print("Replacing",skipped.name,"with", replacement.name)
+
+                # Check if we are skipping the output of the whole graph
+                graphOutputs = self.getSubgraph().outputs.tmpOutputs 
+                if skipped in graphOutputs:
+                    idx = graphOutputs.index(skipped)
+                    graphOutputs[idx] = replacement
+
+                # Don't look for more replacements
+                break
 
 
     def checkAndAppendOperator(self, tOp: tflO.Operator):

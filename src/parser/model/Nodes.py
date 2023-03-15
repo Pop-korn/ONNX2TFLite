@@ -38,6 +38,8 @@ class Node(meta.ONNXObject):
         """ Assign the exact attributes based on the 'opType'. Each operator is represented
             by a unique class in the '/builtin/' directory. """
         match self.opType:
+            case "Add":
+                self.attributes = None
             case "Conv":
                 self.attributes = Conv.Conv(self._descriptor.attribute)
             case "Dropout":
