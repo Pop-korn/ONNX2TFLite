@@ -2,13 +2,14 @@
 ## **Work In Progress**
 Open project to **directly** convert models from the *.onnx* to *.tflite* format.
 
-To use the converter, run **pyton onnx2tflite <input-model.onnx> <output-model.tflite>**
+To use the converter, run **pyton onnx2tflite <input-model.onnx> <output-model.tflite>**. For example: *python onnx2tflite data/onnx/bvlcalexnet-12.onnx test/alexnet.tflite*
 
 Verified models:
 
 * Alexnet (https://github.com/onnx/models/blob/main/vision/classification/alexnet/model/bvlcalexnet-12.onnx)
+* TinyYOLO (https://github.com/onnx/models/blob/main/vision/object_detection_segmentation/tiny-yolov2/model/tinyyolov2-8.onnx)
 
-Project should be in a usable state by June 2023. For now, you can download the *bvlcalexnet-12.onnx* model from https://github.com/onnx/models/blob/main/vision/classification/alexnet/model/bvlcalexnet-12.onnx, save it in the *data/onnx* directory and run *make* from the root directory to try and convert the model.
+Project should be in a usable state by June 2023.
 
 The only python packages required for model conversion are *numpy*, *flatbuffers* and *protobuf*. Others are used just for testing. To install all used python packages, run *make install* in the root directory. There is a requirement confilct between tensorflow and onnx over protobuf version. This program doesn't require that part of tensorflow functionality, so if there is a problem during instalation, run **pip install onnx==1.13.0**. Conversion testing should now work.
 
