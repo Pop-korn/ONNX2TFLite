@@ -54,16 +54,24 @@ class Quantization(meta.TFLiteObject):
         tflScale = self.scale.genTFLite(builder)
         tflZeroPoint = self.zeroPoint.genTFLite(builder)
         
+
+
+
         qp.Start(builder)
 
         if tflMin is not None:
             qp.AddMin(builder, tflMin)
+
         if tflMax is not None:
             qp.AddMax(builder, tflMax)
+
         qp.AddScale(builder, tflScale)
+
         qp.AddZeroPoint(builder, tflZeroPoint)
-        qp.AddQuantizedDimension(builder,self.quantizedDimension)
+
         qp.AddDetailsType(builder, self.detailsType)
+        
+        qp.AddQuantizedDimension(builder,self.quantizedDimension)
 
         return qp.End(builder)
         

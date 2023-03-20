@@ -39,32 +39,38 @@ class Model(meta.TFLiteObject):
         self.buffers = buffers
 
     def genTFLite(self, builder: fb.Builder):
-        if self.description is not None:
-            err.expectType(self.description, str, "Model.description")
-            tflDescription = builder.CreateString(self.description)
-        
         err.expectType(self.operatorCodes, oc.OperatorCodes, "Model.operatorCodes") # TODO change to 'requireType'
         if self.operatorCodes is not None:
             tflOperatorCodes = self.operatorCodes.genTFLite(builder)
-        
+
         err.expectType(self.subGraphs, sg.SubGraphs, "Model.subGraphs") # TODO change to 'requireType'
         if self.subGraphs is not None:
             tflSubGraphs = self.subGraphs.genTFLite(builder)
+        
+        if self.description is not None:
+            err.expectType(self.description, str, "Model.description")
+            tflDescription = builder.CreateString(self.description)
         
         err.expectType(self.buffers, b.Buffers, "Model.buffers") # TODO change to 'requireType'
         if self.buffers is not None:
             tflBuffers = self.buffers.genTFLite(builder)
 
+
+
+
         m.Start(builder)
             
         m.AddVersion(builder,self.version)
 
-        if self.description is not None:
-            m.AddDescription(builder,tflDescription)
         if self.operatorCodes is not None:
             m.AddOperatorCodes(builder,tflOperatorCodes)
+
         if self.subGraphs is not None:
             m.AddSubgraphs(builder,tflSubGraphs)
+
+        if self.description is not None:
+            m.AddDescription(builder,tflDescription)
+
         if self.buffers is not None:
             m.AddBuffers(builder,tflBuffers)
 

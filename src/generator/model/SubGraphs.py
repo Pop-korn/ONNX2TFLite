@@ -40,6 +40,7 @@ class SubGraph(meta.TFLiteObject):
     outputs: Outputs
     tensors: Tensors.Tensors
     operators: Operators.Operators
+    # TODO name
 
     def __init__(self, inputs: Inputs=None, outputs: Outputs=None,
                 tensors: Tensors.Tensors=None,
@@ -50,6 +51,10 @@ class SubGraph(meta.TFLiteObject):
         self.operators = operators
 
     def genTFLite(self, builder: fb.Builder):
+        err.expectType(self.tensors, Tensors.Tensors, "SubGraph.tensors")
+        if self.tensors is not None:
+            tflTensors = self.tensors.genTFLite(builder)
+
         err.expectType(self.inputs, Inputs, "SubGraph.inputs")
         if self.inputs is not None:
             tflInputs = self.inputs.genTFLite(builder)
@@ -58,22 +63,24 @@ class SubGraph(meta.TFLiteObject):
         if self.outputs is not None:
             tflOutputs = self.outputs.genTFLite(builder)
 
-        err.expectType(self.tensors, Tensors.Tensors, "SubGraph.tensors")
-        if self.tensors is not None:
-            tflTensors = self.tensors.genTFLite(builder)
-
         err.expectType(self.operators, Operators.Operators, "SubGraph.operators")
         if self.operators is not None:
             tflOperators = self.operators.genTFLite(builder)
 
+
+
+
         sg.Start(builder)
         
-        if self.inputs is not None:
-            sg.AddInputs(builder, tflInputs)
-        if self.outputs is not None:
-            sg.AddOutputs(builder, tflOutputs)
         if self.tensors is not None:
             sg.AddTensors(builder, tflTensors)
+
+        if self.inputs is not None:
+            sg.AddInputs(builder, tflInputs)
+
+        if self.outputs is not None:
+            sg.AddOutputs(builder, tflOutputs)
+
         if self.operators is not None:
             sg.AddOperators(builder, tflOperators)
 

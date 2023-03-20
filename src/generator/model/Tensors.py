@@ -93,7 +93,7 @@ class Tensor(meta.TFLiteObject):
     tmpReferenceCount: int
 
 
-    def __init__(self, shape: Shape,
+    def __init__(self, shape: Shape = None,
                 name: str = None, 
                 buffer: int = None, 
                 type: tt.TensorType = tt.TensorType.FLOAT32,
@@ -109,8 +109,12 @@ class Tensor(meta.TFLiteObject):
         self.quantization = quantization
 
     def genTFLite(self, builder: fb.Builder):
-        name = builder.CreateString(self.name)
-        self.shape.genTFLite(builder, self)
+
+        if self.shape is not None:
+            self.shape.genTFLite(builder, self)
+
+        if self.name is not None:
+            name = builder.CreateString(self.name)
 
         if(self.quantization is not None):
             err.requireType(self.quantization, Quantization.Quantization, "Tensor.quantization")
@@ -118,18 +122,23 @@ class Tensor(meta.TFLiteObject):
 
         t.Start(builder)
 
-        t.AddType(builder, self.type)
-        t.AddIsVariable(builder, self.isVariable)
-        t.AddHasRank(builder, self.hasRank)
-        t.AddBuffer(builder, self.buffer)
-        
-        if name is not None:
-            t.AddName(builder, name)
+        if self.shape is not None:
+            self.shape.addTFLite(builder)
 
-        self.shape.addTFLite(builder)
+        t.AddType(builder, self.type)
+
+        if self.buffer is not None:
+            t.AddBuffer(builder, self.buffer)
+
+        if self.name is not None:
+            t.AddName(builder, name)
 
         if(self.quantization is not None):
             t.AddQuantization(builder,tflQuantization)
+
+        t.AddIsVariable(builder, self.isVariable)
+
+        t.AddHasRank(builder, self.hasRank)
         
         return t.End(builder)
 

@@ -1,7 +1,7 @@
 import src.converter.builder.ModelBuilder as ModelBuilder
 
 from src.converter.builtin import CvtConv, CvtLRN, CvtMaxPool, CvtReshape, CvtDropout
-from src.converter.builtin import CvtSoftmax, CvtGemm, CvtMul, CvtAdd
+from src.converter.builtin import CvtSoftmax, CvtGemm, CvtMul, CvtAdd, CvtBatchNormalization
 
 import src.generator.model.Operators as tflO
 
@@ -87,7 +87,12 @@ class OperatorConverter:
                 if tOp.builtinOptions is None:
                     self.__builder.skipOperator(tOp)
                 return
+            
 
+                """ Operators that handle adding operators to the model themselves """
+            # case "BatchNormalization":
+            #     CvtBatchNormalization.convert(oNode.attributes, tOp, self.__builder)
+            #     return
 
             case _:
                 implicitOperatorType = False

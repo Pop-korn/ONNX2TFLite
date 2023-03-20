@@ -5,14 +5,10 @@ import src.err as err
 
 import src.parser.meta.meta as meta
 
-import src.parser.builtin.Conv as Conv
-import src.parser.builtin.Dropout as Dropout
-import src.parser.builtin.Gemm as Gemm
-import src.parser.builtin.LRN as LRN
-import src.parser.builtin.MaxPool as MaxPool
-import src.parser.builtin.Relu as Relu
-import src.parser.builtin.Reshape as Reshape
-import src.parser.builtin.Softmax as Softmax
+from src.parser.builtin import (
+    Conv, Dropout, Gemm, LRN, MaxPool, Relu, Reshape, Softmax, 
+    BatchNormalization
+)
 
 class Node(meta.ONNXObject):
     inputs: List[str]
@@ -40,6 +36,8 @@ class Node(meta.ONNXObject):
         match self.opType:
             case "Add":
                 self.attributes = None
+            case "BatchNormalization":
+                self.attributes = BatchNormalization.BatchNormalization(self._descriptor.attribute)
             case "Conv":
                 self.attributes = Conv.Conv(self._descriptor.attribute)
             case "Dropout":

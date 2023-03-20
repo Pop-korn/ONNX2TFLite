@@ -218,7 +218,7 @@ tflReducedFile = "test/tinyyolo.tflite"
 # inpt: np.ndarray = np.random.rand(*shape).astype(np.float32)
 # printStats("ONNX FULL:",runOnnxModel( onnxFile ,inpt))
 
-runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,0,2)
+runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,0,3)
 exit()
 
 

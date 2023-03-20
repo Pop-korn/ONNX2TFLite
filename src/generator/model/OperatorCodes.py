@@ -29,8 +29,8 @@ class OperatorCode(meta.TFLiteObject):
         """ Generate TFLite representation for this OperatorCode """
         oc.Start(builder)
         oc.AddDeprecatedBuiltinCode(builder,self.builtinCode)
-        oc.AddBuiltinCode(builder,self.builtinCode)
         oc.AddVersion(builder,self.version)
+        oc.AddBuiltinCode(builder,self.builtinCode)
         
         return oc.End(builder)
 
