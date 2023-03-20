@@ -63,7 +63,7 @@ def convert(oBN: onnxBN.BatchNormalization,
         opcodeIndex=modelBuilder.opCodeIndexForOpType(tflBOp.BuiltinOperator.MUL)
     )
     mul.tmpInputs = [X,invDenom]
-    fraction = modelBuilder.createEmptyTensor([],"BatchNorm_frac",np.float32)
+    fraction = modelBuilder.createEmptyTensor([],"BatchNorm_frac", tmp.dtype)
     mul.tmpOutputs = [fraction]
 
     # Create 'Add' operator to add 'bias' to the previous result
