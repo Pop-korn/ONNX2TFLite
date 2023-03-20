@@ -7,7 +7,7 @@ import src.parser.meta.meta as meta
 
 from src.parser.builtin import (
     Conv, Dropout, Gemm, LRN, MaxPool, Relu, Reshape, Softmax, 
-    BatchNormalization
+    BatchNormalization, LeakyRelu
 )
 
 class Node(meta.ONNXObject):
@@ -44,6 +44,8 @@ class Node(meta.ONNXObject):
                 self.attributes = Dropout.Dropout(self._descriptor.attribute)
             case "Gemm":
                 self.attributes = Gemm.Gemm(self._descriptor.attribute)
+            case "LeakyRelu":
+                self.attributes = LeakyRelu.LeakyRelu(self._descriptor.attribute)
             case "LRN":
                 self.attributes = LRN.LRN(self._descriptor.attribute)
             case "MaxPool":

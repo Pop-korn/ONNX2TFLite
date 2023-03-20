@@ -1,7 +1,10 @@
 import src.converter.builder.ModelBuilder as ModelBuilder
 
-from src.converter.builtin import CvtConv, CvtLRN, CvtMaxPool, CvtReshape, CvtDropout
-from src.converter.builtin import CvtSoftmax, CvtGemm, CvtMul, CvtAdd, CvtBatchNormalization
+
+from src.converter.builtin import (
+    CvtConv, CvtLRN, CvtMaxPool, CvtReshape, CvtDropout, CvtSoftmax, CvtGemm, 
+    CvtMul, CvtAdd, CvtBatchNormalization, CvtLeakyRelu
+)
 
 import src.generator.model.Operators as tflO
 
@@ -60,6 +63,8 @@ class OperatorConverter:
                 tOp.builtinOptions = CvtGemm.convert(oNode.attributes,
                                                      tOp,
                                                      self.__builder)
+            case "LeakyRelu":
+                tOp.builtinOptions = CvtLeakyRelu.convert(oNode.attributes)
             case "LRN":
                 tOp.builtinOptions = CvtLRN.convert(oNode.attributes)
             case "MaxPool":
