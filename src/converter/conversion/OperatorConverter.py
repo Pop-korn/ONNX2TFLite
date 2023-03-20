@@ -90,9 +90,11 @@ class OperatorConverter:
             
 
                 """ Operators that handle adding operators to the model themselves """
-            # case "BatchNormalization":
-            #     CvtBatchNormalization.convert(oNode.attributes, tOp, self.__builder)
-            #     return
+            case "BatchNormalization":
+                CvtBatchNormalization.convert(oNode.attributes, 
+                                              tOp, 
+                                              self.__builder)
+                return
 
             case _:
                 implicitOperatorType = False

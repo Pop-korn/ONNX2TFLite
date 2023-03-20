@@ -62,7 +62,7 @@ class ModelBuilder:
         
         data = np.zeros(dims, dtype)
 
-        return self.__createTensorForData(data, name)
+        return self.createTensorForData(data, name)
 
 
     def nchwVersionOf(self,tTensor: tflT.Tensor):
@@ -78,7 +78,7 @@ class ModelBuilder:
 
         perm = Translator.createToNCHWPerm(tTensor.shape.vector)
 
-        shapeTensor = self.__createTensorForData(perm,
+        shapeTensor = self.createTensorForData(perm,
                                                  "transpose_to_nchw_perm")
 
         transpose = tflO.Operator(builtinOptions=tflTranspose.Transpose())
@@ -274,6 +274,8 @@ class ModelBuilder:
             tensor.tmpIndex = i
             tensor.buffer = tensor.tmpBuffer.tmpIndex
 
+        # TODO Remove inputs and outputs that are not in the tensors collection
+
         # Assign 'Outputs' and 'Inputs' their tensor inidces
         outputs = self.getSubgraph().outputs
         for tensor in outputs.tmpOutputs:
@@ -413,6 +415,25 @@ class ModelBuilder:
         return buffer
 
 
+    def createTensorForData(self, data: np.ndarray, 
+                              name: str):
+        type = Translator.numpyTypeToTFLite(data.dtype)
+
+        buffer = tflB.Buffer(data, type)
+        self.appendNewBuffer(buffer)
+
+        shape = Translator.shapeFromNumpy(data)
+        name = self.__validateNewTensorName(name)
+
+        tensor = tflT.Tensor(shape, name, type=type)
+
+        tensor.tmpBuffer = buffer
+
+        self.appendNewTensor(tensor)
+
+        return tensor
+    
+
 
 
     """ -------------------- 'quality of life' functions. -------------------- """
@@ -441,25 +462,6 @@ class ModelBuilder:
                             tflBOpt.BuiltinOptions.TransposeOptions]
         
         return tOp.builtinOptions.builtinOptionsType in supportedOptions
-
-
-    def __createTensorForData(self, data: np.ndarray, 
-                              name: str):
-        type = Translator.numpyTypeToTFLite(data.dtype)
-
-        buffer = tflB.Buffer(data, type)
-        self.appendNewBuffer(buffer)
-
-        shape = Translator.shapeFromNumpy(data)
-        name = self.__validateNewTensorName(name)
-
-        tensor = tflT.Tensor(shape, name, type=type)
-
-        tensor.tmpBuffer = buffer
-
-        self.appendNewTensor(tensor)
-
-        return tensor
 
 
     def __validateNewTensorName(self, name: str) -> str:
