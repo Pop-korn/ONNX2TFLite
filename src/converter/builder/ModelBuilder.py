@@ -277,7 +277,6 @@ class ModelBuilder:
         # Assign 'Outputs' and 'Inputs' their tensor inidces
         outputs = self.getSubgraph().outputs
         for tensor in outputs.tmpOutputs:
-            print(tensor.name)
             outputs.append(tensor.tmpIndex)
 
         inputs = self.getSubgraph().inputs

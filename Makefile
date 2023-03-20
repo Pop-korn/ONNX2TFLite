@@ -1,7 +1,7 @@
 .PHONY: all get_schema gen_json parse_json test
 
 all:
-	python3 ./main.py
+	python3 ./onnx2tflite.py data/onnx/bvlcalexnet-12.onnx test/alexnet.tflite
 
 install:
 	pip install -r requirements.txt

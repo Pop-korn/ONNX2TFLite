@@ -25,6 +25,8 @@ class Code(Enum):
 
     CONVERSION_IMPOSSIBLE = 41
 
+    INPUT_ERR = 51
+
 def error(errCode: Code, *args, **kwargs):
     """ Print error message with given parameters. Alse EXIT code execution but ONLY IF
         'errCode' is not None. """
