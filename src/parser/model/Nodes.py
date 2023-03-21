@@ -31,7 +31,7 @@ class Node(meta.ONNXObject):
         self.__assignAttributes()
 
     def __assignAttributes(self):
-        """ Assign the exact attributes based on the 'opType'. Each operator is represented
+        """ Assign the exact ATTRIBUTES based on the 'opType'. Each operator is represented
             by a unique class in the '/builtin/' directory. """
         match self.opType:
             case "Add":
@@ -58,6 +58,8 @@ class Node(meta.ONNXObject):
                 self.attributes = Reshape.Reshape(self._descriptor.attribute)
             case "Softmax":
                 self.attributes = Softmax.Softmax(self._descriptor.attribute)
+            case "Sum":
+                self.attributes = None
             case _:
                 err.warning(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
             

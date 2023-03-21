@@ -237,8 +237,6 @@ class ModelBuilder:
                     # The operator before Relu does not support fused act. fun.
                     continue
 
-                print("A")
-
                 if prevOp.tmpOutputs[0] != inTensor:
                     # The Relu is being applied to a different output
                     # than the main one. Keep things as they are

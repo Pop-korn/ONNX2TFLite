@@ -3,7 +3,7 @@ import src.converter.builder.ModelBuilder as ModelBuilder
 
 from src.converter.builtin import (
     CvtConv, CvtLRN, CvtMaxPool, CvtReshape, CvtDropout, CvtSoftmax, CvtGemm, 
-    CvtMul, CvtAdd, CvtBatchNormalization, CvtLeakyRelu
+    CvtMul, CvtAdd, CvtBatchNormalization, CvtLeakyRelu, CvtSum
 )
 
 import src.generator.model.Operators as tflO
@@ -79,6 +79,8 @@ class OperatorConverter:
                 tOp.builtinOptions = CvtReshape.convert(tOp, self.__builder)
             case "Softmax":
                 tOp.builtinOptions = CvtSoftmax.convert(oNode.attributes)
+            case "Sum":
+                tOp.builtinOptions = CvtSum.convert(tOp)
 
 
                 """ Operators that might not get converted! """

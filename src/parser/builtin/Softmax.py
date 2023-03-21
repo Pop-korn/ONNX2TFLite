@@ -22,3 +22,4 @@ class Softmax(meta.ONNXOperatorAttributes):
                     self.axis = attr.i 
                 case _:
                     err.warning(f"ONNX Softmax attribute '{attr.name}' is not supported!")
+                    
