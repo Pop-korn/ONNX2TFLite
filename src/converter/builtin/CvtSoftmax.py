@@ -65,11 +65,11 @@ def convert(oSM: onnxSoftmax.Softmax,
         Y = tOp.tmpOutputs[0]
 
         T1 = modelBuilder.duplicateTensor(X, "Softmax_tmp_1_")
-        T1.shape = tflT.Shape([]) # TODO calculate exact new shape
+        T1.shape = tflT.Shape(newShape)
 
         T2 = modelBuilder.duplicateTensor(Y, "Softmax_tmp_2_")
-        T2.shape = tflT.Shape([]) # TODO calculate exact new shape
-
+        T2.shape = tflT.Shape(newShape) 
+        
 
         """ Create the first 'Reshape' operator. """
         reshape1 = tflO.Operator(

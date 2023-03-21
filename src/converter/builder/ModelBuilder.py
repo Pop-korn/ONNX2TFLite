@@ -189,12 +189,14 @@ class ModelBuilder:
 
     def finish(self) -> tflM.Model:
         """ Finalize the TFLite model and return it. """
-
         # Keep only 1 empty buffer
         self.__redirectEmptyTensorsToOneBuffer()
 
         # Combine activation function operators where possible
         self.__fuseActivationFunctions()
+
+        # Fuse Reshape operators if possible
+        self.__fuseReshapeOperators()
 
         # Remove unused tensors and bufers
         self.__removeUnusedTensorsAndBuffers()
@@ -205,6 +207,65 @@ class ModelBuilder:
 
         return self.__tflModel
     
+
+    def __fuseReshapeOperators(self):
+        """ Searh the SubGraph for occurances of 2 Reshape moderators right
+            after one another and try to merge them. """
+        
+        if tflBO.BuiltinOperator.RESHAPE not in self.__opCodeTypeIndexMap.keys():
+            # There is no Reshape in the model
+            return
+        
+        reshapeOpCodeIndex = self.opCodeIndexForOpType(tflBO.BuiltinOperator.RESHAPE)
+
+        self.__countReferencesToTensorsAndBuffers()
+
+        # Find Reshape operators
+        prevOp = None
+        toRemove = []
+        for op in self.getOperators().vector:
+            try:
+                if op.opcodeIndex != reshapeOpCodeIndex:
+                    prevOp = op
+                    continue
+
+                # Found Reshape
+
+                if prevOp is None:
+                    # Previous operator was not a Reshape
+                    prevOp = op
+                    continue
+
+                if prevOp.opcodeIndex != reshapeOpCodeIndex:
+                    # Previous operator was not a Reshape
+                    prevOp = op
+                    continue
+
+                # LastOp is Reshape
+                if op.tmpInputs[0].tmpReferenceCount != 2:
+                    # Someting else is also using the ouptu of the previous Reshape
+                    prevOp = op
+                    continue
+
+                # Found 2 Reshape operators that can be merged
+                
+                if len(op.tmpInputs) != 1 or len(prevOp.tmpInputs) != 1:
+                    err.internal("ModelBuilder.fuseReshapeOperators():",
+                                 f"{prevOp.name}, {op.name} have unexpected inputs.")
+                    continue
+
+                op.tmpInputs[0] = prevOp.tmpInputs[0]
+                toRemove.append(prevOp)
+                
+                prevOp = op
+
+            except:
+                err.internal("ModelBuilder.fuseReshapeOperators(): Exception")
+        
+        # Remove unnecessary Reshape operators
+        ops = self.getOperators().vector
+        for op in toRemove:
+            ops.remove(op)
 
     def __fuseActivationFunctions(self):
         if tflBO.BuiltinOperator.RELU not in self.__opCodeTypeIndexMap.keys():
