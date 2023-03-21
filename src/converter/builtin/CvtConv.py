@@ -23,10 +23,11 @@ def convert(oConv: onnxConv.Conv, tOp: tflO.Operator,
 
             if common.isOfSize(oConv.dilations, 2):
                 tConv.dilationHFactor = oConv.dilations[0]
-                tConv.dilationHFactor = oConv.dilations[1]
+                tConv.dilationWFactor = oConv.dilations[1]
 
             tConv.padding = Translator.convertPadding(oConv.autoPad, oConv.pads, 
-                                                      oConv.kernelShape)
+                                                      oConv.kernelShape,
+                                                      oConv.dilations)
             
             if len(tOp.tmpInputs) == 2:
                 # Operator is has no bias. ONNX model can ommit it. TFLite can't.

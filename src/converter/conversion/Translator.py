@@ -67,12 +67,21 @@ def collectionsEqual(colA, colB):
     return True
 
 
-def __isSAMEPadding(oPads: List[int], oKernelShape: List[int]):
+def __isSAMEPadding(oPads: List[int], oKernelShape: List[int],
+                    oDilations: List[int]):
     """ Determine if given 'oPads' padding can be represented exactly with the
         'SAME' padding type for given kernel shape. """
     
-    for padding, dim in zip(oPads, oKernelShape):
-        if dim // 2 != padding:
+    """ Calculate the 'range' of the kernel, taking into account dilations and
+        kernel shape. """
+    if len(oKernelShape) == len(oDilations):
+        kernelRange = [ int(dim/2) * dilation for dim, dilation in zip(oKernelShape, oDilations)]
+    else:
+        kernelRange = [ int(dim/2) for dim in oKernelShape]
+
+    
+    for padding, reach in zip(oPads, kernelRange):
+        if reach != padding:
             return False
         
     return True
@@ -91,7 +100,8 @@ def shapeFromNumpy(numpyArray):
 
 
 def convertPadding(autoPad: str, oPads: List[int], 
-                   oKernelShape: List[int]) -> tflPad.Padding:
+                   oKernelShape: List[int],
+                   oDilations: List[int]) -> tflPad.Padding:
         """ Convert ONNX pads to TFLite padding. 'autoPad' is the ONNX attribute
             'auto_pad' and 'oPads' is the ONNX attribute 'pads'. 
             The 'oKernelShape' is used to determine if conversion was valid"""
@@ -116,9 +126,10 @@ def convertPadding(autoPad: str, oPads: List[int],
             # No padding in any dieraction
             return tflPad.Padding.VALID
 
-        if not __isSAMEPadding(oPads, oKernelShape):
+        if not __isSAMEPadding(oPads, oKernelShape, oDilations):
             err.warning(f"TFLite does NOT support '{oPads}' padding for kernel",
-                        f"'{oKernelShape}'! Using 'SAME'.")
+                        f"'{oKernelShape}' and dilations '{oDilations}'!",
+                        "Using 'SAME'.")
         
         return tflPad.Padding.SAME
 

@@ -27,7 +27,8 @@ def convert(oMP: onnxMaxPool.MaxPool) -> tflMeta.BuiltinOptions:
                 tMP.filterW = oMP.kernelShape[1]
 
             tMP.padding = Translator.convertPadding(oMP.autoPad, oMP.pads, 
-                                                    oMP.kernelShape)
+                                                    oMP.kernelShape,
+                                                    oMP.dilations)
 
             # TODO tMP.fusedActivationFunction
 
