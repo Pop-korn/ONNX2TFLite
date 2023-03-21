@@ -229,13 +229,15 @@ class ModelBuilder:
                 if inTensor.tmpReferenceCount != 2:
                     # The output of the previous tensor is used by something 
                     # other that the Relu.
-                    continue
+                    continue                
 
                 prevOp = self.__getOperatorWithOutput(inTensor)
 
                 if not self.__canHaveFusedActivationFunction(prevOp):
                     # The operator before Relu does not support fused act. fun.
                     continue
+
+                print("A")
 
                 if prevOp.tmpOutputs[0] != inTensor:
                     # The Relu is being applied to a different output
@@ -453,10 +455,12 @@ class ModelBuilder:
                             tflBOpt.BuiltinOptions.BidirectionalSequenceRNNOptions,
                             tflBOpt.BuiltinOptions.FullyConnectedOptions,
                             tflBOpt.BuiltinOptions.ConcatenationOptions,
+                            tflBOpt.BuiltinOptions.AddOptions,
                             tflBOpt.BuiltinOptions.MulOptions,
                             tflBOpt.BuiltinOptions.L2NormOptions,
                             tflBOpt.BuiltinOptions.LSTMOptions,
                             tflBOpt.BuiltinOptions.UnidirectionalSequenceLSTMOptions,
+                            tflBOpt.BuiltinOptions.BidirectionalSequenceLSTMOptions,
                             tflBOpt.BuiltinOptions.SubOptions,
                             tflBOpt.BuiltinOptions.DivOptions,
                             tflBOpt.BuiltinOptions.TransposeOptions]

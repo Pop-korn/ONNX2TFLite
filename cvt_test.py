@@ -204,9 +204,9 @@ def runAndTestOperators(originalOnnxFile, outOnnxFile,
 """ -------------------- Start of execution -------------------- """
 
 imageFile = "data/224x224/cat2.jpg"
-onnxFile = "data/onnx/tinyyolov2-8.onnx"
-onnxReducedFile = "test/tinyyolo.onnx"
-tflReducedFile = "test/tinyyolo.tflite"
+onnxFile = "data/onnx/ResNet101-DUC-12.onnx"
+onnxReducedFile = "test/duc.onnx"
+tflReducedFile = "test/duc.tflite"
 
 # TESTE ALEXNET CONVERSION
 # runAndTestFirstNOperators("data/onnx/bvlcalexnet-12.onnx","test/alexnet.onnx",
@@ -218,7 +218,7 @@ tflReducedFile = "test/tinyyolo.tflite"
 # inpt: np.ndarray = np.random.rand(*shape).astype(np.float32)
 # printStats("ONNX FULL:",runOnnxModel( onnxFile ,inpt))
 
-runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,0,32)
+runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,1,2)
 exit()
 
 

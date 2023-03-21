@@ -8,7 +8,7 @@ import src.err as err
 
 from src.generator.builtin import(
     Add as tflAdd,
-    Div as tflDiv,
+    Sub as tflSub,
     Mul as tflMul
 )
 
@@ -42,20 +42,23 @@ def convert(oBN: onnxBN.BatchNormalization,
 
         It can be rewritten as:
 
-            Y = (X - mean) * ( scale / ( sqrt(var + eps) ) ) + bias
+            Y = X * ( scale / ( sqrt(var + eps) ) ) + 
+            + ( bias - mean * scale / ( sqrt(var + eps) ) )
 
-        where ( scale / ( sqrt(var + eps) ) ) is a static tensor.
+        where ( scale / ( sqrt(var + eps) ) ) and 
+        ( bias - mean * scale / ( sqrt(var + eps) ) ) are static tensors.
     """
 
-    if not isZeroTensor(mean):
-        # TODO generate Sub operator to subtract mean from input
-        # X = X - mean
-        err.internal("CvtBatchNormalization.convert(): mean is not just zeros!",
-                     "Implement necessary conversion.")
         
     # Calculate the static portion of the expression
     tmp = scale.tmpBuffer.data / np.sqrt(var.tmpBuffer.data + oBN.epsilon)
     invDenom = modelBuilder.createTensorForData(tmp, "BatchNorm_invdenom")
+    
+    if not isZeroTensor(mean):
+        """ Mean is not just all zeros. Need to claculate the second static 
+            tensor. Use it as the new value for 'bias'. """
+        tmp = mean.tmpBuffer.data * tmp
+        bias.tmpBuffer.data -= tmp
 
     # Create 'Mul' operator, to multiply the input with the static tensor
     mul = tflO.Operator(
