@@ -219,7 +219,7 @@ tflReducedFile = "test/duc.tflite"
 # printStats("ONNX FULL:",runOnnxModel( onnxFile ,inpt))
 
 # runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,9,347)
-runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,347,353)
+runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,353,353)
 exit()
 
 
