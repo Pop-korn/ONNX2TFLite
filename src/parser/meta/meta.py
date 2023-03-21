@@ -52,8 +52,3 @@ class ONNXIntListAttribute(List [int]):
 
         for item in descriptor.ints:
             self.append(item)
-
-def isDefined(descriptor: onnx.DESCRIPTOR):
-    """ Tetermine if given descriptor is not empty. """
-    return descriptor != ""
-        
