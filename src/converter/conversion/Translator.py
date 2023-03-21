@@ -74,7 +74,7 @@ def __isSAMEPadding(oPads: List[int], oKernelShape: List[int],
     
     """ Calculate the 'range' of the kernel, taking into account dilations and
         kernel shape. """
-    if len(oKernelShape) == len(oDilations):
+    if  oDilations is not None and len(oKernelShape) == len(oDilations):
         kernelRange = [ int(dim/2) * dilation for dim, dilation in zip(oKernelShape, oDilations)]
     else:
         kernelRange = [ int(dim/2) for dim in oKernelShape]
