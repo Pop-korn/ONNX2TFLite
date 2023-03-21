@@ -77,8 +77,6 @@ class OperatorConverter:
                 implicitOperatorType = False
             case "Reshape":
                 tOp.builtinOptions = CvtReshape.convert(tOp, self.__builder)
-            case "Softmax":
-                tOp.builtinOptions = CvtSoftmax.convert(oNode.attributes)
             case "Sum":
                 tOp.builtinOptions = CvtSum.convert(tOp)
 
@@ -98,9 +96,11 @@ class OperatorConverter:
 
                 """ Operators that handle adding operators to the model themselves """
             case "BatchNormalization":
-                CvtBatchNormalization.convert(oNode.attributes, 
-                                              tOp, 
+                CvtBatchNormalization.convert(oNode.attributes, tOp, 
                                               self.__builder)
+                return
+            case "Softmax":
+                CvtSoftmax.convert(oNode.attributes, tOp, self.__builder)
                 return
 
             case _:

@@ -24,6 +24,8 @@ def tensorToNCHW(tensor: np.ndarray):
     return np.moveaxis(tensor,3,1)
 
 def shapeToNHWC(shape):
+    if len(shape) < 4:
+        return shape
     c = shape[1]
     shape[1:-2] = shape[2:-1]
     shape[-1] = c
@@ -49,6 +51,9 @@ def runTFLiteModel(modelFile, inpt):
 
     inDet = tflModel.get_input_details()
     outDet = tflModel.get_output_details()
+
+    print("In:",inDet[0]['shape'])
+    print("Out:",outDet[0]['shape'])
 
     tflModel.set_tensor(inDet[0]['index'], inpt)
 
@@ -193,6 +198,7 @@ def runAndTestOperators(originalOnnxFile, outOnnxFile,
 
     inpt: np.ndarray = np.random.rand(*shape).astype(np.float32)
 
+
     onnxOut = runOnnxModel(outOnnxFile, inpt)
     printStats("ONNX", onnxOut)
 
@@ -219,7 +225,7 @@ tflReducedFile = "test/duc.tflite"
 # printStats("ONNX FULL:",runOnnxModel( onnxFile ,inpt))
 
 # runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,9,347)
-runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,353,353)
+runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,353,354)
 exit()
 
 

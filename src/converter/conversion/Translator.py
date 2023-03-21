@@ -29,6 +29,16 @@ def isNCHW(dims: List[int]) -> bool:
     return False
 
 
+def isNHWC(dims: List[int]) -> bool:
+    """ Figure out if given 'dims' is in the 'nhwc' format. """
+
+    # TODO Improve
+    if len(dims) >= 4:
+        return True
+
+    return False
+
+
 def __dimsToNCHW(nhwcList: List[int]) -> List[int]:
     """ Convert a list of ints which represent dimensions from NHWC to NCHW. """
 
@@ -203,6 +213,31 @@ def createToNCHWPerm(dims: List[int]) -> np.ndarray:
     return np.asarray(perm, np.int32)
 
 
+def createAxisToLastPerm(axis, numDims):
+    """ Create a numpy array representing the transpose permutations needed, to 
+        make the 'axis' dimension, the last dimension. """
+    
+    dims = list(range(numDims))
+    
+    if axis == numDims-1:
+        return dims
+    elif axis >= numDims or axis < 0:
+        err.warning(f"Translator.createAxisToLastPerm({axis},{numDims}).",
+                    "Inputs don't make sense!")
+        return np.asarray(dims, np.int32)
+
+    # Remember axis dimension
+    axisDim = dims[axis]
+
+    # Move dimensions after 'axis' to the left
+    dims[axis:-1] = dims[axis+1:-1]
+
+    # Add axis dimension to the end
+    dims.append(axisDim)
+    
+    return np.asarray(dims, np.int32)
+
+
 def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
     """ Convert ONNX DataType to TFLite TensorType """
 
@@ -319,3 +354,58 @@ def numpyTypeToTFLite(numpyType) -> tflTT.TensorType:
             err.warning(f"Cannot convert numpy data type '{numpyType}'",
                         "to TFLite.")
             return tflTT.TensorType.FLOAT32
+        
+
+def TFLiteTypeToNumpy(tflType) -> tflTT.TensorType:
+    """ Convert TFLite TensorType to numpy dtype """
+
+    match tflType:
+        case tflTT.TensorType.FLOAT32:
+            return np.float32
+
+        case tflTT.TensorType.UINT8:
+            return np.uint8
+
+        case tflTT.TensorType.INT8:
+            return np.int8
+
+        case tflTT.TensorType.UINT16:
+            return np.uint16
+
+        case tflTT.TensorType.INT16:
+            return np.int16
+
+        case tflTT.TensorType.INT32:
+            return np.int32
+
+        case tflTT.TensorType.INT64:
+            return np.int64
+
+        case tflTT.TensorType.STRING:
+            return np.string_
+
+        case tflTT.TensorType.BOOL:
+            return np.bool_
+
+        case tflTT.TensorType.FLOAT16:
+            return np.float16
+
+        case tflTT.TensorType.FLOAT64:
+            return np.float64
+
+        case tflTT.TensorType.UINT32:
+            return np.uint32
+
+        case tflTT.TensorType.UINT64:
+            return np.uint64
+
+        case tflTT.TensorType.COMPLEX64:
+            return np.complex64
+
+        case tflTT.TensorType.COMPLEX128:
+            return np.complex128
+            
+        case _:
+            err.warning(f"Cannot convert TFLite type '{tflType}'",
+                        "to numpy dtype.")
+            return np.float32
