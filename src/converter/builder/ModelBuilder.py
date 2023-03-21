@@ -198,6 +198,9 @@ class ModelBuilder:
         # Fuse Reshape operators if possible
         self.__fuseReshapeOperators()
 
+        # Fuse Reshape operators if possible
+        self.__fuseReshapeOperators()
+
         # Remove unused tensors and bufers
         self.__removeUnusedTensorsAndBuffers()
 
