@@ -214,61 +214,20 @@ onnxFile = "data/onnx/ResNet101-DUC-12.onnx"
 onnxReducedFile = "test/duc.onnx"
 tflReducedFile = "test/duc.tflite"
 
-# TESTE ALEXNET CONVERSION
+# # TEST ALEXNET CONVERSION
 # runAndTestFirstNOperators("data/onnx/bvlcalexnet-12.onnx","test/alexnet.onnx",
 #                           "test/alexnet.tflite",24,imageFile)
 # exit()
 
+# # TEST TINYYOLO CONVERSION
+# runAndTestOperators("data/onnx/tinyyolov2-8.onnx","test/tinyyolo.onnx",
+#                     "test/tinyyolo.tflite",0,32)
+# exit()
 
-# shape = [1,416,416,3]
-# inpt: np.ndarray = np.random.rand(*shape).astype(np.float32)
-# printStats("ONNX FULL:",runOnnxModel( onnxFile ,inpt))
-
-# runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,9,347)
-runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,353,354)
+# # TEST RESNET-DUC CONVERSION
+runAndTestOperators("data/onnx/ResNet101-DUC-12.onnx","test/duc.onnx",
+                    "test/duc.tflite",0,354)
 exit()
 
 
-from onnx import helper
-from onnx import AttributeProto, TensorProto, GraphProto
-
-X = helper.make_tensor_value_info("X", TensorProto.FLOAT, ["None",3,2,2])
-bias = helper.make_tensor("bias", TensorProto.FLOAT, [1,3,1,1], np.ones([3],np.float32))
-
-# Create one output (ValueInfoProto)
-Y = helper.make_tensor_value_info("Y", TensorProto.FLOAT, ["None",3,2,2])
-
-# Create a node (NodeProto) - This is based on Pad-11
-node_def = helper.make_node(
-    "Add",                  # name
-    ["bias","X"],          # inputs
-    ["Y"],                  # outputs
-)
-
-# Create the graph (GraphProto)
-graph_def = helper.make_graph(
-    [node_def],        # nodes
-    "test-model",      # name
-    [X],                # inputs
-    [Y],               # outputs
-    [bias]
-)
-
-# Create the model (ModelProto)
-model_def = helper.make_model(graph_def, producer_name="onnx-example")
-
-print(f"The model is:\n{model_def}")
-onnx.checker.check_model(model_def)
-print("The model is checked!")
-
-onnx.save(model_def,"test/test.onnx")
-sess = ort.InferenceSession("test/test.onnx")
-    
-res = sess.run(None, {sess.get_inputs()[0].name : np.ones([2,3,2,2],np.float32)})
-res = np.asarray(res).squeeze()
-
-print(res)
-
-
-runAndTestOperators("test/test.onnx", "test/test.onnx", "test/test.tflite",0,0)
-
+# runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,353,354)

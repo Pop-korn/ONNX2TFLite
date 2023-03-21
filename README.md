@@ -8,8 +8,9 @@ Verified models:
 
 * Alexnet (https://github.com/onnx/models/blob/main/vision/classification/alexnet/model/bvlcalexnet-12.onnx)
 * TinyYOLO (https://github.com/onnx/models/blob/main/vision/object_detection_segmentation/tiny-yolov2/model/tinyyolov2-8.onnx)
+* DUC (https://github.com/onnx/models/blob/main/vision/object_detection_segmentation/duc/model/ResNet101-DUC-12.onnx)
 
-Project should be in a usable state by June 2023.
+Only a few operators are supported at the moment. Project should be in a usable state by June 2023.
 
 The only python packages required for model conversion are *numpy*, *flatbuffers* and *protobuf*. Others are used just for testing. To install all used python packages, run *make install* in the root directory. There is a requirement confilct between tensorflow and onnx over protobuf version. This program doesn't require that part of tensorflow functionality, so if there is a problem during instalation, run **pip install onnx==1.13.0**. Conversion testing should now work.
 
