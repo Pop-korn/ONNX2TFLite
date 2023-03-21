@@ -47,6 +47,8 @@ class ModelBuilder:
                              # of skipped operators, to 'tflT.Tensor' ouputs of 
                              # previous operators
 
+    __zerosTensorMap: Dict # Mapping 'string' shapes to 'tflT.Tensor' objects
+
 
     def __init__(self, modelVersion: int, modelDescription: str) -> None:
         self.__tflModel = tflM.Model(modelVersion, modelDescription)
@@ -54,12 +56,39 @@ class ModelBuilder:
         self.__tensorNameMap = {}
         self.__nchwTensorVersion = {}
         self.__skippedOutputMap = {}
+        self.__zerosTensorMap = {}
 
 
-    def createEmptyTensor(self, dims: List[int], 
+    def createZerosTensor(self, dims: List[int], 
                           name: str, 
-                          dtype: np.dtype) -> tflT.Tensor:
+                          dtype: np.dtype,
+                          canReuse: bool = False) -> tflT.Tensor:
+        """ Create and return a Tensor with given shape, name and dtype that
+            only contains zeros.
+            If 'canReuse' is True, created tensor can be shared with other 
+            operators. """
         
+        if canReuse:
+            # The zeros vector can be shared with other operators
+
+            strDims = self.__dimsToString(dims)
+
+            # Check if such tensor already exists
+            if strDims in self.__zerosTensorMap.keys():
+                print("REUSING", strDims)
+                return self.__zerosTensorMap[strDims]
+
+            else:
+                print(" ADDING",strDims)
+                # Create a new one and register it for potential future use
+                data = np.zeros(dims, dtype)
+                newTensor = self.createTensorForData(data, name)
+
+                self.__zerosTensorMap[strDims] = newTensor
+
+                return newTensor
+
+        # Tensor cannot be shared. Just create one and return it
         data = np.zeros(dims, dtype)
 
         return self.createTensorForData(data, name)
@@ -498,6 +527,12 @@ class ModelBuilder:
 
 
     """ -------------------- 'quality of life' functions. -------------------- """
+
+
+    def __dimsToString(self, dims: List[int]):
+        """ Convert a list of integers to a string. """
+        tmp = [str(dim) for dim in dims]
+        return "_".join(tmp)
 
 
     def __canHaveFusedActivationFunction(self, tOp: tflO.Operator) -> bool:

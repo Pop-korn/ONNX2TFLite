@@ -32,9 +32,10 @@ def convert(oConv: onnxConv.Conv, tOp: tflO.Operator,
             if len(tOp.tmpInputs) == 2:
                 # Operator is has no bias. ONNX model can ommit it. TFLite can't.
                 kernelShape = tOp.tmpInputs[1].shape.vector
-                bias = modelBuilder.createEmptyTensor([kernelShape[0]], 
+                bias = modelBuilder.createZerosTensor([kernelShape[0]], 
                                                       "zero_conv_bias",
-                                                      tOp.tmpInputs[1].tmpBuffer.data.dtype)
+                                                      tOp.tmpInputs[1].tmpBuffer.data.dtype,
+                                                      True)
                 tOp.tmpInputs.append(bias)
 
             return tConv
