@@ -218,7 +218,8 @@ tflReducedFile = "test/duc.tflite"
 # inpt: np.ndarray = np.random.rand(*shape).astype(np.float32)
 # printStats("ONNX FULL:",runOnnxModel( onnxFile ,inpt))
 
-runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,9,205)
+# runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,9,347)
+runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,347,353)
 exit()
 
 
