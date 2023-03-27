@@ -225,9 +225,9 @@ tflReducedFile = "test/duc.tflite"
 # exit()
 
 # # TEST RESNET-DUC CONVERSION
-runAndTestOperators("data/onnx/ResNet101-DUC-12.onnx","test/duc.onnx",
-                    "test/duc.tflite",0,354)
-exit()
+# runAndTestOperators("data/onnx/ResNet101-DUC-12.onnx","test/duc.onnx",
+#                     "test/duc.tflite",0,354)
+# exit()
 
 
-# runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,353,354)
+runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,0,1)

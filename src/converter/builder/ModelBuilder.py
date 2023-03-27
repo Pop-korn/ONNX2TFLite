@@ -141,7 +141,7 @@ class ModelBuilder:
 
                 # Found suitable replacement
                 self.__skippedOutputMap[skipped] = replacement
-                print("Replacing",skipped.name,"with", replacement.name)
+                err.internal("Replacing",skipped.name,"with", replacement.name)
 
                 # Check if we are skipping the output of the whole graph
                 graphOutputs = self.getSubgraph().outputs.tmpOutputs 
@@ -604,7 +604,7 @@ class ModelBuilder:
             does NOT exist, function will create and register a new tensor with
             shape '[]', which will be returned."""
         if name not in self.__tensorNameMap.keys():
-            err.note(f"Tensor '{name}' is not yet in the tensors. Adding it!") 
+            err.internal(f"Tensor '{name}' is not yet in the tensors. Adding it!") 
 
             newTensor = tflT.Tensor(tflT.Shape([]),name) # TODO Should be OK (only useless output tensor)
             newTensor.tmpBuffer = self.buildEmptyBuffer()
