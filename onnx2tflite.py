@@ -9,4 +9,9 @@ if len(sys.argv) < 3:
               "Example use: 'python onnx2tflite model.onnx out/model.tflite'.")
 
 
+if len(sys.argv) >= 4:
+    errLevel = int(sys.argv[3])
+    err.MIN_OUTPUT_IMPORTANCE = err.MessageImportance(errLevel)
+
+
 convert.convertModel(sys.argv[1], sys.argv[2])

@@ -44,7 +44,6 @@ def convert(oSM: onnxSoftmax.Softmax,
     if oSM.axis != -1 and oSM.axis != len(tOp.tmpInputs[0].shape.vector)-1:
         err.note(f"ONNX operator 'Softmax' has attribute 'axis' = '{oSM.axis}'.",
                  "Must add 2 'Reshape' operators to implement conversion.")
-        print(oSM.axis, oSM.axis == -1)
 
         # Special case        
         if Translator.isNHWC(tOp.tmpInputs[0].shape.vector):

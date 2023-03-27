@@ -75,11 +75,11 @@ class ModelBuilder:
 
             # Check if such tensor already exists
             if strDims in self.__zerosTensorMap.keys():
-                print("REUSING", strDims)
+                err.internal("REUSING zero tensor of size", strDims)
                 return self.__zerosTensorMap[strDims]
 
             else:
-                print(" ADDING",strDims)
+                err.internal("ADDING zero tensor of size",strDims)
                 # Create a new one and register it for potential future use
                 data = np.zeros(dims, dtype)
                 newTensor = self.createTensorForData(data, name)

@@ -8,7 +8,10 @@ import numpy as np
 
 import src.converter.convert as convert
 
-""" This file provides functions to  """
+import src.err as err
+
+err.MIN_OUTPUT_IMPORTANCE = err.MessageImportance.LOWEST
+
 
 def printStats(formatName, output):
     print(formatName)
@@ -230,4 +233,4 @@ tflReducedFile = "test/duc.tflite"
 # exit()
 
 
-runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,0,1)
+runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,0,100)

@@ -3,13 +3,15 @@ from enum import Enum
 
 """ Minumum message importance level to print. """
 class MessageImportance(Enum):
+    LOWEST = -1
     UNCHECKED = 0
     INTERNAL = 1
     NOTE = 2
     WARNING = 3
     ERROR = 4
+    HIGHEST = 10
 
-MIN_OUTPUT_IMPORTANCE = MessageImportance.UNCHECKED
+MIN_OUTPUT_IMPORTANCE = MessageImportance.WARNING
 
 
 class Code(Enum):
