@@ -1,11 +1,15 @@
 TFL?=test.tflite
 JSON?=test.json
+ONNX?=test.onnx
 
-to-json:
+flatbuffer-to-json:
 	flatc -t --strict-json --defaults-json -o . ../data/schemas/tflite/schema.fbs -- $(TFL) --raw-binary
 
-from-json:
+json-to-flatbuffer:
 	flatc -b --strict-json --defaults-json -o . ../data/schemas/tflite/schema.fbs $(JSON)
+
+protobuf-to-json:
+	python protobufToJson.py $(ONNX) > $(JSON)
 	
 	
 test-efficiency: 

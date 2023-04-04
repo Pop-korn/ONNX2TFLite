@@ -363,6 +363,6 @@ tinyyoloTfl = "test/tinyyolo.tflite"
 # exit()
 
 
-testConversion(alexnetOnnx, alexnetTfl, 10)
+# testConversion(alexnetOnnx, alexnetTfl, 10)
 
-# runAndTestOperators(onnxFile, onnxReducedFile, tflReducedFile,354,354)
+runAndTestOperators(alexnetOnnx, "test/alexnet.onnx", alexnetTfl,12,13)

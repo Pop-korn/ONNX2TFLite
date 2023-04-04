@@ -7,7 +7,7 @@ install:
 	pip install -r requirements.txt
 
 test:
-	python3 cvt_test.py
+	python3 conversion_test.py
 
 to-json: all
 	flatc -t --strict-json --defaults-json -o test data/schemas/tflite/schema.fbs -- test/alexnet.tflite --raw-binary 
