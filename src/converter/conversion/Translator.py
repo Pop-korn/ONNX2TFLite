@@ -23,6 +23,7 @@ def isNCHW(dims: List[int]) -> bool:
     """ Figure out if given 'dims' is in the 'nchw' format. """
 
     # TODO Improve
+    # Conv conversion can use NHC / NCH shapes
     if len(dims) >= 4:
         return True
 
@@ -33,33 +34,28 @@ def isNHWC(dims: List[int]) -> bool:
     """ Figure out if given 'dims' is in the 'nhwc' format. """
 
     # TODO Improve
+    # Conv conversion can use NHC / NCH shapes
     if len(dims) >= 4:
         return True
 
     return False
 
 
-def __dimsToNCHW(nhwcList: List[int]) -> List[int]:
+def dimsToNCHW(nhwcList: List[int]) -> List[int]:
     """ Convert a list of ints which represent dimensions from NHWC to NCHW. """
 
-    res = [nhwcList[0]] # First element is 'n'
+    res = list(nhwcList)
 
-    res.append(nhwcList[-1]) # Channels
-
-    res[2:] = nhwcList[1:-1] # Move h,w,... one to the right
+    res.insert(1, res.pop()) # Insert 'C' (last item) to index 1
 
     return res
 
-def __dimsToNHWC(nchwList: List[int]) -> List[int]:
+def dimsToNHWC(nchwList: List[int]) -> List[int]:
     """ Convert a list of ints which represent dimensions from NCHW to NHWC. """
 
-    res = [nchwList[0]] # First element is 'n'
+    res = list(nchwList)
 
-    channels = nchwList[1] # Save the channels
-
-    res[1:] = nchwList[2:] # Move h,w,... one to the left
-
-    res.append(channels) # Add channels at the end
+    res.append( res.pop(1) ) # Move 'C' (idx 1) to the end
 
     return res
 
@@ -100,6 +96,30 @@ def __isSAMEPadding(oPads: List[int], oKernelShape: List[int],
 
 
 """ -------------------- Public Functions -------------------- """
+
+
+def nchToNhwcDims(nchDims: List[int]):
+    """ Convert a list of ints representing the shape of an NCH tensor to the
+        dimensions of an equivalent NHWC tensor. """
+
+    res = nchDims.copy()
+
+    res.append( res.pop(1) ) # Move 'C' to the end
+
+    res.insert(2,1) # Insert 'W' = 1
+    
+    return res
+
+
+def nchToNchwDims(nchDims: List[int]):
+    """ Convert a list of ints representing the shape of an NCH tensor to the
+        dimensions of an equivalent NCHW tensor. i.e. add '1' to the end. """
+
+    res = nchDims.copy()
+
+    res.append(1)
+    
+    return res
 
 
 def shapeFromNumpy(numpyArray):
@@ -144,6 +164,37 @@ def convertPadding(autoPad: str, oPads: List[int],
         return tflPad.Padding.SAME
 
 
+def nchToNhwcData(data: np.ndarray, dims: List[int]):
+    """ Convert the data of an 'NCH' tensor to equivalent 'NHWC' format. """
+
+    dims = dims.copy()
+
+    err.expectEqualLists(dims, list(data.shape))
+
+    # Product of all dimensions multiplied together (total size)
+    size = ft.reduce(lambda a,b : a*b, dims) 
+    if size != len(data.flatten()):
+        err.error(err.Code.INVALID_TENSOR_SHAPE,
+            f"Numpy array for tensor of shape '{dims}' should have '{size}'",
+            f"elements, but has '{len(data)}'!")
+        
+    # Append '1' to the end of the shape to make it NCHW
+    dims.append(1)
+
+    # Assign 'data' its current shape 
+    data.shape = dims
+
+    # "Move" the channels (index 1) to the end to make it NHWC
+    data = np.moveaxis(data,1,-1)
+
+    # Check it worked
+    nhwcShape = dimsToNHWC(dims)
+    if not collectionsEqual(data.shape, nhwcShape):
+        err.warning(f"Failed to convert data from NCH shape '{dims}' to NHC!",
+                    f"Got '{data.shape}', expected '{nhwcShape}'.")
+
+    return data
+
 def convertTensorData(data: np.ndarray, shape: List[int]):
     """ Convert the data of a tensor from the 'NCHW' to 'NHWC' format. """
 
@@ -153,7 +204,7 @@ def convertTensorData(data: np.ndarray, shape: List[int]):
         # 'data' does not need to be converted
         return data
 
-    # Product of all dimensions multiplied together
+    # Product of all dimensions multiplied together (total size)
     size = ft.reduce(lambda a,b : a*b, shape) 
     if size != len(data.flatten()):
         err.error(err.Code.INVALID_TENSOR_SHAPE,
@@ -167,7 +218,7 @@ def convertTensorData(data: np.ndarray, shape: List[int]):
     data = np.moveaxis(data,1,-1)
     
     # Check it worked
-    nhwcShape = __dimsToNHWC(shape)
+    nhwcShape = dimsToNHWC(shape)
     if not collectionsEqual(data.shape, nhwcShape):
         err.warning(f"Failed to convert data from shape '{shape}'!",
                     f"Got '{data.shape}', expected '{nhwcShape}'.")
@@ -187,7 +238,7 @@ def NHWCShapeToNCHW(nhwcShape: tflT.Shape) -> tflT.Shape:
     """ Create an NCHW version of an NHWC 'generator/shape' object. """
 
     dims = nhwcShape.vector.copy()
-    dims = __dimsToNCHW(dims)
+    dims = dimsToNCHW(dims)
 
     return tflT.Shape(dims)
 
@@ -199,7 +250,7 @@ def convertShapeDims(oDims: List[int]) -> tflT.Shape:
     dims = [dim for dim in oDims] # Copy just in case
 
     if isNCHW(dims):
-        dims = __dimsToNHWC(dims)
+        dims = dimsToNHWC(dims)
 
     return tflT.Shape(dims)
 
@@ -208,7 +259,15 @@ def createToNCHWPerm(dims: List[int]) -> np.ndarray:
     """ Take 'dims' in NHWC and return a numpy array, holding data that 
         describes the permutation which would change 'dims' to NCHW. """
     
-    perm = __dimsToNCHW( list(range(len(dims))) )
+    perm = dimsToNCHW( list(range(len(dims))) )
+
+    return np.asarray(perm, np.int32)
+
+def createToNHWCPerm(dims: List[int]) -> np.ndarray:
+    """ Take 'dims' in NCHW and return a numpy array, holding data that 
+        describes the permutation which would change 'dims' to NHWC. """
+    
+    perm = dimsToNHWC( list(range(len(dims))) )
 
     return np.asarray(perm, np.int32)
 

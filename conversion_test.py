@@ -33,19 +33,20 @@ def printStats(formatName, output):
     print(f"\tStd = {output.std()}")
 
 def tensorToNCHW(tensor: np.ndarray):
-    """ Determine if given 'tensor' is in the NCHW format. """
+    """ Determine if given static 'tensor' is in the NCHW format, if so, convert it.
+        """
     if len(tensor.shape) < 4:
         return tensor
-    return np.moveaxis(tensor,3,1)
+    return np.moveaxis(tensor, len(tensor.shape) - 1, 1)
 
 def shapeToNHWC(shape):
     """ Convert NCHW shape to NHWC and return it. If 'shape' is not in NCHW, 
         nothing is done to it. """
     if len(shape) < 4:
         return shape
-    c = shape[1]
-    shape[1:-2] = shape[2:-1]
-    shape[-1] = c
+    
+    shape.append( shape.pop(1) ) # Move 'channels' (idx 1) to the end
+
     return shape
 
 def loadImage(file):
@@ -240,7 +241,9 @@ def runAndTestOperators(originalOnnxFile, outOnnxFile,
 
     # Get input shape
     shape = [dim.dim_value if dim.dim_value != 0 else 1 for dim in onnxModel.graph.input[0].type.tensor_type.shape.dim]
+    print(shape)
     shape = shapeToNHWC(shape)
+    print(shape)
 
     # Generate random input
     inpt: np.ndarray = np.random.rand(*shape).astype(np.float32)
@@ -347,6 +350,9 @@ ducTfl = "test/duc.tflite"
 tinyyoloOnnx = "data/onnx/tinyyolov2-8.onnx"
 tinyyoloTfl = "test/tinyyolo.tflite"
 
+audioOnnx = "data/onnx/audio.onnx"
+audioTfl = "test/audio.tflite"
+
 # # TEST ALEXNET CONVERSION
 # runAndTestFirstNOperators("data/onnx/bvlcalexnet-12.onnx","test/alexnet.onnx",
 #                           "test/alexnet.tflite",24,imageFile)
@@ -357,12 +363,12 @@ tinyyoloTfl = "test/tinyyolo.tflite"
 #                     "test/tinyyolo.tflite",0,32)
 # exit()
 
-# TEST RESNET-DUC CONVERSION
-runAndTestOperators("data/onnx/ResNet101-DUC-12.onnx","test/duc.onnx",
-                    "test/duc.tflite",0,354)
-exit()
+# # TEST RESNET-DUC CONVERSION
+# runAndTestOperators("data/onnx/ResNet101-DUC-12.onnx","test/duc.onnx",
+#                     "test/duc.tflite",0,354)
+# exit()
 
 
 # testConversion(alexnetOnnx, alexnetTfl, 10)
 
-# runAndTestOperators(alexnetOnnx, "test/alexnet.onnx", alexnetTfl,12,13)
+runAndTestOperators(audioOnnx, "test/audio.onnx", audioTfl,3,3)

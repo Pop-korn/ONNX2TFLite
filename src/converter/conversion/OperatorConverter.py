@@ -55,10 +55,6 @@ class OperatorConverter:
 
         # Identify ONNX operator and convert it
         match(oNode.opType):
-            case "Conv":
-                tOp.builtinOptions = CvtConv.convert(oNode.attributes, 
-                                                     tOp,
-                                                     self.__builder)
             case "Gemm":
                 tOp.builtinOptions = CvtGemm.convert(oNode.attributes,
                                                      tOp,
@@ -98,6 +94,9 @@ class OperatorConverter:
             case "BatchNormalization":
                 CvtBatchNormalization.convert(oNode.attributes, tOp, 
                                               self.__builder)
+                return
+            case "Conv":
+                CvtConv.convert(oNode.attributes, tOp, self.__builder)
                 return
             case "Softmax":
                 CvtSoftmax.convert(oNode.attributes, tOp, self.__builder)
