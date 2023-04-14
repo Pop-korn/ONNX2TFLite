@@ -357,12 +357,12 @@ tinyyoloTfl = "test/tinyyolo.tflite"
 #                     "test/tinyyolo.tflite",0,32)
 # exit()
 
-# # TEST RESNET-DUC CONVERSION
-# runAndTestOperators("data/onnx/ResNet101-DUC-12.onnx","test/duc.onnx",
-#                     "test/duc.tflite",0,354)
-# exit()
+# TEST RESNET-DUC CONVERSION
+runAndTestOperators("data/onnx/ResNet101-DUC-12.onnx","test/duc.onnx",
+                    "test/duc.tflite",0,354)
+exit()
 
 
 # testConversion(alexnetOnnx, alexnetTfl, 10)
 
-runAndTestOperators(alexnetOnnx, "test/alexnet.onnx", alexnetTfl,12,13)
+# runAndTestOperators(alexnetOnnx, "test/alexnet.onnx", alexnetTfl,12,13)

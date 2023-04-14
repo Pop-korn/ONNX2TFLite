@@ -18,3 +18,6 @@ test-efficiency:
 	flatc -b --strict-json --defaults-json -o . ../data/schemas/tflite/schema.fbs $(JSON)
 	diff $(TFL) old.tflite
 		
+clear:
+	rm *.tflite *.onnx 2> /dev/null
+	
