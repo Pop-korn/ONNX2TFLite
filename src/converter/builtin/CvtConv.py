@@ -126,11 +126,11 @@ def __convert1DConv(oConv: onnxConv.Conv, tOp: tflO.Operator,
 
 
     """ Add the new operators to the model """
-    modelBuilder.checkAndAppendOperator(transpose1)
     modelBuilder.checkAndAppendOperator(reshape1)
+    modelBuilder.checkAndAppendOperator(transpose1)
     modelBuilder.checkAndAppendOperator(conv)
-    modelBuilder.checkAndAppendOperator(reshape2)
     modelBuilder.checkAndAppendOperator(transpose2)
+    modelBuilder.checkAndAppendOperator(reshape2)
 
 
 

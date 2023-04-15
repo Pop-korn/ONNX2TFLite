@@ -237,6 +237,52 @@ class ModelBuilder:
         return self.__tflModel
     
 
+    def __findSuitableOperatorToFuseActFunWith(self, tTensor: tflT.Tensor, 
+                                               startOpIndex: int) -> tflO.Operator:
+        """ Find a operator, which comes before the operator on index 'idx', 
+            which can be fused with an activation function.
+            tTensor is the input of the ActFun operator.
+            The result can be None, or a suitable operator to fuse. In general
+            the operator does't need to be the one just before the ActFun op!
+            """
+        
+
+        # Search for the operator from the current op, backwards
+        operators = self.getOperators().vector[:startOpIndex]
+        operators = operators[::-1]
+
+        lastTensor = tTensor
+
+        for op in operators:
+            op: tflO.Operator
+            print(op.tmpInputs[0].name)
+
+            # print(op.tmpInputs[0].name)
+            if self.__canHaveFusedActivationFunction(op):
+
+                if op.tmpOutputs[0].tmpReferenceCount == 2 and op.tmpOutputs[0] == lastTensor:
+                    # Operator can be fused
+                    return op
+                else:
+                    # Operator cannot be fused
+                    return None
+            else:
+                # Check if ActFun can be moved 'in front' of the operator
+                if op.builtinOptions.operatorType in (
+                    tflBO.BuiltinOperator.RESHAPE,
+                    tflBO.BuiltinOperator.TRANSPOSE
+                ):
+                    lastTensor = op.tmpInputs[0]
+                    continue
+
+                else:
+                    # Cannot continue search
+                    return None
+                
+        return None
+
+
+
     def __fuseReshapeOperators(self):
         """ Searh the SubGraph for occurances of 2 Reshape moderators right
             after one another and try to merge them. """
@@ -296,6 +342,7 @@ class ModelBuilder:
         for op in toRemove:
             ops.remove(op)
 
+
     def __fuseActivationFunctions(self):
         if tflBO.BuiltinOperator.RELU not in self.__opCodeTypeIndexMap.keys():
             # There is no RELU operator in the model
@@ -306,7 +353,7 @@ class ModelBuilder:
         self.__countReferencesToTensorsAndBuffers()
 
         # Find Relu operators and remove them if possible
-        for op in self.getOperators().vector:
+        for opIdx, op in enumerate(self.getOperators().vector):
             
             try:
 
@@ -314,37 +361,22 @@ class ModelBuilder:
                     # Operator is not Relu
                     continue
                 
-                inTensor = op.tmpInputs[0]
-                
-                if inTensor.tmpReferenceCount != 2:
-                    # The output of the previous tensor is used by something 
-                    # other that the Relu.
-                    continue                
+                inTensor = op.tmpInputs[0]           
 
-                prevOp = self.__getOperatorWithOutput(inTensor)
+                mergeOp = self.__findSuitableOperatorToFuseActFunWith(inTensor, opIdx)
+                if mergeOp is None:
+                    # Could not find a suitable operator to fuse the activation
+                    # function with
+                    continue       
 
-                if not self.__canHaveFusedActivationFunction(prevOp):
-                    # The operator before Relu does not support fused act. fun.
-                    continue
-
-                if prevOp.tmpOutputs[0] != inTensor:
-                    # The Relu is being applied to a different output
-                    # than the main one. Keep things as they are
-                    continue
-
-                if not self.tensorsSimilar(inTensor, op.tmpOutputs[0]):
-                    # Should never happen
-                    err.internal("ModelBuilder.__fuseActivationFunctions()",
-                                 "Relu input differs from its output!")
-                    continue
-
-                if prevOp.builtinOptions.fusedActivationFunction != tflAFT.ActivationFunctionType.NONE:
+                if mergeOp.builtinOptions.fusedActivationFunction != tflAFT.ActivationFunctionType.NONE:
                     # Previous operator already has an activation function
                     continue
 
-                # Finally fuse the activation function with 'prevOp'
-                prevOp.tmpOutputs[0] = op.tmpOutputs[0]
-                prevOp.builtinOptions.fusedActivationFunction = tflAFT.ActivationFunctionType.RELU
+                # Finally fuse the activation function with 'mergeOp' and remove it
+                prevOp = self.__getOperatorWithOutput(inTensor) # Operator beforthe ActFun
+                prevOp.tmpOutputs[0] = op.tmpOutputs[0] # Bypass the ActFun
+                mergeOp.builtinOptions.fusedActivationFunction = tflAFT.ActivationFunctionType.RELU
                 self.getOperators().remove(op)
 
             except:
@@ -557,7 +589,7 @@ class ModelBuilder:
                             tflBOpt.BuiltinOptions.BidirectionalSequenceLSTMOptions,
                             tflBOpt.BuiltinOptions.SubOptions,
                             tflBOpt.BuiltinOptions.DivOptions,
-                            tflBOpt.BuiltinOptions.TransposeOptions]
+                            tflBOpt.BuiltinOptions.TransposeConvOptions]
         
         return tOp.builtinOptions.builtinOptionsType in supportedOptions
 
