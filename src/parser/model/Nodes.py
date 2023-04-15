@@ -6,7 +6,7 @@ import src.err as err
 import src.parser.meta.meta as meta
 
 from src.parser.builtin import (
-    Conv, Dropout, Gemm, LRN, MaxPool, Relu, Reshape, Softmax, 
+    Conv, Dropout, Gemm, LRN, MaxPool, Relu, Reshape, Softmax, MatMul,
     BatchNormalization, LeakyRelu, Pad, AveragePool, Transpose
 )
 
@@ -50,6 +50,8 @@ class Node(meta.ONNXObject):
                 self.attributes = LeakyRelu.LeakyRelu(self._descriptor.attribute)
             case "LRN":
                 self.attributes = LRN.LRN(self._descriptor.attribute)
+            case "MatMul":
+                self.attributes = MatMul.MatMul(self._descriptor.attribute)
             case "MaxPool":
                 self.attributes = MaxPool.MaxPool(self._descriptor.attribute)
             case "Mul":

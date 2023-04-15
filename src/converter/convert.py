@@ -1,12 +1,59 @@
 import src.generator.model.Model as tflM
 
-import src.parser.model.Model as onnxM
+from src.parser.model import Model as onnxM, Nodes as onnxN, Tensors as onnxT
 
 import src.converter.builder.ModelBuilder as ModelBuilder
-import src.converter.conversion.OperatorConverter as OperatorConverter
-import src.converter.conversion.TensorConverter as TensorConverter
+from src.converter.conversion import OperatorConverter, TensorConverter
 
 import flatbuffers as fb
+
+
+def __nodeAtIdxIsType(oNodes: onnxN.Nodes, idx: int, opType: str) -> bool:
+    """ Determine if node in 'oNodes' at index 'idx' has type 'opType', if such
+        node even exists. """
+    try:
+
+        return oNodes[idx].opType == opType
+    except:
+        return False
+    
+
+def __tensorIsOnlyUsedOnce(oNodes: onnxN.Nodes, name: str, idx: int):
+    """ Determine if tensor with 'name' is the input of exactly 1 operator in 
+        'oNodes'. 'idx' is the index of the operator that produces the tensor
+        as its output.
+        """
+    refCnt = 0
+
+    for oNode in oNodes[idx:]:
+        if name in oNode.inputs:
+            refCnt += 1
+            if refCnt > 1:
+                return False
+            
+    return refCnt == 1
+
+
+def __convertOperators(oNodes: onnxN.Nodes, 
+                       operatorCvt: OperatorConverter.OperatorConverter):
+    """ Find the best way to convert all operators in the ONNX model and
+        convert them to TFLite. """
+
+    for idx, oNode in enumerate(oNodes):
+
+        if oNode.opType == "MatMul":
+            if __nodeAtIdxIsType(oNodes, idx+1, "Add"):
+
+                if __tensorIsOnlyUsedOnce(oNodes, oNode.inputs[0], idx):
+                    # MatMul operator followed by Add operator -> convert to 
+                    # FullyConnected
+                    operatorCvt.convert_MatMul_Add(oNode, oNodes[idx + 1])
+                    continue
+
+
+        operatorCvt.convertOperator(oNode)
+
+
 
 def __convert(oM: onnxM.Model) -> tflM.Model:
     description="doc:'"+oM.docString+f"' domain:'"+oM.domain+"' producer:'"+oM.producerName+" "+oM.producerVersion+"'"
@@ -22,8 +69,7 @@ def __convert(oM: onnxM.Model) -> tflM.Model:
 
     tensorCvt.convertInternalTensors(oM.graph.valueInfo)
 
-    for oNode in oM.graph.nodes:
-        operatorCvt.convertOperator(oNode)
+    __convertOperators(oM.graph.nodes, operatorCvt)
 
     return builder.finish()
 

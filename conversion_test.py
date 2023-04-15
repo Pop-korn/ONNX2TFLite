@@ -371,4 +371,4 @@ audioTfl = "test/audio.tflite"
 
 # testConversion(alexnetOnnx, alexnetTfl, 10)
 
-runAndTestOperators(audioOnnx, "test/audio.onnx", audioTfl,0,14)
+runAndTestOperators(audioOnnx, "test/audio.onnx", audioTfl,0,16)

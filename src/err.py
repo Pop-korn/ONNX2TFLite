@@ -15,6 +15,9 @@ MIN_OUTPUT_IMPORTANCE = MessageImportance.WARNING
 
 
 class Code(Enum):
+    INTERNAL_ERR = 1
+    GENERATED_MODEL_ERR = 2
+
     INPUT_FILE_ERR = 11
 
     UNSUPPORTED_OPERATOR = 21

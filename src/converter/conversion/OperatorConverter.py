@@ -7,13 +7,17 @@ from src.converter.builtin import (
     CvtAveragePool, CvtTranspose
 )
 
+
 import src.generator.model.Operators as tflO
+import src.converter.builtin.groups.Cvt_MatMul_Add as Cvt_MatMul_Add
 
 import src.parser.model.Nodes as onnxN
 
 import src.err as err
 
 import lib.tflite.BuiltinOperator as tflBO
+
+from typing import List
 
 
 class OperatorConverter:
@@ -26,7 +30,26 @@ class OperatorConverter:
         self.__builder = builder
 
 
-    def convertNode(self, oNode: onnxN.Node) -> tflO.Operator:
+    def __createOperator(self, opType: tflBO.BuiltinOperator, 
+                         inputs: List[str], outputs: List[str]) -> tflO.Operator:
+        """ Create a TFLite operator with given operator type, inputs and 
+            outputs and return it. """
+        
+        tOp = tflO.Operator(
+            opcodeIndex=self.__builder.opCodeIndexForOpType(opType),
+            inputs=tflO.Inputs([]),
+            outputs=tflO.Outputs([])
+        )
+
+        for name in inputs:
+            tOp.tmpInputs.append(self.__builder.tensorForName(name))
+        for name in outputs:
+            tOp.tmpOutputs.append(self.__builder.tensorForName(name))
+
+        return tOp
+
+
+    def __convertNode(self, oNode: onnxN.Node) -> tflO.Operator:
         """ Create a TFLite 'Operator' from the ONNX 'Node' with corresponding 
             'inputs' and 'outputs'. """
         
@@ -49,7 +72,7 @@ class OperatorConverter:
         """ Convert an ONNX Node to a corresponding TFLite operator.
             This is ALWAYS a 1 to 1 conversion. """
 
-        tOp = self.convertNode(oNode)
+        tOp = self.__convertNode(oNode)
 
         # Indicator if after conversion, 'tOp.builtinOptions' was set
         implicitOperatorType = True
@@ -117,7 +140,8 @@ class OperatorConverter:
 
             case _:
                 implicitOperatorType = False
-                err.error(None, f"Conversion of ONNX Operator '{oNode.opType}'",
+                err.error(err.Code.UNSUPPORTED_OPERATOR, 
+                          f"Conversion of ONNX Operator '{oNode.opType}'",
                           "is not yet supported!")
                 return
                 
@@ -127,3 +151,26 @@ class OperatorConverter:
         
 
         self.__builder.checkAndAppendOperator(tOp)
+
+
+    def convert_MatMul_Add(self, matMul: onnxN.Node, add: onnxN.Node):
+        """ Convert ONNX MatMul and Add operators to TFLite FullyConnected. """
+
+        # New operator inputs
+        inputs = [ name for name in matMul.inputs ]
+        # Add the input of 'Add' which is not the output of 'MatMul'
+        if add.inputs[0] == matMul.outputs[0]:
+            inputs.append(add.inputs[1])
+        else:
+            inputs.append(add.inputs[0])
+
+        # New operator outputs
+        outputs = [ name for name in add.outputs ]
+
+
+        # Create the operator
+        tOp = self.__createOperator(tflBO.BuiltinOperator.FULLY_CONNECTED,
+                                    inputs, outputs)
+
+        # Adjust the input tensor shapes to be compatible and add the operator
+        Cvt_MatMul_Add.convert(tOp, self.__builder)

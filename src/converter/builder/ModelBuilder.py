@@ -486,11 +486,21 @@ class ModelBuilder:
         # Assign 'Outputs' and 'Inputs' their tensor inidces
         outputs = self.getSubgraph().outputs
         for tensor in outputs.tmpOutputs:
-            outputs.append(tensor.tmpIndex)
+            try:
+                outputs.append(tensor.tmpIndex)
+            except:
+                err.error(err.Code.GENERATED_MODEL_ERR,
+                          f"The tensor '{tensor.name}' is among the model",
+                          "outputs, but does NOT appear in the graph!")
 
         inputs = self.getSubgraph().inputs
         for tensor in inputs.tmpInputs:
-            inputs.append(tensor.tmpIndex)
+            try:
+                inputs.append(tensor.tmpIndex)
+            except:
+                err.error(err.Code.GENERATED_MODEL_ERR,
+                          f"The tensor '{tensor.name}' is among the model",
+                          "inputs, but does NOT appear in the graph!")
 
         # Assign each operator its inputs and outputs indices
         for operator in self.getSubgraph().operators.vector:
