@@ -7,7 +7,7 @@ import src.parser.meta.meta as meta
 
 from src.parser.builtin import (
     Conv, Dropout, Gemm, LRN, MaxPool, Relu, Reshape, Softmax, 
-    BatchNormalization, LeakyRelu, Pad
+    BatchNormalization, LeakyRelu, Pad, AveragePool
 )
 
 class Node(meta.ONNXObject):
@@ -36,6 +36,8 @@ class Node(meta.ONNXObject):
         match self.opType:
             case "Add":
                 self.attributes = None
+            case "AveragePool":
+                self.attributes = AveragePool.AveragePool(self._descriptor.attribute)
             case "BatchNormalization":
                 self.attributes = BatchNormalization.BatchNormalization(self._descriptor.attribute)
             case "Conv":

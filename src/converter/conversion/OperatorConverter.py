@@ -3,7 +3,8 @@ import src.converter.builder.ModelBuilder as ModelBuilder
 
 from src.converter.builtin import (
     CvtConv, CvtLRN, CvtMaxPool, CvtReshape, CvtDropout, CvtSoftmax, CvtGemm, 
-    CvtMul, CvtAdd, CvtBatchNormalization, CvtLeakyRelu, CvtSum, CvtPad
+    CvtMul, CvtAdd, CvtBatchNormalization, CvtLeakyRelu, CvtSum, CvtPad,
+    CvtAveragePool
 )
 
 import src.generator.model.Operators as tflO
@@ -94,6 +95,9 @@ class OperatorConverter:
             
 
                 """ Operators that handle adding operators to the model themselves """
+            case "AveragePool":
+                CvtAveragePool.convert(oNode.attributes, tOp, self.__builder)
+                return
             case "BatchNormalization":
                 CvtBatchNormalization.convert(oNode.attributes, tOp, 
                                               self.__builder)
@@ -112,6 +116,7 @@ class OperatorConverter:
                 implicitOperatorType = False
                 err.error(None, f"Conversion of ONNX Operator '{oNode.opType}'",
                           "is not yet supported!")
+                return
                 
         # Assign 'tOp' its operator type. If possible
         if implicitOperatorType:
