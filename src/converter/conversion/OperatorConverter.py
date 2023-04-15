@@ -3,7 +3,7 @@ import src.converter.builder.ModelBuilder as ModelBuilder
 
 from src.converter.builtin import (
     CvtConv, CvtLRN, CvtMaxPool, CvtReshape, CvtDropout, CvtSoftmax, CvtGemm, 
-    CvtMul, CvtAdd, CvtBatchNormalization, CvtLeakyRelu, CvtSum
+    CvtMul, CvtAdd, CvtBatchNormalization, CvtLeakyRelu, CvtSum, CvtPad
 )
 
 import src.generator.model.Operators as tflO
@@ -76,13 +76,18 @@ class OperatorConverter:
 
 
                 """ Operators that might not get converted! """
+            case "Add":
+                tOp.builtinOptions = CvtAdd.convert(tOp, self.__builder)
+                if tOp.builtinOptions is None:
+                    self.__builder.skipOperator(tOp)
+                return
             case "Dropout":
                 tOp.builtinOptions = CvtDropout.convert(oNode.attributes)
                 if tOp.builtinOptions is None:
                     self.__builder.skipOperator(tOp)
                 return
-            case "Add":
-                tOp.builtinOptions = CvtAdd.convert(tOp, self.__builder)
+            case "Pad":
+                tOp.builtinOptions = CvtPad.convert(oNode.attributes)
                 if tOp.builtinOptions is None:
                     self.__builder.skipOperator(tOp)
                 return

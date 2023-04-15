@@ -98,6 +98,20 @@ def __isSAMEPadding(oPads: List[int], oKernelShape: List[int],
 """ -------------------- Public Functions -------------------- """
 
 
+def permutationsAreInverse(perm1: List[int], perm2: List[int]) -> bool:
+    """ Determine if given Transpose permutations are inverse of each other. 
+        i.e. when applied back to back, there will be no effect. """
+    # Example:
+    #   0 3 1 2
+    #   0 2 3 1
+
+    for i, _ in enumerate(perm1):
+        if i != perm1[perm2[i]]:
+            return False
+        
+    return True
+
+
 def nchToNhwcDims(nchDims: List[int]):
     """ Convert a list of ints representing the shape of an NCH tensor to the
         dimensions of an equivalent NHWC tensor. """

@@ -227,6 +227,9 @@ class ModelBuilder:
         # Fuse Reshape operators if possible
         self.__fuseReshapeOperators()
 
+        # Fuse Transpose operators if possible
+        self.__fuseTransposeOperators()
+
         # Remove unused tensors and bufers
         self.__removeUnusedTensorsAndBuffers()
 
@@ -254,10 +257,6 @@ class ModelBuilder:
         lastTensor = tTensor
 
         for op in operators:
-            op: tflO.Operator
-            print(op.tmpInputs[0].name)
-
-            # print(op.tmpInputs[0].name)
             if self.__canHaveFusedActivationFunction(op):
 
                 if op.tmpOutputs[0].tmpReferenceCount == 2 and op.tmpOutputs[0] == lastTensor:
@@ -282,9 +281,82 @@ class ModelBuilder:
         return None
 
 
+    def __fuseTransposeOperators(self):
+        """ Search the SubGraph for occurances of 2 Transpose operators right
+            after one anouther and try to merge them. """
+        if tflBO.BuiltinOperator.TRANSPOSE not in self.__opCodeTypeIndexMap.keys():
+            # There is no Transpose in the model
+            return
+        
+        transposeOpCodeIndex = self.opCodeIndexForOpType(tflBO.BuiltinOperator.TRANSPOSE)
+        
+        self.__countReferencesToTensorsAndBuffers()
+
+        # Find Transpose operators
+        prevOp = None
+        toRemove = []
+        for op in self.getOperators().vector:
+            try:
+                if op.opcodeIndex != transposeOpCodeIndex:
+                    prevOp = op
+                    continue
+
+                # Found Transpose
+
+                if prevOp is None:
+                    # Previous operator was not Transpose
+                    prevOp = op
+                    continue
+
+                if prevOp.opcodeIndex != transposeOpCodeIndex:
+                    # Previous operator was not Transpose
+                    prevOp = op
+                    continue
+
+                # LastOp is Transpose
+
+                if op.tmpInputs[0].tmpReferenceCount != 2:
+                    # Someting else is also using the ouputof the previous Transpose
+                    prevOp = op
+                    continue
+                """ Found 2 Transpose operators that can be merged. """
+                if len(op.tmpInputs) != 2 or len(prevOp.tmpInputs) != 2:
+                    err.internal("ModelBuilder.fuseTransposeOperators():",
+                                 "Transpose operators have unexpected inputs.")
+                    continue
+
+                perm1 = prevOp.tmpInputs[1].tmpBuffer.data
+                perm2 = op.tmpInputs[1].tmpBuffer.data
+                
+                if Translator.permutationsAreInverse(perm1, perm2):
+                    # The first Transpose changes the tensor and the second one
+                    # changes it back. Both can be removed.
+                    toRemove.append(op)
+                    toRemove.append(prevOp)
+
+                    # The operator before both Transpose
+                    nonTransposeOp = self.__getOperatorWithOutput(prevOp.tmpInputs[0])
+                    
+                    # Skip the Transpose operators
+                    nonTransposeOp.tmpOutputs[0] = op.tmpOutputs[0]
+
+                else:
+                    # Merge the Transpose operators into one
+                    err.internal("ModelBuilder.fuseTransposeOperators()",
+                                 "Merging not yet implemented!")
+                    continue
+
+            except Exception as e: 
+                err.internal("ModelBuilder.fuseTransposeOperators(): Exception")
+                print(e)
+
+        # Remove unnecessary Transpose operators
+        ops = self.getOperators().vector
+        for op in toRemove:
+            ops.remove(op)
 
     def __fuseReshapeOperators(self):
-        """ Searh the SubGraph for occurances of 2 Reshape moderators right
+        """ Searh the SubGraph for occurances of 2 Reshape operators right
             after one another and try to merge them. """
         
         if tflBO.BuiltinOperator.RESHAPE not in self.__opCodeTypeIndexMap.keys():
@@ -318,7 +390,7 @@ class ModelBuilder:
 
                 # LastOp is Reshape
                 if op.tmpInputs[0].tmpReferenceCount != 2:
-                    # Someting else is also using the ouptu of the previous Reshape
+                    # Someting else is also using the output of the previous Reshape
                     prevOp = op
                     continue
 
@@ -326,7 +398,7 @@ class ModelBuilder:
                 
                 if len(op.tmpInputs) != 1 or len(prevOp.tmpInputs) != 1:
                     err.internal("ModelBuilder.fuseReshapeOperators():",
-                                 f"{prevOp.name}, {op.name} have unexpected inputs.")
+                                 "Reshape operators have unexpected inputs.")
                     continue
 
                 if Translator.collectionsEqual(prevOp.tmpInputs[0].shape.vector, 
@@ -756,7 +828,6 @@ class ModelBuilder:
         res = self.bufferHasData(tTensor.tmpBuffer)
         if res is None:
             res = False
-            print(tTensor.name)
 
         return res
         
