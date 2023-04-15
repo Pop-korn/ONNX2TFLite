@@ -322,17 +322,30 @@ class ModelBuilder:
                     prevOp = op
                     continue
 
-                # Found 2 Reshape operators that can be merged
+                """ Found 2 Reshape operators that can be merged. """
                 
                 if len(op.tmpInputs) != 1 or len(prevOp.tmpInputs) != 1:
                     err.internal("ModelBuilder.fuseReshapeOperators():",
                                  f"{prevOp.name}, {op.name} have unexpected inputs.")
                     continue
 
-                op.tmpInputs[0] = prevOp.tmpInputs[0]
-                toRemove.append(prevOp)
-                
-                prevOp = op
+                if Translator.collectionsEqual(prevOp.tmpInputs[0].shape.vector, 
+                                               op.tmpOutputs[0].shape.vector):
+                    # The first Reshape changes the shape and the second one
+                    # changes it back. Both can be removed.
+                    toRemove.append(op)
+                    toRemove.append(prevOp)
+
+                    # The operator before both Reshapes
+                    nonReshapeOp = self.__getOperatorWithOutput(prevOp.tmpInputs[0])
+                    
+                    # Skip the reshapes
+                    nonReshapeOp.tmpOutputs[0] = op.tmpOutputs[0]
+
+                else:
+                    # Merge the Reshape operators into one
+                    op.tmpInputs[0] = prevOp.tmpInputs[0]
+                    toRemove.append(prevOp)
 
             except:
                 err.internal("ModelBuilder.fuseReshapeOperators(): Exception")
