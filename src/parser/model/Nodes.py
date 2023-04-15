@@ -7,7 +7,7 @@ import src.parser.meta.meta as meta
 
 from src.parser.builtin import (
     Conv, Dropout, Gemm, LRN, MaxPool, Relu, Reshape, Softmax, 
-    BatchNormalization, LeakyRelu, Pad, AveragePool
+    BatchNormalization, LeakyRelu, Pad, AveragePool, Transpose
 )
 
 class Node(meta.ONNXObject):
@@ -64,6 +64,8 @@ class Node(meta.ONNXObject):
                 self.attributes = Softmax.Softmax(self._descriptor.attribute)
             case "Sum":
                 self.attributes = None
+            case "Transpose":
+                self.attributes = Transpose.Transpose(self._descriptor.attribute)
             case _:
                 err.warning(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
             

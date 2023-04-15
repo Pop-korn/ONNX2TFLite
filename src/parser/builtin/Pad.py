@@ -28,5 +28,5 @@ class Pad(meta.ONNXOperatorAttributes):
                 case "value":
                     self.value = attr.f
                 case _:
-                    err.warning(f"ONNX LRN attribute '{attr.name}' is not supported!")
+                    err.warning(f"ONNX Pad attribute '{attr.name}' is not supported!")
 
