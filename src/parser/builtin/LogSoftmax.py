@@ -6,7 +6,7 @@ import src.parser.meta.meta as meta
 
 import src.err as err
 
-class Softmax(meta.ONNXOperatorAttributes):
+class LogSoftmax(meta.ONNXOperatorAttributes):
     # Attribute is 'None' if not present in the model
     axis: int
 

@@ -368,7 +368,12 @@ audioTfl = "test/audio.tflite"
 #                     "test/duc.tflite",0,354)
 # exit()
 
+# # TEST AUDIO MODEL CONVERSION
+# runAndTestOperators(audioOnnx,"test/duc.onnx",
+#                     audioTfl,0,17)
+# exit()
 
-# testConversion(alexnetOnnx, alexnetTfl, 10)
+testConversion(audioOnnx, audioTfl, 10)
+exit()
 
-runAndTestOperators(audioOnnx, "test/audio.onnx", audioTfl,0,16)
+runAndTestOperators(audioOnnx, "test/audio.onnx", audioTfl,0,17)

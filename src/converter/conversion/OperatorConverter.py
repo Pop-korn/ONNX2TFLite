@@ -4,7 +4,7 @@ import src.converter.builder.ModelBuilder as ModelBuilder
 from src.converter.builtin import (
     CvtConv, CvtLRN, CvtMaxPool, CvtReshape, CvtDropout, CvtSoftmax, CvtGemm, 
     CvtMul, CvtAdd, CvtBatchNormalization, CvtLeakyRelu, CvtSum, CvtPad,
-    CvtAveragePool, CvtTranspose
+    CvtAveragePool, CvtTranspose, CvtLogSoftmax
 )
 
 
@@ -85,6 +85,8 @@ class OperatorConverter:
                                                      self.__builder)
             case "LeakyRelu":
                 tOp.builtinOptions = CvtLeakyRelu.convert(oNode.attributes)
+            case "LogSoftmax":
+                tOp.builtinOptions = CvtLogSoftmax.convert(oNode.attributes, tOp)
             case "LRN":
                 tOp.builtinOptions = CvtLRN.convert(oNode.attributes)
             case "Mul":
