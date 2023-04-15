@@ -63,8 +63,6 @@ class OperatorConverter:
                 tOp.builtinOptions = CvtLeakyRelu.convert(oNode.attributes)
             case "LRN":
                 tOp.builtinOptions = CvtLRN.convert(oNode.attributes)
-            case "MaxPool":
-                tOp.builtinOptions = CvtMaxPool.convert(oNode.attributes)
             case "Mul":
                 tOp.builtinOptions = CvtMul.convert()
             case "Relu":
@@ -97,6 +95,9 @@ class OperatorConverter:
                 return
             case "Conv":
                 CvtConv.convert(oNode.attributes, tOp, self.__builder)
+                return
+            case "MaxPool":
+                CvtMaxPool.convert(oNode.attributes, tOp, self.__builder)
                 return
             case "Softmax":
                 CvtSoftmax.convert(oNode.attributes, tOp, self.__builder)
