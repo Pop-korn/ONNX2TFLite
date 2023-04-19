@@ -38,8 +38,15 @@ def __convertOperators(oNodes: onnxN.Nodes,
                        operatorCvt: OperatorConverter.OperatorConverter):
     """ Find the best way to convert all operators in the ONNX model and
         convert them to TFLite. """
+    
+    opsToSkip = 0
 
     for idx, oNode in enumerate(oNodes):
+
+        if opsToSkip > 0:
+            # Skip operators if needed
+            opsToSkip -= 1
+            continue
 
         if oNode.opType == "MatMul":
             if __nodeAtIdxIsType(oNodes, idx+1, "Add"):
@@ -48,6 +55,9 @@ def __convertOperators(oNodes: onnxN.Nodes,
                     # MatMul operator followed by Add operator -> convert to 
                     # FullyConnected
                     operatorCvt.convert_MatMul_Add(oNode, oNodes[idx + 1])
+                    
+                    # Skip the Add operator
+                    opsToSkip = 1
                     continue
 
 

@@ -58,7 +58,7 @@ def convert(oBN: onnxBN.BatchNormalization,
         """ Mean is not just all zeros. Need to claculate the second static 
             tensor. Use it as the new value for 'bias'. """
         tmp = mean.tmpBuffer.data * tmp
-        bias.tmpBuffer.data -= tmp
+        bias.tmpBuffer.data = bias.tmpBuffer.data - tmp
 
     # Create 'Mul' operator, to multiply the input with the static tensor
     mul = tflO.Operator(

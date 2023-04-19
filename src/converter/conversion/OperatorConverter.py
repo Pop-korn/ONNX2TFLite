@@ -4,7 +4,7 @@ import src.converter.builder.ModelBuilder as ModelBuilder
 from src.converter.builtin import (
     CvtConv, CvtLRN, CvtMaxPool, CvtReshape, CvtDropout, CvtSoftmax, CvtGemm, 
     CvtMul, CvtAdd, CvtBatchNormalization, CvtLeakyRelu, CvtSum, CvtPad,
-    CvtAveragePool, CvtTranspose, CvtLogSoftmax
+    CvtAveragePool, CvtTranspose, CvtLogSoftmax, CvtConstant
 )
 
 
@@ -109,17 +109,22 @@ class OperatorConverter:
                 tOp.builtinOptions = CvtAdd.convert(tOp, self.__builder)
                 if tOp.builtinOptions is None:
                     self.__builder.skipOperator(tOp)
-                return
+                    return
+            case "Constant":
+                tOp.builtinOptions = CvtConstant.convert(oNode.attributes,
+                                                         self.__builder)
+                if tOp.builtinOptions is None:
+                    return
             case "Dropout":
                 tOp.builtinOptions = CvtDropout.convert(oNode.attributes)
                 if tOp.builtinOptions is None:
                     self.__builder.skipOperator(tOp)
-                return
+                    return
             case "Pad":
                 tOp.builtinOptions = CvtPad.convert(oNode.attributes)
                 if tOp.builtinOptions is None:
                     self.__builder.skipOperator(tOp)
-                return
+                    return
             
 
                 """ Operators that handle adding operators to the model themselves """

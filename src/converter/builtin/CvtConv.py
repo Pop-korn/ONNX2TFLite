@@ -29,7 +29,7 @@ def __convert1DConv(oConv: onnxConv.Conv, tOp: tflO.Operator,
     """ Calculate the shapes for equivalent 2D convolution """
     oldInputShape = tOp.tmpInputs[0].shape.vector #  NCH 
     oldOutputShape = tOp.tmpOutputs[0].shape.vector #  NCH
-            
+
     nchwInputShape = Translator.nchToNchwDims(oldInputShape) # NCHW
     nchwOutputShape = Translator.nchToNchwDims(oldOutputShape) # NCHW
 

@@ -6,7 +6,7 @@ import src.err as err
 import src.parser.meta.meta as meta
 
 from src.parser.builtin import (
-    Conv, Dropout, Gemm, LRN, MaxPool, Relu, Reshape, Softmax, MatMul,
+    Conv, Dropout, Gemm, LRN, MaxPool, Relu, Reshape, Softmax, MatMul, Constant,
     BatchNormalization, LeakyRelu, Pad, AveragePool, Transpose, LogSoftmax
 )
 
@@ -40,6 +40,8 @@ class Node(meta.ONNXObject):
                 self.attributes = AveragePool.AveragePool(self._descriptor.attribute)
             case "BatchNormalization":
                 self.attributes = BatchNormalization.BatchNormalization(self._descriptor.attribute)
+            case "Constant":
+                self.attributes = Constant.Constant(self._descriptor.attribute)
             case "Conv":
                 self.attributes = Conv.Conv(self._descriptor.attribute)
             case "Dropout":
@@ -71,7 +73,7 @@ class Node(meta.ONNXObject):
             case "Transpose":
                 self.attributes = Transpose.Transpose(self._descriptor.attribute)
             case _:
-                err.warning(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
+                err.error(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
             
 
 class Nodes(List[Node]):
