@@ -98,6 +98,25 @@ def __isSAMEPadding(oPads: List[int], oKernelShape: List[int],
 """ -------------------- Public Functions -------------------- """
 
 
+def broadcastDims(dims1: List[int], dims2: List[int]):
+    """ Broadcast 'dims1' so it matches 'dims2' where possible.
+        Same as numpy and onnx broadcasting. """
+    
+    # TODO expand and improve
+    
+    if len(dims1) == 1:
+        """ 1D shape """
+        newDims = [ dim if dim == dims1[0] else 1 for dim in dims2]
+
+        return newDims
+
+
+    else:
+        err.warning(f"Broadcasting of shapes '{dims1}' to  '{dims2}'",
+                    "is not yet implemented!")
+        return dims1
+
+
 def permutationsAreInverse(perm1: List[int], perm2: List[int]) -> bool:
     """ Determine if given Transpose permutations are inverse of each other. 
         i.e. when applied back to back, there will be no effect. """

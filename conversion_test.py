@@ -376,8 +376,8 @@ audioTfl = "test/audio.tflite"
 # testConversion(audioOnnx, audioTfl, 10)
 # exit()
 
-# runAndTestOperators("data/onnx/speech_command_classifier_trained.onnx",
-#                      "test/audio-2.onnx", "test/audio-2.tflite",0,22)
+runAndTestOperators("data/onnx/speech_command_classifier_trained.onnx",
+                     "test/audio-2.onnx", "test/audio-2.tflite",0,22)
 # runAndTestOperators(alexnetOnnx, "test/alexnet.onnx", alexnetTfl,15,15)
-# runAndTestOperators(audioOnnx, "test/audio.onnx", audioTfl,3,3)
-runAndTestOperators(ducOnnx, "test/duc.onnx", ducTfl,1,1)
+# runAndTestOperators(audioOnnx, "test/audio.onnx", audioTfl,0, 17)
+# runAndTestOperators(ducOnnx, "test/duc.onnx", ducTfl,1,1)

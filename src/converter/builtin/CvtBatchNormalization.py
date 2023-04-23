@@ -6,6 +6,8 @@ import src.parser.builtin.BatchNormalization as onnxBN
 
 import src.err as err
 
+import src.converter.conversion.Translator as  Translator
+
 from src.generator.builtin import(
     Add as tflAdd,
     Sub as tflSub,
@@ -34,6 +36,8 @@ def convert(oBN: onnxBN.BatchNormalization,
     mean = tOp.tmpInputs[3]
     var = tOp.tmpInputs[4]
 
+    dimensionality = X.shape.len()
+
     """ TFLite does not support a BatchNormalization operator, we have to 
         simulate it with Mul and Add. 
         ONNX BatchNormalization implements the following equation:
@@ -60,21 +64,34 @@ def convert(oBN: onnxBN.BatchNormalization,
         tmp = mean.tmpBuffer.data * tmp
         bias.tmpBuffer.data = bias.tmpBuffer.data - tmp
 
+    
+    """ Broadcast tensor shapes if needed. """
+    if invDenom.shape.len() < dimensionality:
+        newDims = Translator.broadcastDims(invDenom.shape.vector, X.shape.vector)
+        invDenom.shape.vector = newDims.copy()
+        invDenom.tmpBuffer.data.reshape(newDims)
+
+    if bias.shape.len() < dimensionality:
+        newDims = Translator.broadcastDims(bias.shape.vector, X.shape.vector)
+        bias.shape.vector = newDims.copy()
+        bias.tmpBuffer.data.reshape(newDims)
+
+
     # Create 'Mul' operator, to multiply the input with the static tensor
     mul = tflO.Operator(
         builtinOptions= tflMul.Mul(),
         opcodeIndex=modelBuilder.opCodeIndexForOpType(tflBOp.BuiltinOperator.MUL)
     )
-    mul.tmpInputs = [X,invDenom]
+    mul.tmpInputs = [ X , invDenom ]
     fraction = modelBuilder.duplicateTensor(X,"BatchNorm_frac")
-    mul.tmpOutputs = [fraction]
+    mul.tmpOutputs = [ fraction ]
 
     # Create 'Add' operator to add 'bias' to the previous result
     add = tflO.Operator(
         builtinOptions=tflAdd.Add(),
         opcodeIndex=modelBuilder.opCodeIndexForOpType(tflBOp.BuiltinOperator.ADD)
     )
-    add.tmpInputs = [fraction, bias]
+    add.tmpInputs = [ fraction , bias ]
     add.tmpOutputs = tOp.tmpOutputs
 
     # Add the operators
