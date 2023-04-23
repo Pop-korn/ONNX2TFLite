@@ -103,18 +103,29 @@ def broadcastDims(dims1: List[int], dims2: List[int]):
         Same as numpy and onnx broadcasting. """
     
     # TODO expand and improve
-    
-    if len(dims1) == 1:
-        """ 1D shape """
-        newDims = [ dim if dim == dims1[0] else 1 for dim in dims2]
+
+    try:
+
+        numDimsToBroadcast = len(dims1)
+        newDims = []
+        
+        for dim in dims2[::-1]:
+
+            if (dims1[numDimsToBroadcast - 1] == dim) and numDimsToBroadcast > 0:
+                newDims.append(dim)
+                numDimsToBroadcast -= 1
+
+            else:
+                newDims.append(1)
 
         return newDims
 
 
-    else:
+    except:
         err.warning(f"Broadcasting of shapes '{dims1}' to  '{dims2}'",
                     "is not yet implemented!")
         return dims1
+
 
 
 def permutationsAreInverse(perm1: List[int], perm2: List[int]) -> bool:
