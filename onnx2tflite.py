@@ -1,8 +1,6 @@
 import src.converter.convert as convert
 import src.err as err
 
-import sys
-
 import argparse
 import ntpath
 
@@ -10,14 +8,17 @@ import ntpath
 """ Create argument parser """
 parser = argparse.ArgumentParser(
     prog = "onnx2tflite",
-    description = "Convert a '.onnx' DNN model to an equivalent '.tflite' model.",
-    usage="python onnx2tflite <input_file.onnx> [-o/--output <output_file.tflite> --verbose]",
-    epilog = "Koniec"
+    description = """
+        Convert a '.onnx' DNN model to an equivalent '.tflite' model.
+        By default the output '.tflite' file will be generated in the current 
+        working directory and have the same name as the input '.onnx' file.
+    """,
+    usage="python onnx2tflite.py <input_file.onnx> [-o/--output <output_file.tflite> --verbose]"
 )
 
 parser.add_argument("onnxFile")
-parser.add_argument("-o", "--output", type=str, required=True, metavar="output_tflite_file")
-parser.add_argument("--verbose", action="store_true")
+parser.add_argument("-o", "--output", type=str, required=False, metavar="out", help="output '.tflite' file")
+parser.add_argument("--verbose", action="store_true", help="print detailed internal messages")
 
 
 """ Parse program arguments """
@@ -42,4 +43,4 @@ if args.verbose:
 """ Convert the model """
 convert.convertModel(inputOnnxFile, outputTFLiteFile)
 
-print(inputOnnxFile, outputTFLiteFile)
+print(f"Succesfully converted '{inputOnnxFile}' model to '{outputTFLiteFile}'.")

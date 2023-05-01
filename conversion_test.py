@@ -10,6 +10,7 @@ import src.converter.convert as convert
 
 import src.err as err
 
+# Enable all output messages of the converter
 err.MIN_OUTPUT_IMPORTANCE = err.MessageImportance.LOWEST
 
 
@@ -25,8 +26,8 @@ def printStats(formatName, output):
             max = el
 
     print(formatName)
-    print(f"\tMax: output[{output.argmax()}] = {output.max()}")
-    print(f"\tSecond Max: = {secMax}")
+    print(f"\tMax: (index {output.argmax()}) = {output.max()}")
+    print(f"\tSecond Max = {secMax}")
     print(f"\tShape = {output.shape}")
     print(f"\tSum = {output.sum()}")
     print(f"\tMean = {output.mean()}")
@@ -74,9 +75,6 @@ def runTFLiteModel(modelFile, inpt):
 
     inDet = tflModel.get_input_details()
     outDet = tflModel.get_output_details()
-
-    # print("In:",inDet[0]['shape'])
-    # print("Out:",outDet[0]['shape'])
 
     tflModel.set_tensor(inDet[0]['index'], inpt)
 
@@ -229,7 +227,7 @@ def runAndTestOperators(originalOnnxFile, outOnnxFile,
     """ Take the ONNX model in 'originalOnnxFile'. Reduce it to only contain
         operators with indices 'startIdx' to 'ednIdx' (both included). Save the 
         reduced model in 'outOnnxFile' and convert it to TFLite in 
-        'outTfliteFile'. Then Run both reduced models with the same random
+        'outTfliteFile'. Then run both reduced models with the same random
         input data and print statistics. """
     
     onnxModel = pickOutOperators(originalOnnxFile,startIdx, endIdx)          
@@ -241,9 +239,7 @@ def runAndTestOperators(originalOnnxFile, outOnnxFile,
 
     # Get input shape
     shape = [dim.dim_value if dim.dim_value != 0 else 1 for dim in onnxModel.graph.input[0].type.tensor_type.shape.dim]
-    print(shape)
     shape = shapeToNHWC(shape)
-    print(shape)
 
     # Generate random input
     inpt: np.ndarray = np.random.rand(*shape).astype(np.float32)
@@ -260,9 +256,13 @@ def runAndTestOperators(originalOnnxFile, outOnnxFile,
 
 
 def testConversion(onnxFile, tflFile, numIterations):
-    """ Convert ONNX model in 'onnxFile' to TFLite and save it in 'tflFile'. 
+    """ 
+        MAIN TESTING FUNCTION
+        
+        Convert ONNX model in 'onnxFile' to TFLite and save it in 'tflFile'. 
         Then run both models with the same random data 'numIterations' times'.
-        Finally print statistics of the outputs. """
+        Finally print statistics of the outputs. 
+    """
     
     onnxModel = onnx.load(onnxFile)
 
@@ -274,30 +274,33 @@ def testConversion(onnxFile, tflFile, numIterations):
 
     # Run models with random inputs and collect statistics
     absErr = []
-    precErr = []
+    relErr = []
     meanErr = []
-    meanPercErr = []
+    meanRelErr = []
     stdErr = []
-    stdPercErr = []
+    stdRelErr = []
     for i in range(numIterations):
+        # Generate random input
         inpt: np.ndarray = np.random.rand(*shape).astype(np.float32)
 
+        # Run models
         oOut = runOnnxModel(onnxFile, inpt)
         tOut = tensorToNCHW(runTFLiteModel(tflFile, inpt))
 
+        # Collect statistics
         tmpAbsErr = np.abs(oOut - tOut)
         tmpPercErr = tmpAbsErr / np.abs(oOut)
 
         absErr.append(tmpAbsErr)
-        precErr.append(tmpPercErr)
+        relErr.append(tmpPercErr)
 
         tmpMeanErr = np.abs(oOut.mean() - tOut.mean())
         meanErr.append(tmpMeanErr)
-        meanPercErr.append(tmpMeanErr / np.abs(oOut.mean()))
+        meanRelErr.append(tmpMeanErr / np.abs(oOut.mean()))
 
         tmpStdErr = np.abs(oOut.std() - tOut.std())
         stdErr.append(tmpStdErr)
-        stdPercErr.append(tmpStdErr / np.abs(oOut.std()))
+        stdRelErr.append(tmpStdErr / np.abs(oOut.std()))
 
 
     # Calculate the mean and max absolute error
@@ -306,30 +309,30 @@ def testConversion(onnxFile, tflFile, numIterations):
     for el in absErr:
         maxSum += el.max()
         meanSum += el.mean()
-    print("Average MAX ABS ERR =",maxSum/numIterations)
-    print("Average ABS ERR =",meanSum/numIterations)
+    print("Max Absolute error =\t", "%.6e" % (maxSum/numIterations))
+    print("Mean Absolute error =\t", "%.6e" % (meanSum/numIterations))
 
     # Calculate the mean and max percentage error
     maxSum = 0.0
     meanSum = 0.0
-    for el in precErr:
+    for el in relErr:
         maxSum += el.max()
         meanSum += el.mean()
-    print("Average MAX PERC ERR =",maxSum/numIterations)
-    print("Average PERC ERR =",meanSum/numIterations)
+    print("Max Relative error =\t", "%.6e" % (maxSum/numIterations))
+    print("Mean Relative error =\t", "%.6e" % (meanSum/numIterations))
 
     # Calculate statistics
-    print("Max error of output mean =", np.asarray(meanErr).max())
-    print("Average error of output mean =", np.asarray(meanErr).mean())
+    print("Max Absolute error of output mean =\t", "%.6e" % np.asarray(meanErr).max())
+    print("Average Absolute error of output mean =\t", "%.6e" % np.asarray(meanErr).mean())
 
-    print("Max percentage error of output mean =", np.asarray(meanPercErr).max())
-    print("Average precentage error of output mean =", np.asarray(meanPercErr).mean())
+    print("Max Relative error of output mean =\t", "%.6e" % np.asarray(meanRelErr).max())
+    print("Average Relative error of output mean =\t", "%.6e" % np.asarray(meanRelErr).mean())
 
-    print("Max error of output std =", np.asarray(stdErr).max())
-    print("Average error of output std =", np.asarray(stdErr).mean())
+    print("Max Absolute error of output std =\t", "%.6e" % np.asarray(stdErr).max())
+    print("Average Absolute error of output std =\t", "%.6e" % np.asarray(stdErr).mean())
 
-    print("Max percentage error of output std =", np.asarray(stdPercErr).max())
-    print("Average precentage error of output std =", np.asarray(stdPercErr).mean())
+    print("Max Relative error of output std =\t", "%.6e" % np.asarray(stdRelErr).max())
+    print("Average Relative error of output std =\t", "%.6e" % np.asarray(stdRelErr).mean())
 
 
 
@@ -350,34 +353,53 @@ ducTfl = "test/duc.tflite"
 tinyyoloOnnx = "data/onnx/tinyyolov2-8.onnx"
 tinyyoloTfl = "test/tinyyolo.tflite"
 
-audioOnnx = "data/onnx/audio.onnx"
-audioTfl = "test/audio.tflite"
+speechOnnx = "data/onnx/speech_command_classifier_trained.onnx"
+speechTfl = "test/speech_command_classifier_trained.tflite"
+
+
+""" ---------- Quick tests ---------- """
 
 # # TEST ALEXNET CONVERSION
-# runAndTestFirstNOperators("data/onnx/bvlcalexnet-12.onnx","test/alexnet.onnx",
-#                           "test/alexnet.tflite",24,imageFile)
+# print("\tTesting Alexnet conversion.")
+# runAndTestOperators(alexnetOnnx, "test/alexnet.onnx", alexnetTfl, 0, 23)
 # exit()
 
 # # TEST TINYYOLO CONVERSION
-# runAndTestOperators("data/onnx/tinyyolov2-8.onnx","test/tinyyolo.onnx",
-#                     "test/tinyyolo.tflite",0,32)
+# print("\tTesting TinyYOLO v2 conversion.")
+# runAndTestOperators(tinyyoloOnnx, "test/tinyyolo.onnx", tinyyoloTfl, 0, 32)
 # exit()
 
 # # TEST RESNET-DUC CONVERSION
-# runAndTestOperators("data/onnx/ResNet101-DUC-12.onnx","test/duc.onnx",
-#                     "test/duc.tflite",0,354)
+# print("\tTesting Resnet-DUC conversion.")
+# runAndTestOperators(ducOnnx, "test/duc.onnx", ducTfl, 0, 354)
 # exit()
 
-# # TEST AUDIO MODEL CONVERSION
-# runAndTestOperators(audioOnnx,"test/duc.onnx",
-#                     audioTfl,0,17)
+# # TEST SPEECH CLASSIFIER CONVERSION
+# print("\tTesting Speech Classifier conversion.")
+# runAndTestOperators(speechOnnx, "test/duc.onnx",  speechTfl, 0, 17)
 # exit()
 
-# testConversion(audioOnnx, audioTfl, 10)
+
+
+
+""" ---------- Thorough tests ---------- """
+
+# # TEST ALEXNET CONVERSION
+# print("\tTesting Alexnet conversion.")
+# testConversion(alexnetOnnx, alexnetTfl, 10)
 # exit()
 
-runAndTestOperators("data/onnx/speech_command_classifier_trained.onnx",
-                     "test/audio-2.onnx", "test/audio-2.tflite",0,22)
-# runAndTestOperators(alexnetOnnx, "test/alexnet.onnx", alexnetTfl,15,15)
-# runAndTestOperators(audioOnnx, "test/audio.onnx", audioTfl,0, 17)
-# runAndTestOperators(ducOnnx, "test/duc.onnx", ducTfl,1,1)
+# # TEST TINYYOLO CONVERSION
+# print("\tTesting TinyYOLO v2 conversion.")
+# testConversion(tinyyoloOnnx, tinyyoloTfl, 10)
+# exit()
+
+# # TEST RESNET-DUC CONVERSION
+# print("\tTesting Resnet-DUC conversion.")
+# testConversion(ducOnnx, ducTfl, 1)
+# exit()
+
+# TEST SPEECH CLASSIFIER CONVERSION
+print("\tTesting Speech Classifier conversion.")
+testConversion(speechOnnx, speechTfl, 10)
+exit()

@@ -23,7 +23,6 @@ def convert(oTranspose: onnxTranspose.Transpose,
         
     # Create the 'perm' tensor
     perm = np.asarray(oTranspose.perm, np.int32)
-    print(perm)
     P = modelBuilder.createTensorForData(perm, "Transpose_perm_")
 
     tOp.tmpInputs.append(P)

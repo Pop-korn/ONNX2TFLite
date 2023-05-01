@@ -1,5 +1,4 @@
-import onnx
-from onnx import shape_inference, checker
+from onnx import shape_inference
 
 file = "data/onnx/google-speech-dataset-compact.onnx"
 file = "data/onnx/cnn_trad_fpool3.onnx"

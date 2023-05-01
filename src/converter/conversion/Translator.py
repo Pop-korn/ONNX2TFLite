@@ -112,11 +112,11 @@ def broadcastDims(dims1: List[int], dims2: List[int]):
         for dim in dims2[::-1]:
 
             if (dims1[numDimsToBroadcast - 1] == dim) and numDimsToBroadcast > 0:
-                newDims.append(dim)
+                newDims.insert(0, dim)
                 numDimsToBroadcast -= 1
 
             else:
-                newDims.append(1)
+                newDims.insert(0,1)
 
         return newDims
 

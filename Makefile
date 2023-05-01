@@ -1,20 +1,25 @@
-.PHONY: all get_schema gen_json parse_json test
+.PHONY: all install test-model-conversion get-default-models convert-default-models 
+.PHONY: get-schemas compile-tflite-schema compile-onnx-schema regenrate-lib test-tflite-file-generation clear-pycache total-line-count
 
-all:
-	python3 ./onnx2tflite.py data/onnx/bvlcalexnet-12.onnx --output test/alexnet.tflite
+all: # Basic
+	python ./onnx2tflite.py data/onnx/bvlcalexnet-12.onnx --output test/alexnet.tflite
 
 install:
 	pip install -r requirements.txt
 
-test:
-	python3 conversion_test.py
+test-model-conversion:
+	python conversion_test.py
 
-to-json: all
-	flatc -t --strict-json --defaults-json -o test data/schemas/tflite/schema.fbs -- test/alexnet.tflite --raw-binary 
+get-default-models:
+	wget -P ./data/onnx/ https://github.com/onnx/models/raw/main/vision/classification/alexnet/model/bvlcalexnet-12.onnx
+	wget -P ./data/onnx/ https://github.com/onnx/models/raw/main/vision/object_detection_segmentation/tiny-yolov2/model/tinyyolov2-8.onnx
+	wget -P ./data/onnx/ https://github.com/onnx/models/raw/main/vision/object_detection_segmentation/duc/model/ResNet101-DUC-12.onnx
 
-generator-test:
-	export TF_CPP_MIN_LOG_LEVEL="2"
-	python3 ./generator_test.py
+convert-default-models:
+	python onnx2tflite.py data/onnx/bvlcalexnet-12.onnx -o test/bvlcalexnet-12.tflite
+	python onnx2tflite.py data/onnx/ResNet101-DUC-12.onnx -o test/ResNet101-DUC-12.tflite
+	python onnx2tflite.py data/onnx/tinyyolov2-8.onnx -o test/tinyyolov2-8.tflite
+	python onnx2tflite.py data/onnx/speech_command_classifier_trained.onnx -o test/speech_command_classifier_trained.tflite
 
 get-schemas:
 	wget -P ./data/schemas/tflite/ https://raw.githubusercontent.com/tensorflow/tensorflow/master/tensorflow/lite/schema/schema.fbs
@@ -29,8 +34,8 @@ compile-onnx-schema:
 	cd data/schemas/onnx ; protoc --python_out=../../../lib/onnx onnx/onnx-ml.proto onnx-operators-ml.proto onnx-data.proto
 regenrate-lib: get-schemas compile-tflite-schema compile-onnx-schema
 
-
-
+test-tflite-file-generation:
+	python ./generator_test.py
 
 LB := (
 RB := )
@@ -38,4 +43,4 @@ clear-pycache:
 	find . | grep -E "$(LB)/__pycache__$$|\.pyc$$|\.pyo$$$(RB)" | xargs rm -rf
 
 total-line-count:
-	find src/ | xargs wc -l
+	find src/ | xargs wc -l 
