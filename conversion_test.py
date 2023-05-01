@@ -224,11 +224,16 @@ def pickOutOperators(onnxFile, startIdx, endIdx):
 
 def runAndTestOperators(originalOnnxFile, outOnnxFile, 
                          outTfliteFile, startIdx, endIdx):
-    """ Take the ONNX model in 'originalOnnxFile'. Reduce it to only contain
+    """ 
+        Take the ONNX model in 'originalOnnxFile'. Reduce it to only contain
         operators with indices 'startIdx' to 'ednIdx' (both included). Save the 
         reduced model in 'outOnnxFile' and convert it to TFLite in 
         'outTfliteFile'. Then run both reduced models with the same random
-        input data and print statistics. """
+        input data and print statistics. 
+        
+        Doesn't work when the ONNX model does not have internal tensor shapes 
+        specified! For example TinyYOLO v2.
+        """
     
     onnxModel = pickOutOperators(originalOnnxFile,startIdx, endIdx)          
 
