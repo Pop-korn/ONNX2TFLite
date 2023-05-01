@@ -1,3 +1,16 @@
+"""
+    ModelBuilder.
+
+Class encapsulates a TFLite object model defined in '/src/generator/'. 
+Provides functions to create, modify and optimise the TFLite model.
+At the end call 'finish()' to finalize and optimize the model.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
+
 from typing import Dict, List
 
 import numpy as np

@@ -1,3 +1,13 @@
+"""
+    CvtDropout
+
+Convert ONNX operator Dropout to TFLite.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 import src.parser.builtin.Dropout as onnxDropout
 
 import src.generator.meta.meta as tflMeta

@@ -1,3 +1,15 @@
+"""
+    Translator.
+
+Module contains functions for context-free conversion of various
+things from ONNX to TFLite.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
+
 import numpy as np
 import functools as ft
 from typing import List
@@ -11,9 +23,6 @@ import src.err as err
 
 import lib.tflite.TensorType as tflTT
 import lib.tflite.Padding as tflPad
-
-""" This file contains functions for context-free converting of various
-    things from ONNX to TFLite. """
 
 
 """ -------------------- Private Helper Functions -------------------- """

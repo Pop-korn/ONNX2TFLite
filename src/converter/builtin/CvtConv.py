@@ -1,3 +1,13 @@
+"""
+    CvtConv
+
+Convert ONNX operator Conv to TFLite Conv2D or Conv3D.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 from src.converter.conversion import Translator, common
 import src.converter.builder.ModelBuilder as ModelBuilder
 

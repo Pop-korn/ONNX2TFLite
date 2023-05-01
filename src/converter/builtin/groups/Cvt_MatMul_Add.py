@@ -1,3 +1,13 @@
+"""
+    Cvt_MatMul_Add.
+
+Convert MatMul and Add ONNX operators to TFLite FullyConnected.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 import src.generator.model.Operators as tflO
 
 import src.converter.builder.ModelBuilder as ModelBuilder

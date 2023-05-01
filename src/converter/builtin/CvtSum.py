@@ -1,3 +1,13 @@
+"""
+    CvtSum
+
+Convert ONNX operator Sum to TFLite AddN or Add.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 from src.generator.builtin import(
     Add as tflAdd, AddN as tflAddN    
 )

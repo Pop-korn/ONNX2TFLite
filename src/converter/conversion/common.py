@@ -1,5 +1,13 @@
-""" This file contains functions shared by the various files in the 
-    'conversion/builtin'directory. """
+"""
+    common.
+
+This file contains functions shared by the various files in the 
+'conversion/builtin'directory.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
 
 import src.err as err
 

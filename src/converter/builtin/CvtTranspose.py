@@ -1,3 +1,13 @@
+"""
+    CvtTranspose
+
+Convert ONNX operator Transpose to TFLite Transpose.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 import src.err as err
 
 import src.parser.builtin.Transpose as onnxTranspose
