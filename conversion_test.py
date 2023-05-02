@@ -1,3 +1,20 @@
+"""
+    conversion_test
+
+This module implements functions to test the accuracy of converted models.
+Two key functions are implemented:
+    - runAndTestOperators() -> Reduce an ONNX model to selected operators.
+                               Convert it and compare outputs with random data.
+    - testConversion() -> Convert and ONNX model, run both models multiple times
+                          and print detailed statistical information.
+
+Function calls to test default models are implemented at the end of the file.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 from PIL import Image
 
 import tensorflow as tf

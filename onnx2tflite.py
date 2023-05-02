@@ -1,3 +1,13 @@
+"""
+    onnx2tflie
+
+This module provides a CLI for the converter of ONNX models to TFLite.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 import src.converter.convert as convert
 import src.err as err
 

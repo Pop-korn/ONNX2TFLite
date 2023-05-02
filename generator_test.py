@@ -1,3 +1,18 @@
+"""
+    generator_test
+
+
+Generate a basic .tflite model from code. Should behave identically to the 
+'/data/cifar10/cifar10_model.tflite'.
+Script runs both models and prints their outputs to identical inputs.
+Used to test the 'flatbuffer' library and model generation.
+
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 import flatbuffers as fb
 
 import numpy as np
@@ -22,13 +37,6 @@ import src.generator.builtin.Conv2D as Conv2D
 import src.generator.builtin.MaxPool2D as MaxPool2D
 import src.generator.builtin.FullyConnected as FullyConnected
 import src.generator.builtin.Softmax as Softmax
-
-
-
-
-""" Generate a basic .tflite model. 
-Should behave identically to the '/data/cifar10/cifar10_model.tflite'.
-"""
 
 def BuildOperators(operators: o.Operators):
     operators.append(o.Operator(o.Inputs([1,2,3]),o.Outputs([4]),

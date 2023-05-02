@@ -1,3 +1,13 @@
+"""
+    err
+
+Module implements functions for logging, error messages and custom assertions.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 import sys
 from enum import Enum
 

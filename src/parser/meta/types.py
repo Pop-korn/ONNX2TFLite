@@ -1,3 +1,13 @@
+"""
+    types
+
+Module implements functions that work with ONNX data types.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 import numpy as np
 
 import src.parser.meta.meta as meta
@@ -59,3 +69,4 @@ def toNumpyType(oType: meta.DataType):
         case meta.DataType.BFLOAT16:
             err.warning("Cannot convert ONNX DataType 'BFLOAT16' to numpy dtype. Using 'FLOAT16'.")
             return np.uint8
+        

@@ -1,3 +1,14 @@
+"""
+    MaxPool
+
+Representation of an ONNX 'MaxPool' operator. 
+Initialized from a protobuf descriptor object.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 from typing import List
 import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
