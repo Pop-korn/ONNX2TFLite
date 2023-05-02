@@ -1,3 +1,4 @@
 flatbuffers
 numpy
 protobuf
+typing-extensions
