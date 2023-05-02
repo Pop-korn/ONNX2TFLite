@@ -361,10 +361,11 @@ def testConversion(onnxFile, tflFile, numIterations):
 
 """ -------------------- Start of execution -------------------- """
 
+# Mute internal logging
+err.MIN_OUTPUT_IMPORTANCE = err.MessageImportance.WARNING
+
+
 imageFile = "data/224x224/cat2.jpg"
-onnxFile = "data/onnx/ResNet101-DUC-12.onnx"
-onnxReducedFile = "test/duc.onnx"
-tflReducedFile = "test/duc.tflite"
 
 alexnetOnnx = "data/onnx/bvlcalexnet-12.onnx"
 alexnetTfl = "test/alexnet.tflite"
@@ -379,24 +380,30 @@ speechOnnx = "data/onnx/speech_command_classifier_trained.onnx"
 speechTfl = "test/speech_command_classifier_trained.tflite"
 
 
-""" ---------- Quick tests ---------- """
+""" 
+    -------------------------- Quick tests -------------------------
+    Uncomment the lines corresponding to the model you wish to test. 
+"""
 
-# # TEST ALEXNET CONVERSION
+""" TEST ALEXNET CONVERSION """
 # print("\tTesting Alexnet conversion.")
 # runAndTestOperators(alexnetOnnx, "test/alexnet.onnx", alexnetTfl, 0, 23)
 # exit()
 
-# # TEST TINYYOLO CONVERSION
+""" TEST TINYYOLO CONVERSION 
+    Warning - the ONNX model is not defined 'nicely', so the inference engine 
+    prints a lot of warning messages. Just ignore them. """
 # print("\tTesting TinyYOLO v2 conversion.")
 # runAndTestOperators(tinyyoloOnnx, "test/tinyyolo.onnx", tinyyoloTfl, 0, 32)
 # exit()
 
-# # TEST RESNET-DUC CONVERSION
+""" TEST RESNET-DUC CONVERSION 
+    Large model -> takes a minute to run. """
 # print("\tTesting Resnet-DUC conversion.")
 # runAndTestOperators(ducOnnx, "test/duc.onnx", ducTfl, 0, 354)
 # exit()
 
-# # TEST SPEECH CLASSIFIER CONVERSION
+""" TEST SPEECH CLASSIFIER CONVERSION """
 # print("\tTesting Speech Classifier conversion.")
 # runAndTestOperators(speechOnnx, "test/duc.onnx",  speechTfl, 0, 17)
 # exit()
@@ -404,24 +411,30 @@ speechTfl = "test/speech_command_classifier_trained.tflite"
 
 
 
-""" ---------- Thorough tests ---------- """
+""" 
+    ------------------------ Thorough tests ------------------------
+    Uncomment the lines corresponding to the model you wish to test. 
+"""
 
-# # TEST ALEXNET CONVERSION
+""" TEST ALEXNET CONVERSION """
 # print("\tTesting Alexnet conversion.")
 # testConversion(alexnetOnnx, alexnetTfl, 10)
 # exit()
 
-# # TEST TINYYOLO CONVERSION
+""" TEST TINYYOLO CONVERSION 
+    Warning - the ONNX model is not defined 'nicely', so the inference engine 
+    prints a lot of warning messages. Just ignore them. """
 # print("\tTesting TinyYOLO v2 conversion.")
 # testConversion(tinyyoloOnnx, tinyyoloTfl, 10)
 # exit()
 
-# # TEST RESNET-DUC CONVERSION
+""" TEST RESNET-DUC CONVERSION 
+    Large model -> takes a minute to run. """
 # print("\tTesting Resnet-DUC conversion.")
 # testConversion(ducOnnx, ducTfl, 1)
 # exit()
 
-# TEST SPEECH CLASSIFIER CONVERSION
+""" TEST SPEECH CLASSIFIER CONVERSION """
 print("\tTesting Speech Classifier conversion.")
 testConversion(speechOnnx, speechTfl, 10)
 exit()

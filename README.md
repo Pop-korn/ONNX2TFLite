@@ -16,9 +16,13 @@ The models can be downloaded using **make get-default-models** and then converte
 
 The program was developped using **python 3.10.8**. Some earlier versions will not work because of the use of type hints.
 
-The only python packages required for model conversion are *numpy*, *flatbuffers* and *protobuf*. Others are used just for testing. To install all used python packages, run **make install** in the root directory. There is a requirement confilct between *tensorflow* and *onnx* over *protobuf* version. This program doesn't require that part of *tensorflow* functionality, so if there is a problem during instalation, run **pip install onnx==1.13.0**. Conversion testing should now work.
+The program was developped and verified using **Ubuntu 22.04**. It should work on most Linux distributions.
 
-Project comes with *ONNX* and *TFLite* schemas pre-installed and libraries pre-compiled. If you want, you can delete the *data/schemas* and *lib* directories and run **make regenerate-lib**  in the root directory to get the schemas and complie them yourself. THIS MAT CAUSE **make test-model-conversion** TO NOT WORK, because of limitations of the *onnx* library.
+The **pip** tool is required for instalation of Python packages.
+
+To install just the Python packages required for model conversion, use **make install-essential** in the root directory. To install all used python packages (including the ones needed for testing), run **make install**. There is a requirement confilct between *tensorflow* and *onnx* over *protobuf* version. This program doesn't require that part of *tensorflow* functionality, so if there is a problem during instalation, run **pip install onnx==1.13.0**. Conversion testing should now work.
+
+Project comes with *ONNX* and *TFLite* schemas pre-installed and libraries pre-compiled. If you want, you can optionally delete the *data/schemas* and *lib* directories and run **make regenerate-lib**  in the root directory to get the schemas and complie them yourself. THIS MAT CAUSE **make test-model-conversion** TO NOT WORK, because of limitations of the *onnx* library.
 
 ---
 
@@ -28,12 +32,11 @@ Project comes with *ONNX* and *TFLite* schemas pre-installed and libraries pre-c
 
 The program is used via a command line interface of the *onnx2tflite.py* module. It takes 1 required argument, which is the input *.onnx* model to be converted. The output *.tflite* file can be optionally specified using the **-o/--output** option. By default, it will be generated in the current working directory and have the same name as the input file. 
 
-The program will only print error and warning messages, if the input model cannot be converted perfectly. If you wish to see more detailed logging of the internal conversion process, use the **--verbose** option.
+The program will only print error and warning messages, if the input model cannot be converted exactly. If you wish to see more detailed logging of the internal conversion process, use the **--verbose** option.
 
 Example use:
 * python onnx2tflite.py data/onnx/tinyyolov2-8.onnx --output test/tinyyolov2-8.tflite
 * python onnx2tflite.py data/onnx/bvlcalexnet-12.onnx -o test/bvlcalexnet-12.tflite --verbose
-
 
 ---
 

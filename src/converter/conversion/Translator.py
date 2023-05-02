@@ -212,7 +212,7 @@ def convertPadding(autoPad: str, oPads: List[int],
         if not __isSAMEPadding(oPads, oKernelShape, oDilations):
             err.warning(f"TFLite does NOT support '{oPads}' padding for kernel",
                         f"'{oKernelShape}' and dilations '{oDilations}'!",
-                        "Using 'SAME'.")
+                        "Using padding 'SAME', which may cause issues.")
         
         return tflPad.Padding.SAME
 

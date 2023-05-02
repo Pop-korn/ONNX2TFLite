@@ -1,5 +1,7 @@
 flatbuffers
 numpy
+protobuf
+typing-extensions
 tensorflow>=2.11
 onnx==1.13.0
 onnxruntime
