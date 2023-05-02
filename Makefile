@@ -2,6 +2,10 @@
 .PHONY: get-schemas compile-tflite-schema compile-onnx-schema regenrate-lib 
 .PHONY: test-tflite-file-generation clear-pycache total-line-count
 
+# Install all python packages rquired for model conversion
+install-essential:
+	pip install -r requirements_essential.txt
+
 # Install all python packages, required for model conversion as well as testing
 install:
 	pip install -r requirements.txt
