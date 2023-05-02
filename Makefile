@@ -12,7 +12,7 @@ install:
 
 # Uncomment lines at the end of 'conversion_test.py' to specify tests and models
 test-model-conversion: 
-	python conversion_test.py
+	python3 conversion_test.py
 
 # Download the verified .onnx models into the 'data/onnx/' directory
 get-default-models:
@@ -22,10 +22,10 @@ get-default-models:
 
 # Convert all verified .onnx models. Outputs are in the 'test/' directory
 convert-default-models:
-	python onnx2tflite.py data/onnx/bvlcalexnet-12.onnx -o test/bvlcalexnet-12.tflite
-	python onnx2tflite.py data/onnx/ResNet101-DUC-12.onnx -o test/ResNet101-DUC-12.tflite
-	python onnx2tflite.py data/onnx/tinyyolov2-8.onnx -o test/tinyyolov2-8.tflite
-	python onnx2tflite.py data/onnx/speech_command_classifier_trained.onnx -o test/speech_command_classifier_trained.tflite
+	python3 onnx2tflite.py data/onnx/bvlcalexnet-12.onnx -o test/bvlcalexnet-12.tflite
+	python3 onnx2tflite.py data/onnx/ResNet101-DUC-12.onnx -o test/ResNet101-DUC-12.tflite
+	python3 onnx2tflite.py data/onnx/tinyyolov2-8.onnx -o test/tinyyolov2-8.tflite
+	python3 onnx2tflite.py data/onnx/speech_command_classifier_trained.onnx -o test/speech_command_classifier_trained.tflite
 
 
 
@@ -49,7 +49,7 @@ regenrate-lib: get-schemas compile-tflite-schema compile-onnx-schema
 
 # Generate a simple TFLite model from code and run it. Print its and the original models output
 test-tflite-file-generation:
-	python ./generator_test.py
+	python3 ./generator_test.py
 
 LB := (
 RB := )
