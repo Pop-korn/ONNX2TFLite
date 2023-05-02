@@ -1,3 +1,13 @@
+"""
+    SubGraphs
+
+Module contains classes that represent TFLite 'SubGraph' objects.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 import flatbuffers as fb
 
 from typing import List

@@ -1,5 +1,5 @@
 """
-    OperatorConverter.
+    OperatorConverter
 
 Module contains high level functions to convert ONNX operators to TFLite.
 

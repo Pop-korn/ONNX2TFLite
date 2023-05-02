@@ -1,3 +1,14 @@
+"""
+    meta
+
+Implementations of classes that all classes in /src/generator/ inherit from.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
+
 from typing_extensions import override
 import flatbuffers as fb
 from typing import Callable, List

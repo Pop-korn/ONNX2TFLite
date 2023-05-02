@@ -1,3 +1,14 @@
+"""
+    types
+
+Module contains helper functions that work with TFLite data types.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
+
 import flatbuffers as fb
 
 import src.err as err
@@ -5,6 +16,7 @@ import src.err as err
 import lib.tflite.TensorType as tt
 
 def TypeSize(type: tt.TensorType):
+    """ Return the memory size in bytes of given TFLite data type. """
     match type:
         case tt.TensorType.UINT8 | tt.TensorType.INT8:
             return 1
@@ -22,6 +34,7 @@ def TypeSize(type: tt.TensorType):
 
 
 def PrependFunction(builder: fb.Builder, type: tt.TensorType):
+    """ Return the flatbuffer 'Prepend<type>()' function for given type. """
     match type:
         case tt.TensorType.UINT8:
             return builder.PrependUint8
@@ -51,5 +64,6 @@ def PrependFunction(builder: fb.Builder, type: tt.TensorType):
         
         # TODO expand
     
-    err.warning(f"Unsupported type '{type}'! Using default Float32.")
+    err.warning(f"Unsupported flatbuffer prepend function for type '{type}'!",
+                "Using default -> Float32.")
     return builder.PrependFloat32

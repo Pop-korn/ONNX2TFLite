@@ -1,3 +1,13 @@
+"""
+    Transpose
+
+Representation of the TFLite operator 'Transpose'.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 import flatbuffers as fb
 
 import src.generator.meta.meta as meta

@@ -1,5 +1,5 @@
 """
-    common.
+    common
 
 This file contains functions shared by the various files in the 
 'conversion/builtin'directory.

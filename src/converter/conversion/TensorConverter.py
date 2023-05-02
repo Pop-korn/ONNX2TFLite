@@ -1,5 +1,5 @@
 """
-    TensorConverter.
+    TensorConverter
 
 Module contains high level functions to convert ONNX tensors to TFLite.
 

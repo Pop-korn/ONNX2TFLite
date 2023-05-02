@@ -1,5 +1,5 @@
 """
-    convert.
+    convert
 
 Entry point for ONNX to TFLite model conversion.
 

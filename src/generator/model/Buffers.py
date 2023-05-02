@@ -1,3 +1,13 @@
+"""
+    Buffers
+
+Module contains classes that represent TFLite 'Buffer' objects.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 from typing import List
 import flatbuffers as fb
 import numpy as np
@@ -7,7 +17,6 @@ import lib.tflite.Model as m
 import lib.tflite.TensorType as tt
 
 import src.generator.meta.meta as meta
-import src.generator.meta.types as types
 
 import src.err as err
 

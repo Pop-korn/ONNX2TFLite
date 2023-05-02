@@ -1,5 +1,5 @@
 """
-    Translator.
+    Translator
 
 Module contains functions for context-free conversion of various
 things from ONNX to TFLite.

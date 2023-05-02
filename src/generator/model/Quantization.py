@@ -1,3 +1,13 @@
+"""
+    Quantization
+
+Module contains classes that represent TFLite 'Quantization' objects.
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 from typing import List
 import flatbuffers as fb
 
