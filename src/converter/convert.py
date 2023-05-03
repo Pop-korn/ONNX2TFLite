@@ -103,7 +103,7 @@ def convertModel(onnxFile, tfliteFile):
 
     tflModel = __convert(onnxModel)
 
-    fbB = fb.Builder(2000000000)
+    fbB = fb.Builder()
 
     tflModel.genTFLite(fbB)
 

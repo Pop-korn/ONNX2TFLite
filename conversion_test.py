@@ -405,7 +405,7 @@ speechTfl = "test/speech_command_classifier_trained.tflite"
 
 """ TEST SPEECH CLASSIFIER CONVERSION """
 # print("\tTesting Speech Classifier conversion.")
-# runAndTestOperators(speechOnnx, "test/duc.onnx",  speechTfl, 0, 17)
+# runAndTestOperators(speechOnnx, "test/speech.onnx",  speechTfl, 0, 17)
 # exit()
 
 

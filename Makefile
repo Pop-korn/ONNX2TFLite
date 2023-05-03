@@ -31,7 +31,9 @@ convert-default-models:
 	$(PYTHON) onnx2tflite.py data/onnx/tinyyolov2-8.onnx -o test/tinyyolov2-8.tflite
 	$(PYTHON) onnx2tflite.py data/onnx/speech_command_classifier_trained.onnx -o test/speech_command_classifier_trained.tflite
 
-
+# Remove models in the /test/ directory
+clean:
+	rm test/*.tflite test/*.onnx test/*.json 2> /dev/null
 
 # Download the ONNX and TFLite model schemas
 get-schemas:
