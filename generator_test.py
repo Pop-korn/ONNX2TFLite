@@ -4,7 +4,7 @@
 
 Generate a basic .tflite model from code. Should behave identically to the 
 '/data/cifar10/cifar10_model.tflite'.
-Script runs both models and prints their outputs to identical inputs.
+Script runs both models and prints their outputs with identical inputs.
 Used to test the 'flatbuffer' library and model generation.
 
 
@@ -215,12 +215,12 @@ def BuildModel():
 
     subGraph = sg.SubGraph(sg.Inputs([1]), sg.Outputs([0]))
 
-        # Operators
+    # Operators
     operators = o.Operators()
     BuildOperators(operators)
     subGraph.operators = operators
 
-        # Tensors
+    # Tensors
     tensors = t.Tensors()
     BuildTensors(tensors)
     subGraph.tensors = tensors

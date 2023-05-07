@@ -5,8 +5,11 @@ This module implements functions to test the accuracy of converted models.
 Two key functions are implemented:
     - runAndTestOperators() -> Reduce an ONNX model to selected operators.
                                Convert it and compare outputs with random data.
-    - testConversion() -> Convert and ONNX model, run both models multiple times
+    - testConversion() -> Convert an ONNX model, run both models multiple times
                           and print detailed statistical information.
+    - testConversionWithInputs() -> Convert an ONNX model, run both models with
+                                    given prepared data and specified maximum
+                                    accepted error.
 
 Function calls to test default models are implemented at the end of the file.
 
