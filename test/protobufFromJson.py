@@ -1,3 +1,15 @@
+"""
+    protobufFromJson
+
+Simple script to convert a JSON file to the ONNX (Protocol Buffer) format.
+Takes one argument, which is the input JSON file. Ouput is always 'test.onnx'.
+
+
+__author__ = Martin Pavella
+__version__ = 1.0
+__email__ = xpavel39@stud.fit.vutbr.cz
+"""
+
 from google.protobuf.json_format import Parse
 
 import onnx

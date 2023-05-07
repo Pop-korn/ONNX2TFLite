@@ -53,7 +53,9 @@ class Tensor(meta.ONNXObject):
         try:
             self.data =np.reshape(self.data, self.dims)
         except:
-            print(self.name, self.data, self.dims)
+            err.error(None,"parser/Tensor.py",
+                      f"Could not reshape data of tensor '{self.name}' to shape",
+                      f"'{self.dims}'")
 
     
     def __hasData(self, field):

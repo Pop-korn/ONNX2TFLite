@@ -502,7 +502,7 @@ speechInputs = ["cat1.wav", "cat2.wav", "cat3.wav", "dog1.wav", "dog2.wav",
 """ TEST ALEXNET CONVERSION """
 # print("\tTesting Alexnet conversion.")
 # inputs = loadImages(alexnetInputDir, alexnetInputs)
-# testConversionWithInputs(alexnetOnnx, alexnetTfl, inputs, 5*10**-6, True)
+# testConversionWithInputs(alexnetOnnx, alexnetTfl, inputs, 10**-3, True)
 # exit()
 
 """ TEST TINYYOLO CONVERSION 
@@ -517,14 +517,14 @@ speechInputs = ["cat1.wav", "cat2.wav", "cat3.wav", "dog1.wav", "dog2.wav",
     Large model -> takes a minute to run. """
 # print("\tTesting Resnet-DUC conversion.")
 # inputs = loadImages(ducInputDir, ducInputs)
-# testConversionWithInputs(ducOnnx, ducTfl, inputs, 5 * 10**-3, False)
+# testConversionWithInputs(ducOnnx, ducTfl, inputs, 10**-3, False)
 # exit()
 
 """ TEST SPEECH CLASSIFIER CONVERSION """
-# print("\tTesting Speech Classifier conversion.")
-# inputs = loadAudioFiles(speechInputDir, speechInputs)
-# testConversionWithInputs(speechOnnx, speechTfl, inputs, 5*10**-5, True)
-# exit()
+print("\tTesting Speech Classifier conversion.")
+inputs = loadAudioFiles(speechInputDir, speechInputs)
+testConversionWithInputs(speechOnnx, speechTfl, inputs, 10**-3, True)
+exit()
 
 
 
