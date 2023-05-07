@@ -487,7 +487,10 @@ speechInputs = ["cat1.wav", "cat2.wav", "cat3.wav", "dog1.wav", "dog2.wav",
 
 
 """ 
-    --------------------- Tests with real data ---------------------
+    --------------------------- Tests with real data ---------------------------
+    Test the models with real input data before and after conversion.
+    Tests print a summary of the number of successful test cases.
+
     Uncomment the lines corresponding to the model you wish to test. 
 """
 
@@ -523,7 +526,11 @@ speechInputs = ["cat1.wav", "cat2.wav", "cat3.wav", "dog1.wav", "dog2.wav",
 
 
 """ 
-    ---------------------- Quick random tests ----------------------
+    --------------------------- Quick random tests -----------------------------
+    Quickly test models before and after convesion with random inputs.
+    Tests print a short summary describing the output of the ONNX model,
+    the TFLite model and the difference between them.
+
     Uncomment the lines corresponding to the model you wish to test. 
 """
 
@@ -555,7 +562,11 @@ speechInputs = ["cat1.wav", "cat2.wav", "cat3.wav", "dog1.wav", "dog2.wav",
 
 
 """ 
-    ------------------- Thorough random tests ----------------------
+    ------------------------- Thorough random tests ----------------------------
+    Thoroughly test the models before and after conversion using random
+    input data. Tests print detailed statistical information about the
+    difference of the output of the ONNX and TFLite versions of the models.
+
     Uncomment the lines corresponding to the model you wish to test. 
 """
 
