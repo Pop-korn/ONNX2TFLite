@@ -492,6 +492,8 @@ speechInputs = ["cat1.wav", "cat2.wav", "cat3.wav", "dog1.wav", "dog2.wav",
     Tests print a summary of the number of successful test cases.
 
     Uncomment the lines corresponding to the model you wish to test. 
+    Only 1 test can run at once, because of the limitations of the ONNX 
+    library!
 """
 
 """ TEST ALEXNET CONVERSION """
@@ -532,6 +534,8 @@ speechInputs = ["cat1.wav", "cat2.wav", "cat3.wav", "dog1.wav", "dog2.wav",
     the TFLite model and the difference between them.
 
     Uncomment the lines corresponding to the model you wish to test. 
+    Only 1 test can run at once, because of the limitations of the ONNX 
+    library!
 """
 
 """ TEST ALEXNET CONVERSION """
@@ -568,6 +572,8 @@ speechInputs = ["cat1.wav", "cat2.wav", "cat3.wav", "dog1.wav", "dog2.wav",
     difference of the output of the ONNX and TFLite versions of the models.
 
     Uncomment the lines corresponding to the model you wish to test. 
+    Only 1 test can run at once, because of the limitations of the ONNX 
+    library!
 """
 
 """ TEST ALEXNET CONVERSION """

@@ -62,7 +62,3 @@ RB := )
 # Delete pycache files
 clear-pycache:
 	find . | grep -E "$(LB)/__pycache__$$|\.pyc$$|\.pyo$$$(RB)" | xargs rm -rf
-
-# Count the total number of lines in the program
-total-line-count: clear-pycache
-	find src/ | xargs wc -l 

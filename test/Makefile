@@ -16,6 +16,7 @@ protobuf-to-json:
 	
 	
 # Test if generated .tflite file is smaller than one created by flatc through json
+# Does't work with large models!
 test-efficiency: 
 	flatc -t --strict-json --defaults-json -o . ../data/schemas/tflite/schema.fbs -- $(TFL) --raw-binary
 	mv $(TFL) old.tflite
