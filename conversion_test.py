@@ -521,10 +521,10 @@ speechInputs = ["cat1.wav", "cat2.wav", "cat3.wav", "dog1.wav", "dog2.wav",
 # exit()
 
 """ TEST SPEECH CLASSIFIER CONVERSION """
-print("\tTesting Speech Classifier conversion.")
-inputs = loadAudioFiles(speechInputDir, speechInputs)
-testConversionWithInputs(speechOnnx, speechTfl, inputs, 10**-3, True)
-exit()
+# print("\tTesting Speech Classifier conversion.")
+# inputs = loadAudioFiles(speechInputDir, speechInputs)
+# testConversionWithInputs(speechOnnx, speechTfl, inputs, 10**-3, True)
+# exit()
 
 
 
