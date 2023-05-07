@@ -17,6 +17,8 @@ __email__ = xpavel39@stud.fit.vutbr.cz
 
 from PIL import Image
 
+import wave
+
 import tensorflow as tf
 import onnxruntime as ort
 import onnx
@@ -73,12 +75,39 @@ def loadImage(file):
     img = [np.asarray(img).tolist()]
     return np.asarray(img, np.float32)
 
+def loadImages(dir, filenames):
+    """ Load images from the 'dir' directory with given 'filenames'.
+        Return a list of numpy arrays holding their data. """
+    images = []
+
+    for file in filenames:
+        file = dir + file
+        images.append(loadImage(file))    
+
+    return images 
+
+def loadAudioFiles(dir, filenames):
+    """ Load audio file from the 'dir' directory with given 'filenames'.
+        Return a list of numpy arrays holding their data. """
+    audio = []
+
+    for file in filenames:
+        f = wave.open(dir + file)
+        data = f.readframes( 8000 )
+
+        # Load data as float32
+        data = np.frombuffer(data, dtype=np.int8).astype(np.float32)
+
+        # Reshape to model input shape
+        data = np.asarray([ data for i in range(256)]).reshape([256,1,16000])
+
+        audio.append(data)
+
+    return audio
+
 def runOnnxModel(modelFile, inpt):
     """ Run ONNX model stored in 'modelFile' with 'inpt' as input. 
         Return the output tensor. """
-    model = onnx.load(modelFile)
-    onnx.checker.check_model(model)
-
     sess = ort.InferenceSession(modelFile)
     
     res = sess.run(None, {sess.get_inputs()[0].name : tensorToNCHW(inpt)})
@@ -357,6 +386,67 @@ def testConversion(onnxFile, tflFile, numIterations):
     print("Average Relative error of output std =\t", "%.6e" % np.asarray(stdRelErr).mean())
 
 
+def maxErrorLessThan(tensor1: np.ndarray, tensor2: np.ndarray, eps: float):
+    """ Check that the difference of elements on same indices in 'tensor1' and
+        'tensor2' is smaller than 'eps' """
+
+    if len(tensor1) != len(tensor2):
+        return False
+    
+    diff = np.abs( tensor1 - tensor2 )
+
+    return diff.max() < eps
+
+
+def testConversionWithInputs(onnxFile, tfliteFile, inputs, epsilon, alsoCheckMaxIndices):
+    """ Convert the ONNX model in 'onnxFile' and store the result in 'TFLiteFile'.
+        Then run both models with data in 'inputs', which is a list of numpy arrays.
+        Compare the output tensors. Check that all elements are less than 'epsilon'
+        and if 'alsoCheckMaxIndices' is True, make sure the indices of the highest
+        elements are equal.
+        Print the results."""
+
+    print(f"Converting model '{onnxFile}'.")
+
+    convert.convertModel(onnxFile, tfliteFile)
+
+    numTests = len(inputs)
+    numSuccessfulTests = 0
+
+    # Run tests with prepared inputs
+    print("Running tests with specified inputs.")
+    for i, inp in enumerate(inputs):
+        onnxOut = runOnnxModel(onnxFile, inp).flatten()
+        tflOut = tensorToNCHW(runTFLiteModel(tfliteFile, inp)).flatten()
+
+        if maxErrorLessThan(onnxOut, tflOut, epsilon):
+            
+            if alsoCheckMaxIndices:
+                # Compare indices of max elements
+                if onnxOut.argmax() == tflOut.argmax():
+                    numSuccessfulTests += 1
+                    print(f"\tTest '{i+1}' passed.")
+
+                else:
+                    print(f"\tTest '{i+1}' FAILED!",
+                        "Model outputs have maximum at different indices.")
+            else:
+                numSuccessfulTests += 1
+                print(f"\tTest '{i+1}' passed.")
+
+
+        else:
+            print(f"\tTest '{i+1}' FAILED!",
+                  "Model outputs are not exactly the same.")
+        
+    # Print results
+    if numSuccessfulTests == numTests:
+        print("All tests passed successfully!")
+    else:
+        print(f"Only {numSuccessfulTests} / {numTests} passes successfully!")
+
+        
+
 
 
 """ -------------------- Start of execution -------------------- """
@@ -364,24 +454,76 @@ def testConversion(onnxFile, tflFile, numIterations):
 # Mute internal logging
 err.MIN_OUTPUT_IMPORTANCE = err.MessageImportance.WARNING
 
-
-imageFile = "data/224x224/cat2.jpg"
+""" Files with models and real input data """
 
 alexnetOnnx = "data/onnx/bvlcalexnet-12.onnx"
 alexnetTfl = "test/alexnet.tflite"
+alexnetInputDir = "data/224x224/"
+alexnetInputs = ["cat1.jpg","cat2.jpg","cat3.jpg","cat4.jpg","cat5.jpg",
+                 "dog1.jpg","dog2.jpg","dog3.jpg","dog4.jpg","dog5.jpg"]
+
 
 ducOnnx = "data/onnx/ResNet101-DUC-12.onnx"
 ducTfl = "test/duc.tflite"
+ducInputDir = "data/800x800/"
+ducInputs = ["img1.jpg"]
+
 
 tinyyoloOnnx = "data/onnx/tinyyolov2-8.onnx"
 tinyyoloTfl = "test/tinyyolo.tflite"
+tinyyoloInputDir = "data/416x416/"
+tinyyoloInputs = ["img1.jpg","img2.jpg","img3.jpg","img4.jpg","img5.jpg",
+                  "img6.jpg","img7.jpg","img8.jpg","img9.jpg","img10.jpg",]
+
 
 speechOnnx = "data/onnx/speech_command_classifier_trained.onnx"
 speechTfl = "test/speech_command_classifier_trained.tflite"
+speechInputDir = "data/audio/"
+speechInputs = ["cat1.wav", "cat2.wav", "cat3.wav", "dog1.wav", "dog2.wav",
+                "dog3.wav", "happy1.wav", "happy2.wav", "happy3.wav", "happy4.wav"]
+
+
+
 
 
 """ 
-    -------------------------- Quick tests -------------------------
+    --------------------- Tests with real data ---------------------
+    Uncomment the lines corresponding to the model you wish to test. 
+"""
+
+""" TEST ALEXNET CONVERSION """
+# print("\tTesting Alexnet conversion.")
+# inputs = loadImages(alexnetInputDir, alexnetInputs)
+# testConversionWithInputs(alexnetOnnx, alexnetTfl, inputs, 5*10**-6, True)
+# exit()
+
+""" TEST TINYYOLO CONVERSION 
+    Warning - the ONNX model is not defined 'nicely', so the inference engine 
+    prints a lot of warning messages. Just ignore them. """
+# print("\tTesting TinyYOLO v2 conversion.")
+# inputs = loadImages(tinyyoloInputDir, tinyyoloInputs)
+# testConversionWithInputs(tinyyoloOnnx, tinyyoloTfl, inputs, 10**-3, True)
+# exit()
+
+""" TEST RESNET-DUC CONVERSION 
+    Large model -> takes a minute to run. """
+# print("\tTesting Resnet-DUC conversion.")
+# inputs = loadImages(ducInputDir, ducInputs)
+# testConversionWithInputs(ducOnnx, ducTfl, inputs, 5 * 10**-3, False)
+# exit()
+
+""" TEST SPEECH CLASSIFIER CONVERSION """
+# print("\tTesting Speech Classifier conversion.")
+# inputs = loadAudioFiles(speechInputDir, speechInputs)
+# testConversionWithInputs(speechOnnx, speechTfl, inputs, 5*10**-5, True)
+# exit()
+
+
+
+
+
+""" 
+    ---------------------- Quick random tests ----------------------
     Uncomment the lines corresponding to the model you wish to test. 
 """
 
@@ -411,8 +553,9 @@ speechTfl = "test/speech_command_classifier_trained.tflite"
 
 
 
+
 """ 
-    ------------------------ Thorough tests ------------------------
+    ------------------- Thorough random tests ----------------------
     Uncomment the lines corresponding to the model you wish to test. 
 """
 
