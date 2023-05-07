@@ -10,6 +10,8 @@ Verified models:
 
 The models can be downloaded using **make get-default-models** and then converted to *TFLite* using **make convert-default-models** from the root directory.
 
+Project is available on GitHub (https://github.com/Pop-korn/ONNX2TFLite).
+
 ---
 
 ## Instalation
