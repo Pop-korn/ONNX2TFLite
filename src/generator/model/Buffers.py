@@ -86,5 +86,5 @@ class Buffer(meta.TFLiteObject):
 
 
 class Buffers(meta.TFLiteVector):
-    def __init__(self, vector: List[Buffer]=[]) -> None:
+    def __init__(self, vector: List[Buffer] = None) -> None:
         super().__init__(vector, m.StartBuffersVector)

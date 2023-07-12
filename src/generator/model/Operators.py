@@ -19,16 +19,16 @@ import src.generator.meta.meta as meta
 import src.generator.model.Tensors as Tensors
 
 class Inputs(meta.IntVector):
-    def __init__(self, inputs: List[int]):
+    def __init__(self, inputs: List[int] = None):
         super().__init__(inputs,op.StartInputsVector)
 
 class Outputs(meta.IntVector):
-    def __init__(self, outputs: List[int]):
+    def __init__(self, outputs: List[int] = None):
         super().__init__(outputs,op.StartOutputsVector)
 
 class MutatingVariableInputs(meta.BoolVector):
-        def __init__(self, mutatingVariableInputs: List[bool]=[]) -> None:
-             super().__init__(mutatingVariableInputs,op.StartMutatingVariableInputsVector)
+    def __init__(self, mutatingVariableInputs: List[bool] = None) -> None:
+        super().__init__(mutatingVariableInputs, op.StartMutatingVariableInputsVector)
 
 
 class Operator(meta.TFLiteObject):
@@ -60,10 +60,10 @@ class Operator(meta.TFLiteObject):
         self.mutatingVariableInputs = mutatingVariableInputs
         self.builtinOptions = builtinOptions
         if inputs is None:
-            inputs = Inputs([])
+            inputs = Inputs()
         self.inputs = inputs
         if outputs is None:
-            outputs = Outputs([])
+            outputs = Outputs()
         self.outputs = outputs
 
         self.tmpInputs = []
@@ -104,6 +104,6 @@ class Operator(meta.TFLiteObject):
 
 
 class Operators(meta.TFLiteVector):
-    def __init__(self, operators: List[Operator] = []) -> None:
+    def __init__(self, operators: List[Operator] = None) -> None:
         super().__init__(operators,sg.StartOperatorsVector)
         

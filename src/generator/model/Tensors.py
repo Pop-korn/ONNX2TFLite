@@ -153,5 +153,5 @@ class Tensor(meta.TFLiteObject):
         return t.End(builder)
 
 class Tensors(meta.TFLiteVector):
-    def __init__(self, tensors: List[Tensor] = []) -> None:
+    def __init__(self, tensors: List[Tensor] = None) -> None:
         super().__init__(tensors,sg.StartTensorsVector)

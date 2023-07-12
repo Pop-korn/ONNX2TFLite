@@ -97,5 +97,5 @@ class SubGraph(meta.TFLiteObject):
         return sg.End(builder)
 
 class SubGraphs(meta.TFLiteVector):
-    def __init__(self, subGraphs: List[SubGraph] = []) -> None:
+    def __init__(self, subGraphs: List[SubGraph] = None) -> None:
         super().__init__(subGraphs,Model.StartSubgraphsVector)

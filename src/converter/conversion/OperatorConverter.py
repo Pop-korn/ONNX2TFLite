@@ -47,8 +47,8 @@ class OperatorConverter:
         
         tOp = tflO.Operator(
             opcodeIndex=self.__builder.opCodeIndexForOpType(opType),
-            inputs=tflO.Inputs([]),
-            outputs=tflO.Outputs([])
+            inputs=tflO.Inputs(),
+            outputs=tflO.Outputs()
         )
 
         for name in inputs:
@@ -66,12 +66,12 @@ class OperatorConverter:
         tOperator = tflO.Operator()
 
         # Initialize operator inputs
-        tOperator.inputs = tflO.Inputs([])
+        tOperator.inputs = tflO.Inputs()
         for name in oNode.inputs:
             tOperator.tmpInputs.append(self.__builder.tensorForName(name))
 
         # Initialize operator outputs
-        tOperator.outputs = tflO.Outputs([])
+        tOperator.outputs = tflO.Outputs()
         for name in oNode.outputs:
             tOperator.tmpOutputs.append(self.__builder.tensorForName(name))
 
