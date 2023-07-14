@@ -60,7 +60,7 @@ class Tensor(meta.ONNXObject):
     
     def __hasData(self, field):
         """ Determine if given repeated field has data stored in it. """
-        return (field is not None) and (field != "") and (len(field) != 0)
+        return (field is not None) and (len(field) != 0)
 
 
     def __assignData(self):
@@ -69,7 +69,7 @@ class Tensor(meta.ONNXObject):
 
         # Raw data
         if self.__hasData(self._descriptor.raw_data):
-            self.data = np.frombuffer(self._descriptor.raw_data, 
+            self.data = np.frombuffer(self._descriptor.raw_data,
                                       types.toNumpyType(self.dataType))
             
             # 'onnx-ml.proto' line '581'
@@ -82,8 +82,8 @@ class Tensor(meta.ONNXObject):
             tensor values. """
 
         # Float data
-        if self.__hasData(self._descriptor.float_data): 
-            self.data = np.array(self._descriptor.float_data, 
+        if self.__hasData(self._descriptor.float_data):
+            self.data = np.array(self._descriptor.float_data,
                                  types.toNumpyType(self.dataType))
             
             # 'onnx-ml.proto' line '540'
