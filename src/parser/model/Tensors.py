@@ -65,81 +65,70 @@ class Tensor(meta.ONNXObject):
 
     def __assignData(self):
         """ Assign data to either the 'data' attribute correctly. """
+
+        # ---------- WARNING ----------
+        # 'raw_data' is loaded using 'numpy.frumbuffer()' -> tested on many models
+        # type specific arrays are loaded using 'numpy.fromiter()' -> about 30% faster than 'numpy.array()' and similar
+        #                                                             functions, but with limited testing.
+        #                                                             So far works correctly.
+
         self.data = None
 
         # Raw data
         if self.__hasData(self._descriptor.raw_data):
-            self.data = np.frombuffer(self._descriptor.raw_data,
-                                      types.toNumpyType(self.dataType))
+            self.data = np.frombuffer(self._descriptor.raw_data, types.toNumpyType(self.dataType))
             
             # 'onnx-ml.proto' line '581'
-            self.__assertTypeNotBanned([meta.DataType.STRING, 
-                                        meta.DataType.UNDEFINED],"raw_data") 
+            self.__assertTypeNotBanned([meta.DataType.STRING, meta.DataType.UNDEFINED],"raw_data")
             return
         
-
-        """ 'raw_data' is not given. One of the 'data' fields must contain 
-            tensor values. """
-
         # Float data
-        if self.__hasData(self._descriptor.float_data):
-            self.data = np.array(self._descriptor.float_data,
-                                 types.toNumpyType(self.dataType))
+        elif self.__hasData(self._descriptor.float_data):
+            self.data = np.fromiter(self._descriptor.float_data, types.toNumpyType(self.dataType))
             
             # 'onnx-ml.proto' line '540'
-            self.__assertTypeAllowed([meta.DataType.FLOAT, 
-                                     meta.DataType.COMPLEX64],
-                                     "float_data") 
+            self.__assertTypeAllowed([meta.DataType.FLOAT, meta.DataType.COMPLEX64], "float_data")
 
         # Int32 data
         elif self.__hasData(self._descriptor.int32_data): 
             err.unchecked("Tensors.__assignData(): int32_data")
-            self.data = np.array(self._descriptor.int32_data, 
-                                 types.toNumpyType(self.dataType))
+            self.data = np.fromiter(self._descriptor.int32_data, types.toNumpyType(self.dataType))
             
             # 'onnx-ml.proto' line '547'
-            self.__assertTypeAllowed([meta.DataType.INT32, meta.DataType.INT16, 
-                                      meta.DataType.INT8, meta.DataType.UINT16, 
-                                      meta.DataType.UINT8, meta.DataType.BOOL, 
-                                      meta.DataType.FLOAT16, 
-                                      meta.DataType.BFLOAT16],"int32_data") 
+            self.__assertTypeAllowed([meta.DataType.INT32, meta.DataType.INT16, meta.DataType.INT8, meta.DataType.UINT16,
+                                      meta.DataType.UINT8, meta.DataType.BOOL, meta.DataType.FLOAT16,
+                                      meta.DataType.BFLOAT16], "int32_data")
 
         # String data
         elif self.__hasData(self._descriptor.string_data):
             err.unchecked("Tensors.__assignData(): string_data")
-            self.data = np.array(self._descriptor.string_data, 
-                                 types.toNumpyType(self.dataType))
+            self.data = np.fromiter(self._descriptor.string_data, types.toNumpyType(self.dataType))
             
             # 'onnx-ml.proto' line '555'
-            self.__assertTypeAllowed([meta.DataType.STRING],"string_data") 
+            self.__assertTypeAllowed([meta.DataType.STRING], "string_data")
 
         # Int64 data
         elif self.__hasData(self._descriptor.int64_data):
-            self.data = np.array(self._descriptor.int64_data, 
-                                 types.toNumpyType(self.dataType))
+            self.data = np.fromiter(self._descriptor.int64_data, types.toNumpyType(self.dataType))
             
             # 'onnx-ml.proto' line '558'
-            self.__assertTypeAllowed([meta.DataType.INT64],"int64_data") 
+            self.__assertTypeAllowed([meta.DataType.INT64], "int64_data")
 
         # Double data
         elif self.__hasData(self._descriptor.double_data):
             err.unchecked("Tensors.__assignData(): double_data")
-            self.data = np.array(self._descriptor.double_data, 
-                                 types.toNumpyType(self.dataType))
+            self.data = np.fromiter(self._descriptor.double_data, types.toNumpyType(self.dataType))
             
             # 'onnx-ml.proto' line '612'
-            self.__assertTypeAllowed([meta.DataType.DOUBLE, 
-                                      meta.DataType.COMPLEX128],"double_data") 
+            self.__assertTypeAllowed([meta.DataType.DOUBLE, meta.DataType.COMPLEX128], "double_data")
 
         # Uint64 data
         elif self.__hasData(self._descriptor.uint64_data):
             err.unchecked("Tensors.__assignData(): uint64_data")
-            self.data = np.array(self._descriptor.uint64_data, 
-                                 types.toNumpyType(self.dataType))
+            self.data = np.fromiter(self._descriptor.uint64_data, types.toNumpyType(self.dataType))
             
             # 'onnx-ml.proto' line '617'
-            self.__assertTypeAllowed([meta.DataType.UINT32, 
-                                      meta.DataType.UINT64],"uint64_data") 
+            self.__assertTypeAllowed([meta.DataType.UINT32, meta.DataType.UINT64], "uint64_data")
 
 
     def __assertTypeAllowed(self, allowedTypes: List, forField: str) -> bool:
@@ -157,8 +146,7 @@ class Tensor(meta.ONNXObject):
         return True
 
     def __assertTypeNotBanned(self, bannedTypes: List, forField: str) -> bool:
-        """ Check that 'self.dataType' is NOT in 'bannedTypes'. If it IS, print 
-            warning message. 
+        """ Check that 'self.dataType' is NOT in 'bannedTypes'. If it IS, print warning message.
             'bannedTypes' is a list of 'meta.DataType' values. 
             Return 'True' if type is not banned. """
         
@@ -168,7 +156,6 @@ class Tensor(meta.ONNXObject):
             return False
         
         return True
-
 
 
 class Tensors(List [Tensor]):
