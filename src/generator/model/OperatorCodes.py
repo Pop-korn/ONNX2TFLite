@@ -44,7 +44,8 @@ class OperatorCode(meta.TFLiteObject):
         
         return oc.End(builder)
 
+
 class OperatorCodes(meta.TFLiteVector):
-    def __init__(self, operatorCodes: List[OperatorCode] = []) -> None:
-        super().__init__(operatorCodes,Model.StartOperatorCodesVector)
+    def __init__(self, operatorCodes: List[OperatorCode] = None) -> None:
+        super().__init__(operatorCodes, Model.StartOperatorCodesVector)
     
