@@ -38,18 +38,17 @@ class Conv(meta.ONNXOperatorAttributes):
 
     def _initAttributes(self):
         for attr in self._descriptor:
-            match attr.name:
-                case "auto_pad":
-                    self.autoPad = attr.s # Not tested!
-                case "dilations":
-                    self.dilations = meta.ONNXIntListAttribute(attr) # Not tested!
-                case "group":
-                    self.group = attr.i 
-                case "kernel_shape":
-                    self.kernelShape = meta.ONNXIntListAttribute(attr)
-                case "pads":
-                    self.pads = meta.ONNXIntListAttribute(attr)
-                case "strides":
-                    self.strides = meta.ONNXIntListAttribute(attr)
-                case _:
-                    err.warning(f"ONNX Conv attribute '{attr.name}' is not supported!")
+            if attr.name == "auto_pad":
+                self.autoPad = attr.s # Not tested!
+            elif attr.name == "dilations":
+                self.dilations = meta.ONNXIntListAttribute(attr) # Not tested!
+            elif attr.name == "group":
+                self.group = attr.i
+            elif attr.name == "kernel_shape":
+                self.kernelShape = meta.ONNXIntListAttribute(attr)
+            elif attr.name == "pads":
+                self.pads = meta.ONNXIntListAttribute(attr)
+            elif attr.name == "strides":
+                self.strides = meta.ONNXIntListAttribute(attr)
+            else:
+                err.warning(f"ONNX Conv attribute '{attr.name}' is not supported!")

@@ -24,8 +24,7 @@ class Transpose(meta.ONNXOperatorAttributes):
 
     def _initAttributes(self):
         for attr in self._descriptor:
-            match attr.name:
-                case "perm":
-                    self.perm = attr.ints
-                case _:
-                    err.warning(f"ONNX Transpose attribute '{attr.name}' is not supported!")
+            if attr.name == "perm":
+                self.perm = attr.ints
+            else:
+                err.warning(f"ONNX Transpose attribute '{attr.name}' is not supported!")

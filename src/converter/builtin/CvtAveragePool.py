@@ -170,14 +170,13 @@ def convert(oAP: onnxAveragePool.AveragePool,
             modelBuilder: ModelBuilder.ModelBuilder):
     """ Convert the ONNX AveragePool operator to TFLite.  """
     
-    match len(oAP.kernelShape):
-        case 1:
-            # 1D AveragePool
-            __convert1DAveragePool(oAP, tOp, modelBuilder)
-        case 2:
-            # 2D AveragePool
-            __convert2DAveragePool(oAP, tOp, modelBuilder)
+    if len(oAP.kernelShape) == 1:
+        # 1D AveragePool
+        __convert1DAveragePool(oAP, tOp, modelBuilder)
+    elif len(oAP.kernelShape) == 2:
+        # 2D AveragePool
+        __convert2DAveragePool(oAP, tOp, modelBuilder)
 
-        case _:
-            err.error(err.Code.NOT_IMPLEMENTED,"AveragePool with kernel shape",
-                      f"'{oAP.kernelShape}' is not supported!")
+    else:
+        err.error(err.Code.NOT_IMPLEMENTED,"AveragePool with kernel shape",
+                  f"'{oAP.kernelShape}' is not supported!")

@@ -31,13 +31,12 @@ class Pad(meta.ONNXOperatorAttributes):
 
     def _initAttributes(self):
         for attr in self._descriptor:
-            match attr.name:
-                case "mode":
-                    self.mode = attr.s
-                case "pads":
-                    self.pads = attr.ints
-                case "value":
-                    self.value = attr.f
-                case _:
-                    err.warning(f"ONNX Pad attribute '{attr.name}' is not supported!")
+            if attr.name ==  "mode":
+                self.mode = attr.s
+            elif attr.name ==  "pads":
+                self.pads = attr.ints
+            elif attr.name ==  "value":
+                self.value = attr.f
+            else:
+                err.warning(f"ONNX Pad attribute '{attr.name}' is not supported!")
 

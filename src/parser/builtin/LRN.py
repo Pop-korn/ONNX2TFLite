@@ -33,14 +33,13 @@ class LRN(meta.ONNXOperatorAttributes):
 
     def _initAttributes(self):
         for attr in self._descriptor:
-            match attr.name:
-                case "alpha":
-                    self.alpha = attr.f
-                case "beta":
-                    self.beta = attr.f
-                case "bias":
-                    self.bias = attr.f
-                case "size":
-                    self.size = attr.i
-                case _:
-                    err.warning(f"ONNX LRN attribute '{attr.name}' is not supported!")
+            if attr.name ==  "alpha":
+                self.alpha = attr.f
+            elif attr.name ==  "beta":
+                self.beta = attr.f
+            elif attr.name ==  "bias":
+                self.bias = attr.f
+            elif attr.name ==  "size":
+                self.size = attr.i
+            else:
+                err.warning(f"ONNX LRN attribute '{attr.name}' is not supported!")

@@ -29,9 +29,8 @@ class LogSoftmax(meta.ONNXOperatorAttributes):
             
     def _initAttributes(self):
         for attr in self._descriptor:
-            match attr.name:
-                case "axis":
-                    self.axis = attr.i 
-                case _:
-                    err.warning(f"ONNX Softmax attribute '{attr.name}' is not supported!")
+            if attr.name ==  "axis":
+                self.axis = attr.i
+            else:
+                err.warning(f"ONNX Softmax attribute '{attr.name}' is not supported!")
                     

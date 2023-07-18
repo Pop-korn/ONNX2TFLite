@@ -34,14 +34,13 @@ class Gemm(meta.ONNXOperatorAttributes):
 
     def _initAttributes(self):
         for attr in self._descriptor:
-            match attr.name:
-                case "alpha":
-                    self.alpha = attr.f # Not tested!
-                case "beta":
-                    self.beta = attr.f # Not tested!
-                case "transA":
-                    self.transA = attr.i # Not tested!
-                case "transB":
-                    self.transB = attr.i
-                case _:
-                    err.warning(f"ONNX Gemm attribute '{attr.name}' is not supported!")
+            if attr.name ==  "alpha":
+                self.alpha = attr.f # Not tested!
+            elif attr.name ==  "beta":
+                self.beta = attr.f # Not tested!
+            elif attr.name ==  "transA":
+                self.transA = attr.i # Not tested!
+            elif attr.name ==  "transB":
+                self.transB = attr.i
+            else:
+                err.warning(f"ONNX Gemm attribute '{attr.name}' is not supported!")

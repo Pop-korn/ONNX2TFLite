@@ -28,8 +28,7 @@ class Reshape(meta.ONNXOperatorAttributes):
             
     def _initAttributes(self):
         for attr in self._descriptor:
-            match attr.name:
-                case "allowzero": # Not tested!
-                    self.allowZero = attr.i 
-                case _:
-                    err.warning(f"ONNX Reshape attribute '{attr.name}' is not supported!")
+            if attr.name == "allowzero": # Not tested!
+                self.allowZero = attr.i
+            else:
+                err.warning(f"ONNX Reshape attribute '{attr.name}' is not supported!")

@@ -28,8 +28,7 @@ class Dropout(meta.ONNXOperatorAttributes):
 
     def _initAttributes(self):
         for attr in self._descriptor:
-            match attr.name:
-                case "seed": # Not tested!
-                    self.seed = attr.i
-                case _:
-                    err.warning(f"ONNX Dropout attribute '{attr.name}' is not supported!")
+            if attr.name == "seed": # Not tested!
+                self.seed = attr.i
+            else:
+                err.warning(f"ONNX Dropout attribute '{attr.name}' is not supported!")

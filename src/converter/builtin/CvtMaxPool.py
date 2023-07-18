@@ -168,14 +168,13 @@ def __convert2DMaxPool(oMP: onnxMaxPool.MaxPool,
 def convert(oMP: onnxMaxPool.MaxPool,
             tOp: tflO.Operator,           
             modelBuilder: ModelBuilder.ModelBuilder):
-    match len(oMP.kernelShape):
-        case 1:
-            # 1D MaxPool
-            __convert1DMaxPool(oMP, tOp, modelBuilder)
-        case 2:
-            # 2D MaxPool
-            __convert2DMaxPool(oMP, tOp, modelBuilder)
+    if len(oMP.kernelShape) == 1:
+        # 1D MaxPool
+        __convert1DMaxPool(oMP, tOp, modelBuilder)
+    elif len(oMP.kernelShape) == 2:
+        # 2D MaxPool
+        __convert2DMaxPool(oMP, tOp, modelBuilder)
 
-        case _:
-            err.error(err.Code.NOT_IMPLEMENTED,f"MaxPool with kernel shape '{oMP.kernelShape}'",
-                      "is not supported!")
+    else:
+        err.error(err.Code.NOT_IMPLEMENTED,f"MaxPool with kernel shape '{oMP.kernelShape}'",
+                  "is not supported!")

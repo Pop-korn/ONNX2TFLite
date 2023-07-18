@@ -12,7 +12,9 @@ import src.parser.builtin.Dropout as onnxDropout
 
 import src.generator.meta.meta as tflMeta
 
-def convert(oDropout: onnxDropout.Dropout) -> tflMeta.BuiltinOptions | None:
+from typing import Optional
+
+def convert(oDropout: onnxDropout.Dropout) -> Optional[tflMeta.BuiltinOptions]:
     """ Convert the ONNX 'Dropout' operator to TFLite. 
         There is no direct equivalent.
         

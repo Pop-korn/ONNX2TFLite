@@ -11,7 +11,7 @@ __email__ = xpavel39@stud.fit.vutbr.cz
 
 from typing_extensions import override
 import flatbuffers as fb
-from typing import Callable, List
+from typing import Callable, List, Union
 
 import lib.tflite.BuiltinOptions as bOpt
 import lib.tflite.BuiltinOperator as bOp
@@ -92,7 +92,7 @@ class TFLiteVector(TFLiteObject):
         return builder.EndVector()
 
 class TFLiteAtomicVector(TFLiteVector):
-    def __init__(self, vector: List[int | float | bool],
+    def __init__(self, vector: List[Union[int, float, bool]],
                 StartFunction: Callable[[fb.Builder, int],None],
                 PrependFunction: Callable[[fb.Builder],Callable[[int],None]],
                 genEmpty: bool=True) -> None:

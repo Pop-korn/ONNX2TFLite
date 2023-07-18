@@ -189,19 +189,18 @@ def convert(oConv: onnxConv.Conv, tOp: tflO.Operator,
             modelBuilder: ModelBuilder.ModelBuilder):
     """ Convert the ONNX 'Conv' operator to TFLite. """
 
-    match len(oConv.kernelShape):
-        case 1:
-            # 1D Convolution
-            __convert1DConv(oConv, tOp, modelBuilder)
+    if len(oConv.kernelShape) == 1:
+        # 1D Convolution
+        __convert1DConv(oConv, tOp, modelBuilder)
 
-        case 2:
-            # 2D Convolution
-            __convert2DConv(oConv, tOp, modelBuilder)
-        
-        case 3:
-            # 3D Convolution
-            __convert3DConv(oConv, tOp, modelBuilder)
-        case _:
-            err.error(err.Code.UNSUPPORTED_OPERATOR_ATTRIBUTES,
-                      f"Convolution with kernel shape '{oConv.kernelShape}'",
-                      "is not supported!")
+    elif len(oConv.kernelShape) == 2:
+        # 2D Convolution
+        __convert2DConv(oConv, tOp, modelBuilder)
+
+    elif len(oConv.kernelShape) == 3:
+        # 3D Convolution
+        __convert3DConv(oConv, tOp, modelBuilder)
+    else:
+        err.error(err.Code.UNSUPPORTED_OPERATOR_ATTRIBUTES,
+                  f"Convolution with kernel shape '{oConv.kernelShape}'",
+                  "is not supported!")

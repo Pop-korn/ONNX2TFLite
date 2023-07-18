@@ -88,79 +88,78 @@ class OperatorConverter:
         implicitOperatorType = True
 
         # Identify ONNX operator and convert it
-        match(oNode.opType):
-            case "Gemm":
-                tOp.builtinOptions = CvtGemm.convert(oNode.attributes,
-                                                     tOp,
+        if oNode.opType == "Gemm":
+            tOp.builtinOptions = CvtGemm.convert(oNode.attributes,
+                                                 tOp,
+                                                 self.__builder)
+        elif oNode.opType == "LeakyRelu":
+            tOp.builtinOptions = CvtLeakyRelu.convert(oNode.attributes)
+        elif oNode.opType == "LogSoftmax":
+            tOp.builtinOptions = CvtLogSoftmax.convert(oNode.attributes, tOp)
+        elif oNode.opType == "LRN":
+            tOp.builtinOptions = CvtLRN.convert(oNode.attributes)
+        elif oNode.opType == "Mul":
+            tOp.builtinOptions = CvtMul.convert()
+        elif oNode.opType == "Relu":
+            tOp.builtinOptions = None
+            tOp.opcodeIndex = self.__builder.opCodeIndexForOpType(tflBO.BuiltinOperator.RELU)
+            implicitOperatorType = False
+        elif oNode.opType == "Reshape":
+            tOp.builtinOptions = CvtReshape.convert(tOp, self.__builder)
+        elif oNode.opType == "Sum":
+            tOp.builtinOptions = CvtSum.convert(tOp)
+        elif oNode.opType == "Transpose":
+            tOp.builtinOptions = CvtTranspose.convert(oNode.attributes,
+                                                      tOp, self.__builder)
+
+
+            """ Operators that might not get converted! """
+        elif oNode.opType == "Add":
+            tOp.builtinOptions = CvtAdd.convert(tOp, self.__builder)
+            if tOp.builtinOptions is None:
+                self.__builder.skipOperator(tOp)
+                return
+        elif oNode.opType == "Constant":
+            tOp.builtinOptions = CvtConstant.convert(oNode.attributes,
                                                      self.__builder)
-            case "LeakyRelu":
-                tOp.builtinOptions = CvtLeakyRelu.convert(oNode.attributes)
-            case "LogSoftmax":
-                tOp.builtinOptions = CvtLogSoftmax.convert(oNode.attributes, tOp)
-            case "LRN":
-                tOp.builtinOptions = CvtLRN.convert(oNode.attributes)
-            case "Mul":
-                tOp.builtinOptions = CvtMul.convert()
-            case "Relu":
-                tOp.builtinOptions = None
-                tOp.opcodeIndex = self.__builder.opCodeIndexForOpType(tflBO.BuiltinOperator.RELU)
-                implicitOperatorType = False
-            case "Reshape":
-                tOp.builtinOptions = CvtReshape.convert(tOp, self.__builder)
-            case "Sum":
-                tOp.builtinOptions = CvtSum.convert(tOp)
-            case "Transpose":
-                tOp.builtinOptions = CvtTranspose.convert(oNode.attributes,
-                                                          tOp, self.__builder)
-
-
-                """ Operators that might not get converted! """
-            case "Add":
-                tOp.builtinOptions = CvtAdd.convert(tOp, self.__builder)
-                if tOp.builtinOptions is None:
-                    self.__builder.skipOperator(tOp)
-                    return
-            case "Constant":
-                tOp.builtinOptions = CvtConstant.convert(oNode.attributes,
-                                                         self.__builder)
-                if tOp.builtinOptions is None:
-                    return
-            case "Dropout":
-                tOp.builtinOptions = CvtDropout.convert(oNode.attributes)
-                if tOp.builtinOptions is None:
-                    self.__builder.skipOperator(tOp)
-                    return
-            case "Pad":
-                tOp.builtinOptions = CvtPad.convert(oNode.attributes)
-                if tOp.builtinOptions is None:
-                    self.__builder.skipOperator(tOp)
-                    return
-            
-
-                """ Operators that handle adding operators to the model themselves """
-            case "AveragePool":
-                CvtAveragePool.convert(oNode.attributes, tOp, self.__builder)
+            if tOp.builtinOptions is None:
                 return
-            case "BatchNormalization":
-                CvtBatchNormalization.convert(oNode.attributes, tOp, 
-                                              self.__builder)
+        elif oNode.opType == "Dropout":
+            tOp.builtinOptions = CvtDropout.convert(oNode.attributes)
+            if tOp.builtinOptions is None:
+                self.__builder.skipOperator(tOp)
                 return
-            case "Conv":
-                CvtConv.convert(oNode.attributes, tOp, self.__builder)
-                return
-            case "MaxPool":
-                CvtMaxPool.convert(oNode.attributes, tOp, self.__builder)
-                return
-            case "Softmax":
-                CvtSoftmax.convert(oNode.attributes, tOp, self.__builder)
+        elif oNode.opType == "Pad":
+            tOp.builtinOptions = CvtPad.convert(oNode.attributes)
+            if tOp.builtinOptions is None:
+                self.__builder.skipOperator(tOp)
                 return
 
-            case _:
-                implicitOperatorType = False
-                err.error(err.Code.UNSUPPORTED_OPERATOR, 
-                          f"Conversion of ONNX Operator '{oNode.opType}'",
-                          "is not yet supported!")
-                return
+
+            """ Operators that handle adding operators to the model themselves """
+        elif oNode.opType == "AveragePool":
+            CvtAveragePool.convert(oNode.attributes, tOp, self.__builder)
+            return
+        elif oNode.opType == "BatchNormalization":
+            CvtBatchNormalization.convert(oNode.attributes, tOp,
+                                          self.__builder)
+            return
+        elif oNode.opType == "Conv":
+            CvtConv.convert(oNode.attributes, tOp, self.__builder)
+            return
+        elif oNode.opType == "MaxPool":
+            CvtMaxPool.convert(oNode.attributes, tOp, self.__builder)
+            return
+        elif oNode.opType == "Softmax":
+            CvtSoftmax.convert(oNode.attributes, tOp, self.__builder)
+            return
+
+        else:
+            implicitOperatorType = False
+            err.error(err.Code.UNSUPPORTED_OPERATOR,
+                      f"Conversion of ONNX Operator '{oNode.opType}'",
+                      "is not yet supported!")
+            return
                 
         # Assign 'tOp' its operator type. If possible
         if implicitOperatorType:

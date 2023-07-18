@@ -44,47 +44,48 @@ class Node(meta.ONNXObject):
     def __assignAttributes(self):
         """ Assign the exact ATTRIBUTES based on the 'opType'. Each operator is represented
             by a unique class in the '/builtin/' directory. """
-        match self.opType:
-            case "Add":
-                self.attributes = None
-            case "AveragePool":
-                self.attributes = AveragePool.AveragePool(self._descriptor.attribute)
-            case "BatchNormalization":
-                self.attributes = BatchNormalization.BatchNormalization(self._descriptor.attribute)
-            case "Constant":
-                self.attributes = Constant.Constant(self._descriptor.attribute)
-            case "Conv":
-                self.attributes = Conv.Conv(self._descriptor.attribute)
-            case "Dropout":
-                self.attributes = Dropout.Dropout(self._descriptor.attribute)
-            case "Gemm":
-                self.attributes = Gemm.Gemm(self._descriptor.attribute)
-            case "LeakyRelu":
-                self.attributes = LeakyRelu.LeakyRelu(self._descriptor.attribute)
-            case "LogSoftmax":
-                self.attributes = LogSoftmax.LogSoftmax(self._descriptor.attribute)
-            case "LRN":
-                self.attributes = LRN.LRN(self._descriptor.attribute)
-            case "MatMul":
-                self.attributes = MatMul.MatMul(self._descriptor.attribute)
-            case "MaxPool":
-                self.attributes = MaxPool.MaxPool(self._descriptor.attribute)
-            case "Mul":
-                self.attributes = None
-            case "Pad":
-                self.attributes = Pad.Pad(self._descriptor.attribute)
-            case "Relu":
-                self.attributes = Relu.Relu(self._descriptor.attribute)
-            case "Reshape":
-                self.attributes = Reshape.Reshape(self._descriptor.attribute)
-            case "Softmax":
-                self.attributes = Softmax.Softmax(self._descriptor.attribute)
-            case "Sum":
-                self.attributes = None
-            case "Transpose":
-                self.attributes = Transpose.Transpose(self._descriptor.attribute)
-            case _:
-                err.error(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
+        if self.opType == "Add":
+            self.attributes = None
+
+
+        elif self.opType == "AveragePool":
+            self.attributes = AveragePool.AveragePool(self._descriptor.attribute)
+        elif self.opType ==  "BatchNormalization":
+            self.attributes = BatchNormalization.BatchNormalization(self._descriptor.attribute)
+        elif self.opType ==  "Constant":
+            self.attributes = Constant.Constant(self._descriptor.attribute)
+        elif self.opType ==  "Conv":
+            self.attributes = Conv.Conv(self._descriptor.attribute)
+        elif self.opType ==  "Dropout":
+            self.attributes = Dropout.Dropout(self._descriptor.attribute)
+        elif self.opType ==  "Gemm":
+            self.attributes = Gemm.Gemm(self._descriptor.attribute)
+        elif self.opType ==  "LeakyRelu":
+            self.attributes = LeakyRelu.LeakyRelu(self._descriptor.attribute)
+        elif self.opType ==  "LogSoftmax":
+            self.attributes = LogSoftmax.LogSoftmax(self._descriptor.attribute)
+        elif self.opType ==  "LRN":
+            self.attributes = LRN.LRN(self._descriptor.attribute)
+        elif self.opType ==  "MatMul":
+            self.attributes = MatMul.MatMul(self._descriptor.attribute)
+        elif self.opType ==  "MaxPool":
+            self.attributes = MaxPool.MaxPool(self._descriptor.attribute)
+        elif self.opType ==  "Mul":
+            self.attributes = None
+        elif self.opType ==  "Pad":
+            self.attributes = Pad.Pad(self._descriptor.attribute)
+        elif self.opType ==  "Relu":
+            self.attributes = Relu.Relu(self._descriptor.attribute)
+        elif self.opType ==  "Reshape":
+            self.attributes = Reshape.Reshape(self._descriptor.attribute)
+        elif self.opType ==  "Softmax":
+            self.attributes = Softmax.Softmax(self._descriptor.attribute)
+        elif self.opType ==  "Sum":
+            self.attributes = None
+        elif self.opType ==  "Transpose":
+            self.attributes = Transpose.Transpose(self._descriptor.attribute)
+        else:
+            err.error(err.Code.UNSUPPORTED_OPERATOR,f"ONNX operator '{self.opType}' is not yet supported!")
             
 
 class Nodes(List[Node]):

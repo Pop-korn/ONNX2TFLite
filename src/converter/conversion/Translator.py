@@ -353,171 +353,168 @@ def createAxisToLastPerm(axis, numDims):
 def convertDataType(oType: onnxMeta.DataType) -> tflTT.TensorType:
     """ Convert ONNX DataType to TFLite TensorType """
 
-    match oType:
-        case onnxMeta.DataType.UNDEFINED:
-            err.warning("Cannot convert ONNX DataType 'UNDEFINED' to TFLite.",
-                        "Using 'UINT8'.")
-            return tflTT.TensorType.UINT8
+    if oType == onnxMeta.DataType.UNDEFINED:
+        err.warning("Cannot convert ONNX DataType 'UNDEFINED' to TFLite.",
+                    "Using 'UINT8'.")
+        return tflTT.TensorType.UINT8
 
-        case onnxMeta.DataType.FLOAT:
-            return tflTT.TensorType.FLOAT32
+    elif oType == onnxMeta.DataType.FLOAT:
+        return tflTT.TensorType.FLOAT32
 
-        case onnxMeta.DataType.UINT8:
-            return tflTT.TensorType.UINT8
+    elif oType == onnxMeta.DataType.UINT8:
+        return tflTT.TensorType.UINT8
 
-        case onnxMeta.DataType.INT8:
-            return tflTT.TensorType.INT8
+    elif oType == onnxMeta.DataType.INT8:
+        return tflTT.TensorType.INT8
 
-        case onnxMeta.DataType.UINT16:
-            return tflTT.TensorType.UINT16
+    elif oType == onnxMeta.DataType.UINT16:
+        return tflTT.TensorType.UINT16
 
-        case onnxMeta.DataType.INT16:
-            return tflTT.TensorType.INT16
+    elif oType == onnxMeta.DataType.INT16:
+        return tflTT.TensorType.INT16
 
-        case onnxMeta.DataType.INT32:
-            return tflTT.TensorType.INT32
+    elif oType == onnxMeta.DataType.INT32:
+        return tflTT.TensorType.INT32
 
-        case onnxMeta.DataType.INT64:
-            return tflTT.TensorType.INT64
+    elif oType == onnxMeta.DataType.INT64:
+        return tflTT.TensorType.INT64
 
-        case onnxMeta.DataType.STRING:
-            return tflTT.TensorType.STRING
+    elif oType == onnxMeta.DataType.STRING:
+        return tflTT.TensorType.STRING
 
-        case onnxMeta.DataType.BOOL:
-            return tflTT.TensorType.BOOL
+    elif oType == onnxMeta.DataType.BOOL:
+        return tflTT.TensorType.BOOL
 
-        case onnxMeta.DataType.FLOAT16:
-            return tflTT.TensorType.FLOAT16
+    elif oType == onnxMeta.DataType.FLOAT16:
+        return tflTT.TensorType.FLOAT16
 
-        case onnxMeta.DataType.DOUBLE:
-            return tflTT.TensorType.FLOAT64
+    elif oType == onnxMeta.DataType.DOUBLE:
+        return tflTT.TensorType.FLOAT64
 
-        case onnxMeta.DataType.UINT32:
-            return tflTT.TensorType.UINT32
+    elif oType == onnxMeta.DataType.UINT32:
+        return tflTT.TensorType.UINT32
 
-        case onnxMeta.DataType.UINT64:
-            return tflTT.TensorType.UINT64
+    elif oType == onnxMeta.DataType.UINT64:
+        return tflTT.TensorType.UINT64
 
-        case onnxMeta.DataType.COMPLEX64:
-            return tflTT.TensorType.COMPLEX64
+    elif oType == onnxMeta.DataType.COMPLEX64:
+        return tflTT.TensorType.COMPLEX64
 
-        case onnxMeta.DataType.COMPLEX128:
-            return tflTT.TensorType.COMPLEX128
-            
-        case onnxMeta.DataType.BFLOAT16:
-            err.warning("Cannot convert ONNX DataType 'BFLOAT16' to TFLite.",
-                        "Using 'FLOAT16'.")
-            return tflTT.TensorType.FLOAT16
+    elif oType == onnxMeta.DataType.COMPLEX128:
+        return tflTT.TensorType.COMPLEX128
+
+    elif oType == onnxMeta.DataType.BFLOAT16:
+        err.warning("Cannot convert ONNX DataType 'BFLOAT16' to TFLite.",
+                    "Using 'FLOAT16'.")
+        return tflTT.TensorType.FLOAT16
 
 
 
 def numpyTypeToTFLite(numpyType) -> tflTT.TensorType:
     """ Convert numpy dtype to TFLite TensorType """
 
-    match numpyType:
-        case np.float32:
-            return tflTT.TensorType.FLOAT32
+    if numpyType == np.float32:
+        return tflTT.TensorType.FLOAT32
 
-        case np.uint8:
-            return tflTT.TensorType.UINT8
+    elif numpyType == np.uint8:
+        return tflTT.TensorType.UINT8
 
-        case np.int8:
-            return tflTT.TensorType.INT8
+    elif numpyType == np.int8:
+        return tflTT.TensorType.INT8
 
-        case np.uint16:
-            return tflTT.TensorType.UINT16
+    elif numpyType == np.uint16:
+        return tflTT.TensorType.UINT16
 
-        case np.int16:
-            return tflTT.TensorType.INT16
+    elif numpyType == np.int16:
+        return tflTT.TensorType.INT16
 
-        case np.int32:
-            return tflTT.TensorType.INT32
+    elif numpyType == np.int32:
+        return tflTT.TensorType.INT32
 
-        case np.int64:
-            return tflTT.TensorType.INT64
+    elif numpyType == np.int64:
+        return tflTT.TensorType.INT64
 
-        case np.string_:
-            return tflTT.TensorType.STRING
+    elif numpyType == np.string_:
+        return tflTT.TensorType.STRING
 
-        case np.bool_:
-            return tflTT.TensorType.BOOL
+    elif numpyType == np.bool_:
+        return tflTT.TensorType.BOOL
 
-        case np.float16:
-            return tflTT.TensorType.FLOAT16
+    elif numpyType == np.float16:
+        return tflTT.TensorType.FLOAT16
 
-        case np.float64:
-            return tflTT.TensorType.FLOAT64
-        case np.double:
-            return tflTT.TensorType.FLOAT64
+    elif numpyType == np.float64:
+        return tflTT.TensorType.FLOAT64
+    elif numpyType == np.double:
+        return tflTT.TensorType.FLOAT64
 
-        case np.uint32:
-            return tflTT.TensorType.UINT32
+    elif numpyType == np.uint32:
+        return tflTT.TensorType.UINT32
 
-        case np.uint64:
-            return tflTT.TensorType.UINT64
+    elif numpyType == np.uint64:
+        return tflTT.TensorType.UINT64
 
-        case np.complex64:
-            return tflTT.TensorType.COMPLEX64
+    elif numpyType == np.complex64:
+        return tflTT.TensorType.COMPLEX64
 
-        case np.complex128:
-            return tflTT.TensorType.COMPLEX128
-            
-        case _:
-            err.warning(f"Cannot convert numpy data type '{numpyType}'",
-                        "to TFLite.")
-            return tflTT.TensorType.FLOAT32
+    elif numpyType == np.complex128:
+        return tflTT.TensorType.COMPLEX128
+
+    else:
+        err.warning(f"Cannot convert numpy data type '{numpyType}'",
+                    "to TFLite.")
+        return tflTT.TensorType.FLOAT32
         
 
-def TFLiteTypeToNumpy(tflType) -> tflTT.TensorType:
+def TFLiteTypeToNumpy(tflType: tflTT.TensorType) -> np.dtype:
     """ Convert TFLite TensorType to numpy dtype """
 
-    match tflType:
-        case tflTT.TensorType.FLOAT32:
-            return np.float32
+    if tflType == tflTT.TensorType.FLOAT32:
+        return np.float32
 
-        case tflTT.TensorType.UINT8:
-            return np.uint8
+    elif tflType == tflTT.TensorType.UINT8:
+        return np.uint8
 
-        case tflTT.TensorType.INT8:
-            return np.int8
+    elif tflType == tflTT.TensorType.INT8:
+        return np.int8
 
-        case tflTT.TensorType.UINT16:
-            return np.uint16
+    elif tflType == tflTT.TensorType.UINT16:
+        return np.uint16
 
-        case tflTT.TensorType.INT16:
-            return np.int16
+    elif tflType == tflTT.TensorType.INT16:
+        return np.int16
 
-        case tflTT.TensorType.INT32:
-            return np.int32
+    elif tflType == tflTT.TensorType.INT32:
+        return np.int32
 
-        case tflTT.TensorType.INT64:
-            return np.int64
+    elif tflType == tflTT.TensorType.INT64:
+        return np.int64
 
-        case tflTT.TensorType.STRING:
-            return np.string_
+    elif tflType == tflTT.TensorType.STRING:
+        return np.string_
 
-        case tflTT.TensorType.BOOL:
-            return np.bool_
+    elif tflType == tflTT.TensorType.BOOL:
+        return np.bool_
 
-        case tflTT.TensorType.FLOAT16:
-            return np.float16
+    elif tflType == tflTT.TensorType.FLOAT16:
+        return np.float16
 
-        case tflTT.TensorType.FLOAT64:
-            return np.float64
+    elif tflType == tflTT.TensorType.FLOAT64:
+        return np.float64
 
-        case tflTT.TensorType.UINT32:
-            return np.uint32
+    elif tflType == tflTT.TensorType.UINT32:
+        return np.uint32
 
-        case tflTT.TensorType.UINT64:
-            return np.uint64
+    elif tflType == tflTT.TensorType.UINT64:
+        return np.uint64
 
-        case tflTT.TensorType.COMPLEX64:
-            return np.complex64
+    elif tflType == tflTT.TensorType.COMPLEX64:
+        return np.complex64
 
-        case tflTT.TensorType.COMPLEX128:
-            return np.complex128
-            
-        case _:
-            err.warning(f"Cannot convert TFLite type '{tflType}'",
-                        "to numpy dtype.")
-            return np.float32
+    elif tflType == tflTT.TensorType.COMPLEX128:
+        return np.complex128
+
+    else:
+        err.warning(f"Cannot convert TFLite type '{tflType}'",
+                    "to numpy dtype.")
+        return np.float32

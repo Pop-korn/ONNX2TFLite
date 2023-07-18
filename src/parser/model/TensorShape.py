@@ -9,7 +9,7 @@ __version__ = 1.0
 __email__ = xpavel39@stud.fit.vutbr.cz
 """
 
-from typing import List
+from typing import List, Union
 import lib.onnx.onnx.onnx_ml_pb2 as onnx
 
 import src.parser.meta.meta as meta
@@ -17,7 +17,7 @@ import src.parser.meta.meta as meta
 import src.err as err
 
 class Dimention(meta.ONNXObject):
-    value: int | str
+    value: Union[int, str]
     denotation: str
 
     def __init__(self, descriptor: onnx.TensorShapeProto.Dimension) -> None:

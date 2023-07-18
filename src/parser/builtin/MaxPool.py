@@ -42,20 +42,19 @@ class MaxPool(meta.ONNXOperatorAttributes):
 
     def __initAttributes(self):
         for attr in self._descriptor:
-            match attr.name:
-                case "auto_pad": # Not tested!
-                    self.autoPad = attr.s
-                case "ceil_mode": # Not tested!
-                    self.ceilMode = attr.i
-                case "dilations": # Not tested!
-                    self.dilations = meta.ONNXIntListAttribute(attr)
-                case "kernel_shape":
-                    self.kernelShape = meta.ONNXIntListAttribute(attr)
-                case "pads":
-                    self.pads = meta.ONNXIntListAttribute(attr)
-                case "storage_order": # Not tested!
-                    self.storageOrder = attr.i 
-                case "strides":
-                    self.strides = meta.ONNXIntListAttribute(attr)
-                case _:
-                    err.warning(f"ONNX MaxPool attribute '{attr.name}' is not supported!")
+            if attr.name ==  "auto_pad": # Not tested!
+                self.autoPad = attr.s
+            elif attr.name ==  "ceil_mode": # Not tested!
+                self.ceilMode = attr.i
+            elif attr.name ==  "dilations": # Not tested!
+                self.dilations = meta.ONNXIntListAttribute(attr)
+            elif attr.name ==  "kernel_shape":
+                self.kernelShape = meta.ONNXIntListAttribute(attr)
+            elif attr.name ==  "pads":
+                self.pads = meta.ONNXIntListAttribute(attr)
+            elif attr.name ==  "storage_order": # Not tested!
+                self.storageOrder = attr.i
+            elif attr.name ==  "strides":
+                self.strides = meta.ONNXIntListAttribute(attr)
+            else:
+                err.warning(f"ONNX MaxPool attribute '{attr.name}' is not supported!")
